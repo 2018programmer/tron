@@ -1,8 +1,9 @@
 package com.dx.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.dx.entity.ChainPoolAddress;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface ChainPoolAddress extends BaseMapper<com.dx.entity.ChainPoolAddress> {
+public interface ChainPoolAddressMapper extends BaseMapper<ChainPoolAddress> {
 }

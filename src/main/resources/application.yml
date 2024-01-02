@@ -26,7 +26,7 @@
 
 spring:
   application:
-    name: blockchain_service
+    name: blockchain-service
   datasource:
     url: jdbc:mysql://192.168.222.103:3306/blockchain_service?useSSL=false&useUnicode=true&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -44,6 +44,6 @@ mybatis-plus:
   type-aliases-package: com.dx.entity
 
 server:
-  port: 8086
+  port: 8087
 
 
