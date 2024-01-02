@@ -11,7 +11,7 @@ public class ChainPoolAddressController {
     /**
      * 获取地址池的地址明细
      */
-    @GetMapping("getPoolAddress")
+    @GetMapping("/list/get")
     public void getPoolAddress(){
 
     }

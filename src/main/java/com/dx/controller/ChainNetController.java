@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 主网接口
+ */
 @RestController
 @RequestMapping("/net")
 public class ChainNetController {
@@ -19,7 +22,7 @@ public class ChainNetController {
     /**
      * 获取主网列表
      */
-    @GetMapping("/getNets")
+    @GetMapping("/list/get")
     public Result<List<NetDTO>> getNets(){
         return chainNetService.getChainNet();
     }
@@ -27,7 +30,7 @@ public class ChainNetController {
     /**
      * 修改主网运行状态
      */
-    @PostMapping("/updateNetStatus")
+    @PostMapping("/status/update")
     @ResponseBody
     public Result updateNetStatus(UpdateNetStatusDTO dto){
         return chainNetService.updateNetStatus(dto);

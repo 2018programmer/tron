@@ -16,7 +16,14 @@ public class ChainHotWallet {
      * 私钥
      */
     private String privatekey;
-
+    /**
+     * 主网名称
+     */
+    private String netName;
+    /**
+     * 状态 0禁用 1开启
+     */
+    private Integer runningStatus;
     /**
      * 主币余额
      */

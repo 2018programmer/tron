@@ -37,7 +37,6 @@ public class ChainNetService {
         netMapper.update(wrapper);
         result.setMessage("操作成功");
         return result;
-        //根据入参类型,更改运行状态
     }
 
     public Result<List<NetDTO>> getChainNet(){

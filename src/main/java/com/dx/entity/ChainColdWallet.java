@@ -2,10 +2,11 @@ package com.dx.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class ChainColdWallet {
+public class ChainColdWallet implements Serializable {
 
     private Integer id;
     /**

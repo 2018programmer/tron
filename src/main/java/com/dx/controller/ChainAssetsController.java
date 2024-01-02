@@ -12,7 +12,7 @@ public class ChainAssetsController {
 
     @Autowired
     private ChainAssetsService chainAssetsService;
-    @GetMapping("/getHotwalletBalance")
+    @GetMapping("/hot/list/get")
     public void getHotwalletBalance(){
 
     }
