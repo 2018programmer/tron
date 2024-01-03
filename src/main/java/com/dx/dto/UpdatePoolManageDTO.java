@@ -1,5 +1,6 @@
 package com.dx.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ public class UpdatePoolManageDTO implements Serializable {
     /**
      * 币种编码
      */
+    @NotNull
     private String coinCode;
     /**
      * 阀值

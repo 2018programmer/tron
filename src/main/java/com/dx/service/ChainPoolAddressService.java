@@ -1,56 +1,79 @@
 package com.dx.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.dto.*;
+import com.dx.entity.ChainCoin;
+import com.dx.entity.ChainNet;
+import com.dx.mapper.ChainCoinMapper;
+import com.dx.mapper.ChainMainNetMapper;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ChainPoolAddressService {
-    /**
-     * 生成地址
-     */
-    public void  createAddress(){
-
-        //调用基础服务生成地址
 
 
-        //保存地址
-    }
+    @Autowired
+    private ChainCoinMapper coinMapper;
 
-    public Result<List<CoinManageDTO>> getPoolManage(String netName) {
-        Result<List<CoinManageDTO>> result = new Result<>();
-        CoinManageDTO coinManageDTO = new CoinManageDTO();
-        coinManageDTO.setCoinName("TRX");
-        coinManageDTO.setThreshold(BigDecimal.TEN);
-        coinManageDTO.setAutoGather(0);
-        coinManageDTO.setTotalBalance(BigDecimal.ZERO);
-        coinManageDTO.setCoinCode("TRX");
-        List<CoinManageDTO> coinlist = new ArrayList<>();
-        coinlist.add(coinManageDTO);
-        result.setResult(coinlist);
+    @Autowired
+    private ChainMainNetMapper netMapper;
+
+    public Result<IPage<CoinManageDTO>> getPoolManage(String netName,Integer pageNum,Integer pageSize) {
+        Result<IPage<CoinManageDTO>> result = new Result<>();
+        IPage<ChainCoin> page = new Page<>(pageNum,pageSize);
+        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainCoin::getNetName,netName);
+        page=coinMapper.selectPage(page,wrapper);
+        IPage<CoinManageDTO> convert = page.convert(u -> {
+            CoinManageDTO coinManageDTO = new CoinManageDTO();
+            BeanUtils.copyProperties(u, coinManageDTO);
+            coinManageDTO.setTotalBalance(BigDecimal.ZERO);
+            return coinManageDTO;
+        });
+        result.setResult(convert);
         return result;
     }
 
     public Result updatePoolManage(UpdatePoolManageDTO dto) {
         Result<Object> result = new Result<>();
+        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainCoin::getCoinCode,dto.getCoinCode());
+        ChainCoin chainCoin = coinMapper.selectOne(wrapper);
+        if(Objects.isNull(chainCoin)){
+            result.error("币种编码有误");
+            return result;
+        }
+        chainCoin.setThreshold(dto.getThreshold());
+        coinMapper.updateById(chainCoin);
         result.setMessage("操作成功");
         return result;
     }
 
     public Result<List<PoolManageDTO>> getNets() {
         Result<List<PoolManageDTO>> result = new Result<>();
-        PoolManageDTO poolManageDTO = new PoolManageDTO();
-        poolManageDTO.setNetName("TRON");
-        poolManageDTO.setTotalNum(0);
-        poolManageDTO.setGatherStatus(0);
-        poolManageDTO.setNoAssignedNum(0);
+        List<ChainNet> chainNets = netMapper.selectList(null);
         List<PoolManageDTO> poollist = new ArrayList<>();
-        poollist.add(poolManageDTO);
+        for (ChainNet chainNet : chainNets) {
+            PoolManageDTO poolManageDTO = new PoolManageDTO();
+            poolManageDTO.setNetName(chainNet.getNetName());
+            poolManageDTO.setTotalNum(0);
+            poolManageDTO.setGatherStatus(0);
+            poolManageDTO.setNoAssignedNum(0);
+            poollist.add(poolManageDTO);
+        }
         result.setResult(poollist);
         return  result;
     }

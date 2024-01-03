@@ -1,5 +1,6 @@
 package com.dx.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.dto.*;
 import com.dx.service.ChainPoolAddressService;
@@ -37,8 +38,8 @@ public class ChainPoolAddressController {
      * 获取地址池管理明细
      */
     @GetMapping("/manage/list/get")
-    public Result<List<CoinManageDTO>> getPoolManage(@NotNull String netName){
-        return poolService.getPoolManage(netName);
+    public Result<IPage<CoinManageDTO>> getPoolManage(@NotNull String netName, @NotNull Integer pageNum, @NotNull Integer pageSize){
+        return poolService.getPoolManage(netName,pageNum,pageSize);
     }
 
     /**
