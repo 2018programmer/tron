@@ -32,9 +32,9 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 3AdUUfqmtWq3zXryBdWmvCW6K28R67AC
-  jackson:
-    # json 序列化排除值为 null 的属性
-    default-property-inclusion: non_null
+#  jackson:
+#    # json 序列化排除值为 null 的属性
+#    default-property-inclusion: non_null
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml

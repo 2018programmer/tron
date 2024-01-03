@@ -2,8 +2,10 @@ package com.dx.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class CoinDTO {
+public class CoinDTO implements Serializable {
     private Integer id;
     /**
      * 币种名称

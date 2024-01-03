@@ -1,10 +1,7 @@
 package com.dx.controller;
 
 import com.dx.common.Result;
-import com.dx.dto.AddWalletDTO;
-import com.dx.dto.HotWalletDTO;
-import com.dx.dto.UpdateColdWalletDTO;
-import com.dx.dto.UpdateHotWalletStatusDTO;
+import com.dx.dto.*;
 import com.dx.entity.ChainColdWallet;
 import com.dx.service.ChainWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 钱包接口
+ */
 @RestController
 @RequestMapping("/wallet")
 public class ChainWalletController {
@@ -64,7 +64,18 @@ public class ChainWalletController {
      * @return
      */
     @PostMapping("/fee-wallet/add")
-    public Result addfeeWallet(@RequestBody AddWalletDTO dto){
-        return walletService.addfeeWallet(dto);
+    public Result addFeeWallet(@RequestBody AddWalletDTO dto){
+        return walletService.addFeeWallet(dto);
     }
+
+    /**
+     * 获取矿工费钱包列表
+     * @return
+     */
+    @GetMapping("/fee-wallet/list/get")
+    public Result<List<FeeWalletDTO>>  getFeeWallets(String netName){
+        return walletService.getFeeWallets(netName);
+    }
+
+
 }

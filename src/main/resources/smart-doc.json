@@ -3,8 +3,8 @@
   "isStrict": false, //是否开启严格模式
   "outPath": "target/doc",
   "projectName": "chain-service",//配置自己的项目名称
-  "appToken": "1b7f3ff3c86341f2b6b150fb2c28d612", //torna平台appToken,@since 2.0.9
-  "openUrl": "https://docs.minpays.net/api",//torna平台地址，填写自己的私有化部署地址@since 2.0.9
+  "appToken": "19fc608344a04379b372c8f4a4f98580", //torna平台appToken,@since 2.0.9
+  "openUrl": "http://torna.dx.com/api",//torna平台地址，填写自己的私有化部署地址@since 2.0.9
   "debugEnvName":"本地", //torna测试环境
   "replace": true,//推送torna时替换旧的文档,
   "tornaDebug": true,

@@ -1,0 +1,42 @@
+package com.dx.dto;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
+@Data
+public class PoolAddressDTO implements Serializable {
+    /**
+     * 地址
+     */
+    private String address;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 分配状态 0为分配 1已分配
+     */
+    private Integer isAssigned;
+    /**
+     * 激活状态 0 未激活 1已激活
+     */
+    private Integer isActivated;
+
+    /**
+     * 分配类型 0 无 1 商户 2用户
+     */
+    private Integer assignType;
+    /**
+     * 分配id
+     */
+    private Integer assignId;
+
+    /**
+     * 余额估值
+     */
+    private BigDecimal estimateBalance;
+}

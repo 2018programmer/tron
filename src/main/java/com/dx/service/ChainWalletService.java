@@ -2,13 +2,12 @@ package com.dx.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.dx.common.Result;
-import com.dx.dto.AddWalletDTO;
-import com.dx.dto.HotWalletDTO;
-import com.dx.dto.UpdateColdWalletDTO;
-import com.dx.dto.UpdateHotWalletStatusDTO;
+import com.dx.dto.*;
 import com.dx.entity.ChainColdWallet;
+import com.dx.entity.ChainFeeWallet;
 import com.dx.entity.ChainHotWallet;
 import com.dx.mapper.ChainColdWalletMapper;
+import com.dx.mapper.ChainFeeWalletMapper;
 import com.dx.mapper.ChainHotWalletMapper;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +29,9 @@ public class ChainWalletService {
     @Autowired
     private ChainColdWalletMapper coldWalletMapper;
 
+    @Autowired
+    private ChainFeeWalletMapper feeWalletMapper;
+
     public Result updateColdWallet(UpdateColdWalletDTO dto){
         Result<Object> result = new Result<>();
         ChainColdWallet chainColdWallet = coldWalletMapper.selectById(dto.getId());
@@ -41,10 +43,6 @@ public class ChainWalletService {
         coldWalletMapper.updateById(chainColdWallet);
         result.setMessage("操作成功");
         return result;
-    }
-
-    public void  addFeeWallet(){
-        //增加矿工费钱包 并且查询 矿工费钱包的余额
     }
 
     public Result<List<HotWalletDTO>> getHotWallet(String netName) {
@@ -98,17 +96,35 @@ public class ChainWalletService {
 
     public Result addHotWallet(AddWalletDTO dto) {
         Result<Object> result = new Result<>();
-        //生成地址
-        String netName = dto.getNetName();
-
+        // TODO: 2024/1/2   生成地址 插入数据
         result.setMessage("操作成功");
         return result;
     }
 
-    public Result addfeeWallet(AddWalletDTO dto) {
+    public Result addFeeWallet(AddWalletDTO dto) {
         Result<Object> result = new Result<>();
-
+        // TODO: 2024/1/2   生成地址 插入数据
         result.setMessage("操作成功");
+        return result;
+    }
+
+    public Result<List<FeeWalletDTO>> getFeeWallets(String netName) {
+        Result<List<FeeWalletDTO>> result = new Result<>();
+        LambdaQueryWrapper<ChainFeeWallet> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChainFeeWallet::getNetName,netName);
+        List<ChainFeeWallet> chainFeeWallets = feeWalletMapper.selectList(wrapper);
+        if(CollectionUtils.isEmpty(chainFeeWallets)){
+            result.error("数据不存在");
+            return result;
+        }
+        List<FeeWalletDTO> list = new ArrayList<>();
+        for (ChainFeeWallet chainFeeWallet : chainFeeWallets) {
+            FeeWalletDTO feeWalletDTO = new FeeWalletDTO();
+            BeanUtils.copyProperties(chainFeeWallet,feeWalletDTO);
+            list.add(feeWalletDTO);
+
+        }
+        result.setResult(list);
         return result;
     }
 }
