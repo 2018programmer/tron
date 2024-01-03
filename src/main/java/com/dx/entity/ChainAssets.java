@@ -1,12 +1,14 @@
 package com.dx.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
 public class ChainAssets {
-
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
      * 地址

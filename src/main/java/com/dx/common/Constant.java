@@ -11,6 +11,6 @@ public interface Constant {
 
         String V1_CHAIN="/v1/chain/";
 
-        String CREATEADDRESS ="createAddress";
+        String CREATEADDRESS ="/createAddress";
     }
 }

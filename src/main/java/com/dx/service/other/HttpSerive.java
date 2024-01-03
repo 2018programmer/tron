@@ -7,6 +7,8 @@ import com.dx.common.Constant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class HttpSerive {
 
@@ -17,6 +19,13 @@ public class HttpSerive {
      */
     public JSONObject createAddress(String netName){
         String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.CREATEADDRESS).execute().body();
-        return JSON.parseObject(body);
+        JSONObject jsonObject = JSON.parseObject(body);
+        Boolean success = jsonObject.getBoolean("success");
+        if(Objects.isNull(success)||false==success){
+            throw new RuntimeException("生成地址失败");
+        }
+        JSONObject result = jsonObject.getJSONObject("result");
+
+        return result;
     }
 }

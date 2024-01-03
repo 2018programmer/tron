@@ -24,7 +24,7 @@ public class ChainCoinController {
     private ChainCoinService chainCoinService;
 
     /**
-     * 获取币种列表  (缺少分页)
+     * 获取币种列表
      */
     @GetMapping("/list/get")
     public Result<IPage<CoinDTO>> getCoins(Integer pageNum, Integer pageSize){
