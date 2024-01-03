@@ -22,11 +22,19 @@ public class QueryPoolAddressDTO implements Serializable {
     private Integer isActivated;
 
     /**
-     * 分配类型 0 无 1 商户 2用户
+     * 分配类型 1 商户 2用户
      */
     private Integer assignType;
     /**
      * 分配id
      */
     private Integer assignId;
+    /**
+     * 页码
+     */
+    private Integer pageNum;
+    /**
+     * 分页大小
+     */
+    private Integer pageSize;
 }

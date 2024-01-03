@@ -34,6 +34,10 @@ public class PoolAddressDTO implements Serializable {
      * 分配id
      */
     private Integer assignId;
+    /**
+     * 主网名称
+     */
+    private String netName;
 
     /**
      * 余额估值

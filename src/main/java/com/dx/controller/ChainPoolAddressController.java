@@ -24,7 +24,7 @@ public class ChainPoolAddressController {
      * 获取地址池的地址明细
      */
     @PostMapping ("/info/list/get")
-    public Result<List<PoolAddressDTO>> getPoolAddress(@RequestBody QueryPoolAddressDTO dto){
+    public Result<IPage<PoolAddressDTO>> getPoolAddress(@RequestBody QueryPoolAddressDTO dto){
         return poolService.getPoolAddress(dto);
     }
     /**

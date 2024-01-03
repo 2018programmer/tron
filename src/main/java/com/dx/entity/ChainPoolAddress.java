@@ -31,9 +31,13 @@ public class ChainPoolAddress {
      */
     private Integer isActivated;
     /**
-     * 主网id
+     * 分配类型 0 无 1 商户 2用户
      */
-    private Integer MainNetId;
+    private Integer assignType;
+    /**
+     * 主网名字
+     */
+    private String netName;
     /**
      * 分配id
      */
