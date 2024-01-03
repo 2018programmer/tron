@@ -2,6 +2,8 @@ package com.dx.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class ChainFeeWallet {
     private Integer id;
@@ -24,7 +26,7 @@ public class ChainFeeWallet {
     /**
      * 余额
      */
-    private String balance;
+    private BigDecimal balance;
     /**
      * 启动状态 1:启用0:停用
      */

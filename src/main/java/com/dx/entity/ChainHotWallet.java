@@ -2,6 +2,7 @@ package com.dx.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -27,7 +28,7 @@ public class ChainHotWallet {
     /**
      * 主币余额
      */
-    private String balance;
+    private BigDecimal balance;
     /**
      * 创建时间
      */
