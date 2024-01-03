@@ -61,7 +61,7 @@
 <!--        <dependency>-->
 <!--            <groupId>com.github.yulichang</groupId>-->
 <!--            <artifactId>mybatis-plus-join</artifactId>-->
-<!--            <version>${mybatis-plus-jion.version}</version>-->
+<!--            <version>1.4.8.1</version>-->
 <!--        </dependency>-->
 
         <dependency>

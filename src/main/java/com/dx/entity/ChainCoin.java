@@ -12,7 +12,7 @@ public class ChainCoin {
      */
     private String coinName;
     /**
-     * 币种类型
+     * 币种类型 base 主链币 contract 合约币
      */
     private String coinType;
     /**
@@ -22,7 +22,7 @@ public class ChainCoin {
     /**
      * 主网名称
      */
-    private String mainNetName;
+    private String netName;
     /**
      * 浮点数位
      */

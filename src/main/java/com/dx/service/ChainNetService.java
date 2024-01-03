@@ -32,7 +32,7 @@ public class ChainNetService {
     public Result  updateNetStatus(UpdateNetStatusDTO dto){
         Result<Object> result = new Result<>();
         LambdaUpdateWrapper<ChainNet> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(ChainNet::getMainNetName,dto.getNetName());
+        wrapper.eq(ChainNet::getNetName,dto.getNetName());
         wrapper.set(ChainNet::getRunningStatus,dto.getStatus());
         netMapper.update(wrapper);
         result.setMessage("操作成功");
@@ -55,7 +55,7 @@ public class ChainNetService {
             BeanUtils.copyProperties(chainNet,netDTO);
             netDTO.setLogo("没有logo");
             LambdaQueryWrapper<ChainCoin> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(ChainCoin::getMainNetName,chainNet.getMainNetName());
+            wrapper.eq(ChainCoin::getNetName,chainNet.getNetName());
             Long num = coinMapper.selectCount(wrapper);
             netDTO.setCoinNum(num.intValue());
             list.add(netDTO);

@@ -7,4 +7,10 @@ public interface Constant {
 
     String SUCCESS ="success";
 
+    interface BaseUrl {
+
+        String V1_CHAIN="/v1/chain/";
+
+        String CREATEADDRESS ="createAddress";
+    }
 }

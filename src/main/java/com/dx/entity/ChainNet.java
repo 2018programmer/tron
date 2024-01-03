@@ -8,7 +8,7 @@ public class ChainNet {
     /**
      * 主网名称
      */
-    private String mainNetName;
+    private String netName;
     /**
      * 充值网络确认
      */

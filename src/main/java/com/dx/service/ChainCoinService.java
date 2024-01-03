@@ -1,6 +1,10 @@
 package com.dx.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.dto.CoinDTO;
 import com.dx.dto.UpdateMinNumDTO;
@@ -34,21 +38,24 @@ public class ChainCoinService {
 
     }
 
-    public Result<List<CoinDTO>> getCoins() {
-        Result<List<CoinDTO>> result = new Result<>();
-        List<ChainCoin> chainCoins = coinMapper.selectList(null);
+    public Result<IPage<CoinDTO>> getCoins(Integer pageNum,Integer pageSize) {
+        Result<IPage<CoinDTO>> result = new Result<>();
+        IPage<ChainCoin> page = new Page<>(pageNum,pageSize);
+        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainCoin::getRunningStatus,1);
+        page=coinMapper.selectPage(page, wrapper);
 
-        if (CollectionUtils.isEmpty(chainCoins)){
+        List<ChainCoin> records = page.getRecords();
+        if (CollectionUtils.isEmpty(records)){
             result.error("没有数据");
         }
-        List<CoinDTO> list = new ArrayList<>();
-        for (ChainCoin chainCoin : chainCoins) {
+
+        IPage<CoinDTO> convert = page.convert(u -> {
             CoinDTO coinDTO = new CoinDTO();
-            BeanUtils.copyProperties(chainCoin,coinDTO);
-            coinDTO.setCoinType("数字币");
-            list.add(coinDTO);
-        }
-        result.setResult(list);
+            BeanUtils.copyProperties(u, coinDTO);
+            return coinDTO;
+        });
+        result.setResult(convert);
         return result;
     }
 }

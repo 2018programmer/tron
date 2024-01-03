@@ -1,5 +1,6 @@
 package com.dx.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.dto.CoinDTO;
 import com.dx.dto.UpdateMinNumDTO;
@@ -26,8 +27,8 @@ public class ChainCoinController {
      * 获取币种列表  (缺少分页)
      */
     @GetMapping("/list/get")
-    public Result<List<CoinDTO>> getCoins(){
-        return chainCoinService.getCoins();
+    public Result<IPage<CoinDTO>> getCoins(Integer pageNum, Integer pageSize){
+        return chainCoinService.getCoins(pageNum,pageSize);
     }
 
     /**

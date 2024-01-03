@@ -12,7 +12,7 @@ public class CoinDTO implements Serializable {
      */
     private String coinName;
     /**
-     * 币种类型
+     * 币种类型 base 主链币 contract 合约币
      */
     private String coinType;
     /**
@@ -26,5 +26,5 @@ public class CoinDTO implements Serializable {
     /**
      * 主网名称
      */
-    private String mainNetName;
+    private String netName;
 }

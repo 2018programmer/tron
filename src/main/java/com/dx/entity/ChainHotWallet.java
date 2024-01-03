@@ -16,7 +16,7 @@ public class ChainHotWallet {
     /**
      * 私钥
      */
-    private String privatekey;
+    private String privateKey;
     /**
      * 主网名称
      */
