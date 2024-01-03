@@ -155,15 +155,13 @@ public class ChainWalletService {
         LambdaQueryWrapper<ChainFeeWallet> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ChainFeeWallet::getNetName,netName);
         List<ChainFeeWallet> chainFeeWallets = feeWalletMapper.selectList(wrapper);
-        if(CollectionUtils.isEmpty(chainFeeWallets)){
-            result.error("数据不存在");
-            return result;
-        }
         List<FeeWalletDTO> list = new ArrayList<>();
-        for (ChainFeeWallet chainFeeWallet : chainFeeWallets) {
-            FeeWalletDTO feeWalletDTO = new FeeWalletDTO();
-            BeanUtils.copyProperties(chainFeeWallet,feeWalletDTO);
-            list.add(feeWalletDTO);
+        if(!CollectionUtils.isEmpty(chainFeeWallets)){
+            for (ChainFeeWallet chainFeeWallet : chainFeeWallets) {
+                FeeWalletDTO feeWalletDTO = new FeeWalletDTO();
+                BeanUtils.copyProperties(chainFeeWallet,feeWalletDTO);
+                list.add(feeWalletDTO);
+            }
         }
         result.setResult(list);
         return result;

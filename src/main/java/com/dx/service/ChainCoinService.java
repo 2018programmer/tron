@@ -44,12 +44,6 @@ public class ChainCoinService {
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainCoin::getRunningStatus,1);
         page=coinMapper.selectPage(page, wrapper);
-
-        List<ChainCoin> records = page.getRecords();
-        if (CollectionUtils.isEmpty(records)){
-            result.error("没有数据");
-        }
-
         IPage<CoinDTO> convert = page.convert(u -> {
             CoinDTO coinDTO = new CoinDTO();
             BeanUtils.copyProperties(u, coinDTO);
