@@ -23,6 +23,10 @@ public class ChainAssets {
      */
     private String coinCode;
     /**
+     * 币种名称
+     */
+    private String coinName;
+    /**
      * 余额
      */
     private BigDecimal balance;
