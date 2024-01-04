@@ -1,4 +1,4 @@
-package com.dx.dto;
+package com.dx.vo;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class UpdateNetStatusDTO implements Serializable {
+public class UpdateNetStatusVO implements Serializable {
     /**
      * 主网名字
      */

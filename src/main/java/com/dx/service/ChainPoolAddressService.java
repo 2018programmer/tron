@@ -13,14 +13,14 @@ import com.dx.entity.ChainPoolAddress;
 import com.dx.mapper.ChainCoinMapper;
 import com.dx.mapper.ChainMainNetMapper;
 import com.dx.mapper.ChainPoolAddressMapper;
-import jakarta.validation.constraints.NotNull;
+import com.dx.vo.QueryPoolAddressVO;
+import com.dx.vo.UpdatePoolManageVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,16 +53,23 @@ public class ChainPoolAddressService {
         return result;
     }
 
-    public Result updatePoolManage(UpdatePoolManageDTO dto) {
+    public Result updatePoolManage(UpdatePoolManageVO vo) {
         Result<Object> result = new Result<>();
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainCoin::getCoinCode,dto.getCoinCode());
+        wrapper.eq(ChainCoin::getCoinCode,vo.getCoinCode());
         ChainCoin chainCoin = coinMapper.selectOne(wrapper);
         if(Objects.isNull(chainCoin)){
             result.error("币种编码有误");
             return result;
         }
-        chainCoin.setThreshold(dto.getThreshold());
+        if(ObjectUtils.isNotNull(vo.getThreshold())){
+            chainCoin.setThreshold(vo.getThreshold());
+        }
+        if(ObjectUtils.isNotNull(vo.getAutoGather())){
+            chainCoin.setAutoGather(vo.getAutoGather());
+        }
+
+
         coinMapper.updateById(chainCoin);
         result.setMessage("操作成功");
         return result;
@@ -84,23 +91,23 @@ public class ChainPoolAddressService {
         return  result;
     }
 
-    public Result<IPage<PoolAddressDTO>> getPoolAddress(QueryPoolAddressDTO dto) {
+    public Result<IPage<PoolAddressDTO>> getPoolAddress(QueryPoolAddressVO vo) {
         Result<IPage<PoolAddressDTO>> result = new Result<>();
 
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
-        if(ObjectUtils.isNotNull(dto.getAssignId())){
-            wrapper.eq(ChainPoolAddress::getAssignedId,dto.getIsAssigned());
+        if(ObjectUtils.isNotNull(vo.getAssignId())){
+            wrapper.eq(ChainPoolAddress::getAssignedId,vo.getIsAssigned());
         }
-        if(ObjectUtils.isNotNull(dto.getIsActivated())){
-            wrapper.eq(ChainPoolAddress::getIsActivated,dto.getIsActivated());
+        if(ObjectUtils.isNotNull(vo.getIsActivated())){
+            wrapper.eq(ChainPoolAddress::getIsActivated,vo.getIsActivated());
         }
-        if(ObjectUtils.isNotNull(dto.getIsAssigned())){
-            wrapper.eq(ChainPoolAddress::getIsAssigned,dto.getIsAssigned());
+        if(ObjectUtils.isNotNull(vo.getIsAssigned())){
+            wrapper.eq(ChainPoolAddress::getIsAssigned,vo.getIsAssigned());
         }
-        if(ObjectUtils.isNotNull(dto.getAssignType())){
-            wrapper.eq(ChainPoolAddress::getAssignType,dto.getAssignType());
+        if(ObjectUtils.isNotNull(vo.getAssignType())){
+            wrapper.eq(ChainPoolAddress::getAssignType,vo.getAssignType());
         }
-        IPage<ChainPoolAddress> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+        IPage<ChainPoolAddress> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page=poolAddressMapper.selectPage(page,wrapper);
 
         IPage<PoolAddressDTO> convert = page.convert(u -> {

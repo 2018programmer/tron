@@ -2,7 +2,7 @@ package com.dx.service;
 
 import com.dx.common.Result;
 import com.dx.dto.AssetHotDTO;
-import com.dx.dto.FreezeBalanceDTO;
+import com.dx.vo.FreezeBalanceVO;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,7 +29,7 @@ public class ChainAssetsService {
         return result;
     }
 
-    public Result freezeBalance(FreezeBalanceDTO dto) {
+    public Result freezeBalance(FreezeBalanceVO vo) {
         Result<Object> result = new Result<>();
         // TODO: 2024/1/2 实现异步冷却逻辑
         result.setMessage("操作成功");

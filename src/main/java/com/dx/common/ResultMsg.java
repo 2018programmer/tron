@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ResultMsg {
-    private int code = 200;
+    private int code = 0;
     private String message = "";
 }

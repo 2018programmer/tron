@@ -1,17 +1,13 @@
 package com.dx.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.dx.common.PageVO;
 import com.dx.common.Result;
 import com.dx.dto.CoinDTO;
-import com.dx.dto.UpdateMinNumDTO;
+import com.dx.vo.UpdateMinNumVO;
 import com.dx.service.ChainCoinService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 币种接口
@@ -27,15 +23,15 @@ public class ChainCoinController {
      * 获取币种列表
      */
     @GetMapping("/list/get")
-    public Result<IPage<CoinDTO>> getCoins(Integer pageNum, Integer pageSize){
-        return chainCoinService.getCoins(pageNum,pageSize);
+    public Result<IPage<CoinDTO>> getCoins(PageVO vo){
+        return chainCoinService.getCoins(vo.getPageNum(),vo.getPageSize());
     }
 
     /**
      * 修改最小收款数
      */
     @PostMapping("/min-num/update")
-    public Result updateMinNum(UpdateMinNumDTO dto){
-        return chainCoinService.updateMinNum(dto);
+    public Result updateMinNum(@RequestBody UpdateMinNumVO vo){
+        return chainCoinService.updateMinNum(vo);
     }
 }

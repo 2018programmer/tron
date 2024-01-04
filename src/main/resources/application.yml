@@ -45,6 +45,9 @@ mybatis-plus:
 
 server:
   port: 8087
+  servlet:
+    context-path: /blockchain-service
+
 
 base:
   url: http://localhost:8085

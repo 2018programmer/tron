@@ -2,7 +2,7 @@ package com.dx.controller;
 
 import com.dx.common.Result;
 import com.dx.dto.NetDTO;
-import com.dx.dto.UpdateNetStatusDTO;
+import com.dx.vo.UpdateNetStatusVO;
 import com.dx.service.ChainNetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +32,8 @@ public class ChainNetController {
      */
     @PostMapping("/status/update")
     @ResponseBody
-    public Result updateNetStatus(UpdateNetStatusDTO dto){
-        return chainNetService.updateNetStatus(dto);
+    public Result updateNetStatus(@RequestBody UpdateNetStatusVO vo){
+        return chainNetService.updateNetStatus(vo);
     }
 
 

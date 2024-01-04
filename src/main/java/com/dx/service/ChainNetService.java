@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.dx.common.Result;
 import com.dx.dto.NetDTO;
-import com.dx.dto.UpdateNetStatusDTO;
+import com.dx.vo.UpdateNetStatusVO;
 import com.dx.entity.ChainCoin;
 import com.dx.entity.ChainNet;
 import com.dx.mapper.ChainCoinMapper;
@@ -29,11 +29,11 @@ public class ChainNetService {
     /**
      * 修改运行状态
      */
-    public Result  updateNetStatus(UpdateNetStatusDTO dto){
+    public Result  updateNetStatus(UpdateNetStatusVO vo){
         Result<Object> result = new Result<>();
         LambdaUpdateWrapper<ChainNet> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(ChainNet::getNetName,dto.getNetName());
-        wrapper.set(ChainNet::getRunningStatus,dto.getStatus());
+        wrapper.eq(ChainNet::getNetName,vo.getNetName());
+        wrapper.set(ChainNet::getRunningStatus,vo.getStatus());
         netMapper.update(wrapper);
         result.setMessage("操作成功");
         return result;

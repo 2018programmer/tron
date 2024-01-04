@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.dto.*;
 import com.dx.service.ChainPoolAddressService;
-import jakarta.validation.constraints.NotNull;
+import com.dx.vo.GetPoolManageVO;
+import com.dx.vo.QueryPoolAddressVO;
+import com.dx.vo.UpdatePoolManageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +26,8 @@ public class ChainPoolAddressController {
      * 获取地址池的地址明细
      */
     @PostMapping ("/info/list/get")
-    public Result<IPage<PoolAddressDTO>> getPoolAddress(@RequestBody QueryPoolAddressDTO dto){
-        return poolService.getPoolAddress(dto);
+    public Result<IPage<PoolAddressDTO>> getPoolAddress(@RequestBody QueryPoolAddressVO vo){
+        return poolService.getPoolAddress(vo);
     }
     /**
      * 获取主网与地址数量
@@ -38,15 +40,15 @@ public class ChainPoolAddressController {
      * 获取地址池管理明细
      */
     @GetMapping("/manage/list/get")
-    public Result<IPage<CoinManageDTO>> getPoolManage(@NotNull String netName, @NotNull Integer pageNum, @NotNull Integer pageSize){
-        return poolService.getPoolManage(netName,pageNum,pageSize);
+    public Result<IPage<CoinManageDTO>> getPoolManage(GetPoolManageVO vo){
+        return poolService.getPoolManage(vo.getNetName(),vo.getPageNum(),vo.getPageSize());
     }
 
     /**
      * 修改归集阀值
      */
     @PostMapping("/manage/update")
-    public Result updatePoolManage(@RequestBody UpdatePoolManageDTO dto){
-        return poolService.updatePoolManage(dto);
+    public Result updatePoolManage(@RequestBody UpdatePoolManageVO vo){
+        return poolService.updatePoolManage(vo);
     }
 }

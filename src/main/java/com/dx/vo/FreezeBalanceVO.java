@@ -1,4 +1,4 @@
-package com.dx.dto;
+package com.dx.vo;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class FreezeBalanceDTO implements Serializable {
+public class FreezeBalanceVO implements Serializable {
     /**
      * 钱包id
      */
