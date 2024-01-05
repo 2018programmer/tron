@@ -51,4 +51,12 @@ public class ChainPoolAddressController {
     public Result updatePoolManage(@RequestBody UpdatePoolManageVO vo){
         return poolService.updatePoolManage(vo);
     }
+
+    /**
+     * 获取归集数量(用余额的数量)
+     */
+    @GetMapping("/gather-num/get")
+    public Result<GetGatherNumDTO> getGatherNum(String netName){
+        return poolService.getGatherNum(netName);
+    }
 }

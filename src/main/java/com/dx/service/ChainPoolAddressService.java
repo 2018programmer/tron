@@ -11,7 +11,7 @@ import com.dx.entity.ChainCoin;
 import com.dx.entity.ChainNet;
 import com.dx.entity.ChainPoolAddress;
 import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainMainNetMapper;
+import com.dx.mapper.ChainNetMapper;
 import com.dx.mapper.ChainPoolAddressMapper;
 import com.dx.vo.QueryPoolAddressVO;
 import com.dx.vo.UpdatePoolManageVO;
@@ -32,7 +32,7 @@ public class ChainPoolAddressService {
     private ChainCoinMapper coinMapper;
 
     @Autowired
-    private ChainMainNetMapper netMapper;
+    private ChainNetMapper netMapper;
 
     @Autowired
     private ChainPoolAddressMapper poolAddressMapper;
@@ -82,9 +82,17 @@ public class ChainPoolAddressService {
         for (ChainNet chainNet : chainNets) {
             PoolManageDTO poolManageDTO = new PoolManageDTO();
             poolManageDTO.setNetName(chainNet.getNetName());
-            poolManageDTO.setTotalNum(0);
-            poolManageDTO.setGatherStatus(0);
-            poolManageDTO.setNoAssignedNum(0);
+
+            if("TRON".equals(chainNet.getNetName())){
+                poolManageDTO.setTotalNum(12000);
+                poolManageDTO.setGatherStatus(0);
+                poolManageDTO.setNoAssignedNum(200);
+            }
+            if("ETH".equals(chainNet.getNetName())){
+                poolManageDTO.setTotalNum(100);
+                poolManageDTO.setGatherStatus(1);
+                poolManageDTO.setNoAssignedNum(50);
+            }
             poollist.add(poolManageDTO);
         }
         result.setResult(poollist);
@@ -119,6 +127,17 @@ public class ChainPoolAddressService {
 
         result.setResult(convert);
 
+        return result;
+    }
+
+    public Result<GetGatherNumDTO> getGatherNum(String netName) {
+        Result<GetGatherNumDTO> result = new Result<>();
+        GetGatherNumDTO getGatherNumDTO = new GetGatherNumDTO();
+        getGatherNumDTO.setNum(255);
+        getGatherNumDTO.setNetName(netName);
+
+        result.setResult(getGatherNumDTO);
+        result.setResult(getGatherNumDTO);
         return result;
     }
 }

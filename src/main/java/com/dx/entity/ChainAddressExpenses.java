@@ -4,7 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+
 
 @Data
 public class ChainAddressExpenses implements Serializable {
@@ -39,11 +39,11 @@ public class ChainAddressExpenses implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private Long createTime;
     /**
      * 完成时间
      */
-    private Date finishTime;
+    private Long finishTime;
     /**
      * 热钱包地址
      */

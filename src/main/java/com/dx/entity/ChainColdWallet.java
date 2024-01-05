@@ -20,5 +20,5 @@ public class ChainColdWallet implements Serializable {
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private Long updateTime;
 }

@@ -16,17 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
  * 收入出款接口
  */
 @RestController
-@RequestMapping("/tranfer")
-public class ChainTranferController {
+@RequestMapping("/transfer")
+public class ChainTransferController {
 
     @Autowired
-    private ChainTranferService tranferService;
+    private ChainTranferService transferService;
     /**
      * 获取收款监听列表
      */
     @GetMapping("/income/list/get")
     public Result<IPage<ChainAddressIncome>> getAddressIncome(GetAddressIncomeVO vo){
-        return tranferService.getAddressIncome(vo);
+        return transferService.getAddressIncome(vo);
     }
 
     /**
@@ -34,7 +34,15 @@ public class ChainTranferController {
      */
     @GetMapping("/expenses/list/get")
     public Result<IPage<ChainAddressExpenses>> getAddressExpenses(GetAddressExpensesVO vo){
-        return tranferService.getAddressExpenses(vo);
+        return transferService.getAddressExpenses(vo);
+    }
+
+    /**
+     * 获取链流水
+     */
+    @GetMapping("/flow/list/get")
+    public void getTransferFlow(){
+        transferService.getTransferFlow();
     }
 
 }

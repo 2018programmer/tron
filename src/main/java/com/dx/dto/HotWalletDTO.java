@@ -1,5 +1,6 @@
 package com.dx.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -36,5 +37,5 @@ public class HotWalletDTO implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private Long createTime;
 }

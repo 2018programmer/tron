@@ -1,5 +1,6 @@
 package com.dx.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,7 +16,7 @@ public class PoolAddressDTO implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private Long createTime;
 
     /**
      * 分配状态 0为分配 1已分配

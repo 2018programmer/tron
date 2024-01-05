@@ -50,7 +50,7 @@ public class ChainWalletService {
             result.error("参数有误,该对象不存在");
             return result;
         }
-        chainColdWallet.setUpdateTime(new Date());
+        chainColdWallet.setUpdateTime(System.currentTimeMillis());
         chainColdWallet.setAddress(dto.getAddress());
         coldWalletMapper.updateById(chainColdWallet);
         result.setMessage("操作成功");
@@ -117,7 +117,7 @@ public class ChainWalletService {
         chainHotWallet.setAddress(json.getString("address"));
         chainHotWallet.setPrivateKey(json.getString("privateKey"));
         chainHotWallet.setRunningStatus(0);
-        chainHotWallet.setCreateTime(new Date());
+        chainHotWallet.setCreateTime(System.currentTimeMillis());
         chainHotWallet.setBalance(BigDecimal.ZERO);
         hotWalletMapper.insert(chainHotWallet);
         result.setMessage("操作成功");

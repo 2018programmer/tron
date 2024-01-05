@@ -12,7 +12,7 @@ public class PoolManageDTO implements Serializable {
      */
     private String netName;
     /**
-     * 归集状态
+     * 归集状态  0:关闭 1:开启
      */
     private Integer gatherStatus;
     /**

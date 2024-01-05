@@ -21,7 +21,7 @@ public class ChainPoolAddress {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private Long createTime;
     /**
      * 分配状态
      */

@@ -8,7 +8,7 @@ import com.dx.vo.UpdateNetStatusVO;
 import com.dx.entity.ChainCoin;
 import com.dx.entity.ChainNet;
 import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainMainNetMapper;
+import com.dx.mapper.ChainNetMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
 public class ChainNetService {
     
     @Autowired
-    private ChainMainNetMapper netMapper;
+    private ChainNetMapper netMapper;
     
     @Autowired
     private ChainCoinMapper coinMapper;
