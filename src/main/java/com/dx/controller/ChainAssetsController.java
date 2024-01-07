@@ -31,11 +31,19 @@ public class ChainAssetsController {
     }
 
     /**
-     * 冷却
+     * 冷却热钱包
      */
     @PostMapping("/hot-wallet/balance/freeze")
+    public Result freezeHotBalance(@RequestBody FreezeBalanceVO vo){
+        return chainAssetsService.freezeHotBalance(vo);
+
+    }
+    /**
+     * 冷却矿工费钱包
+     */
+    @PostMapping("/fee-wallet/balance/freeze")
     public Result freezeBalance(@RequestBody FreezeBalanceVO vo){
-        return chainAssetsService.freezeBalance(vo);
+        return chainAssetsService.freezeFeeBalance(vo);
 
     }
 }

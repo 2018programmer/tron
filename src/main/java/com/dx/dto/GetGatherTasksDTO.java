@@ -13,7 +13,7 @@ public class GetGatherTasksDTO implements Serializable {
     /**
      * 任务方式  0 手动 1自动
      */
-    private String gatherType;
+    private Integer gatherType;
 
     /**
      * 归集入钱包地址

@@ -5,6 +5,8 @@ import com.dx.service.other.HttpSerive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 /**
  * 调用
  */
@@ -18,5 +20,31 @@ public class ChainBasicService {
      */
     public JSONObject createAddress(String netName){
         return httpSerive.createAddress(netName);
+    }
+
+    public Integer getnowblock(String netName){
+        return httpSerive.getnowblock(netName);
+    }
+
+    public JSONObject getblockbynum(String netName,Integer num){
+        return httpSerive.getblockbynum(netName,num);
+    }
+
+    public JSONObject gettransactioninfo(String netName,String txId ){
+        return httpSerive.gettransactioninfo(netName,txId);
+    }
+
+
+
+    public String estimateenergy(String netName, String formAddress, String toaddress, String privateKey, String coinCode, BigDecimal amount){
+        return httpSerive.estimateenergy(netName,formAddress,toaddress,privateKey,coinCode,amount);
+    }
+
+    public String transferContractCoins(String netName, String formAddress, String toaddress, String privateKey, String coinCode, BigDecimal amount){
+        return httpSerive.transferContractCoins(netName,formAddress,toaddress,privateKey,coinCode,amount);
+    }
+
+    public String transferBaseCoins(String netName, String formAddress, String toaddress, String privateKey, BigDecimal amount){
+        return httpSerive.transferBaseCoins(netName,formAddress,toaddress,privateKey,amount);
     }
 }

@@ -2,6 +2,7 @@ package com.dx.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Result;
 import com.dx.dto.*;
@@ -153,7 +154,10 @@ public class ChainWalletService {
     public Result<List<FeeWalletDTO>> getFeeWallets(String netName) {
         Result<List<FeeWalletDTO>> result = new Result<>();
         LambdaQueryWrapper<ChainFeeWallet> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ChainFeeWallet::getNetName,netName);
+        if(StringUtils.isNotEmpty(netName)){
+            wrapper.eq(ChainFeeWallet::getNetName,netName);
+        }
+
         List<ChainFeeWallet> chainFeeWallets = feeWalletMapper.selectList(wrapper);
         List<FeeWalletDTO> list = new ArrayList<>();
         if(!CollectionUtils.isEmpty(chainFeeWallets)){
@@ -164,6 +168,20 @@ public class ChainWalletService {
             }
         }
         result.setResult(list);
+        return result;
+    }
+
+    public Result updateFeeWalletStatus(UpdateHotWalletStatusDTO dto) {
+
+        Result<Object> result = new Result<>();
+        ChainFeeWallet feeWallet = feeWalletMapper.selectById(dto.getId());
+        if(Objects.isNull(feeWallet)){
+            result.error("没有数据");
+            return result;
+        }
+        feeWallet.setRunningStatus(dto.getRunningStatus());
+        feeWalletMapper.updateById(feeWallet);
+        result.setMessage("操作成功");
         return result;
     }
 }

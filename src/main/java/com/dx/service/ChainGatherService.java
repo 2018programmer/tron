@@ -1,33 +1,34 @@
 package com.dx.service;
 
 import cn.hutool.core.lang.Chain;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dx.common.Constant;
 import com.dx.common.Result;
 import com.dx.dto.GetGatherDetailDTO;
 import com.dx.dto.GetGatherDetailsDTO;
 import com.dx.dto.GetGatherTasksDTO;
-import com.dx.entity.ChainCoin;
-import com.dx.entity.ChainGatherDetail;
-import com.dx.entity.ChainGatherTask;
-import com.dx.entity.ChainNet;
-import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainGatherDetailMapper;
-import com.dx.mapper.ChainGatherTaskMapper;
-import com.dx.mapper.ChainNetMapper;
+import com.dx.entity.*;
+import com.dx.mapper.*;
 import com.dx.vo.GetGatherDetailsVO;
 import com.dx.vo.GetGatherTasksVO;
 import com.dx.vo.ManualGatherVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
+@Slf4j
 public class ChainGatherService {
 
     @Autowired
@@ -39,12 +40,148 @@ public class ChainGatherService {
     @Autowired
     private ChainGatherDetailMapper gatherDetailMapper;
 
+    @Autowired
+    private ChainHotWalletMapper hotWalletMapper;
+    
+    @Autowired
+    private ChainBasicService basicService;
+
+
+    @Autowired
+    private ChainFeeWalletMapper chainFeeWalletMapper;
+
+    @Autowired
+    private ChainFlowMapper flowMapper;
+
+
     public Result manualGather(ManualGatherVO vo) {
         Result<Object> result = new Result<>();
+        LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainGatherTask::getNetName,vo.getNetName());
+        wrapper.eq(ChainGatherTask::getTaskStatus,1);
+        List<ChainGatherTask> chainGatherTasks = gatherTaskMapper.selectList(wrapper);
+        
+        if(CollectionUtils.isNotEmpty(chainGatherTasks)){
+            result.error("正在归集中,请勿使用手动归集");
+            return result;
+        }
+        LambdaQueryWrapper<ChainHotWallet> hotwrapper = Wrappers.lambdaQuery();
+        hotwrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
+        hotwrapper.eq(ChainHotWallet::getRunningStatus,1);
+        List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
+        ChainHotWallet chainHotWallet = chainHotWallets.get(0);
+        if(CollectionUtils.isEmpty(chainHotWallets)){
+            result.error("没有可用热钱包！");
+            return result;
+        }
+        //创建归集明细
 
+        //获取资产表
+
+        //创建 对应明细
+
+        //计算数量
+
+        //保存
+        //创建归集任务
+        ChainGatherTask task = new ChainGatherTask();
+        task.setGatherType(0);
+        task.setAddress(chainHotWallet.getAddress());
+        task.setTaskStatus(1);
+        task.setCreateTime(System.currentTimeMillis());
+        task.setNetName(chainHotWallet.getNetName());
+        task.setTotalNum(25);
+        gatherTaskMapper.insert(task);
         result.setMessage("操作成功！");
         return result;
     }
+
+    /**
+     * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
+     * @return
+     */
+    public String feeWalletCold(ChainFeeWallet feeWallet ,String toAddress,BigDecimal amount){
+        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainCoin::getNetName,feeWallet.getNetName());
+        wrapper.eq(ChainCoin::getCoinType,"base");
+        ChainCoin coin = coinMapper.selectOne(wrapper);
+        amount=amount.subtract(Constant.BaseUrl.trxfee);
+        //开始冷却
+        String txId  = basicService.transferBaseCoins(coin.getNetName(), feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
+
+        return txId;
+    }
+    /**
+     * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
+     * @return
+     */
+    public String addressToGather(String fromAddress ,String toAddress,String privateKey,String code,BigDecimal amount){
+        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainCoin::getCoinCode,code);
+        ChainCoin coin = coinMapper.selectOne(wrapper);
+        String txId = "";
+        if("base".equals(coin.getCoinType())){
+            //转矿工费
+            transferFee(Constant.BaseUrl.trxfee,fromAddress,coin.getNetName(),coin.getCoinName());
+            //开始归集 或者热钱包冷却
+            txId = basicService.transferBaseCoins(coin.getNetName(), fromAddress, toAddress, privateKey, amount);
+        }else {
+            //查询需要消耗的trx
+            String estimateenergy = basicService.estimateenergy(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), amount);
+            //转矿工费
+            transferFee(new BigDecimal(estimateenergy),fromAddress,coin.getNetName(),coin.getCoinName());
+            //开始归集 或者冷却
+            txId = basicService.transferContractCoins(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), amount);
+
+        }
+        return txId;
+    }
+
+    /**
+     * 转矿工费
+     * @return
+     */
+
+    public void transferFee(BigDecimal amount, String toAddress,String netName,String coinName){
+        LambdaQueryWrapper<ChainFeeWallet> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainFeeWallet::getRunningStatus,1);
+        //转账矿工费
+        BigDecimal add = amount.add(Constant.BaseUrl.trxfee);
+        wrapper.gt(ChainFeeWallet::getBalance,add);
+        List<ChainFeeWallet> chainFeeWallets = chainFeeWalletMapper.selectList(wrapper);
+        ChainFeeWallet feeWallet = chainFeeWallets.get(0);
+
+        String txId = basicService.transferBaseCoins(netName, feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
+
+        //查询交易结果
+        JSONObject json = basicService.gettransactioninfo(netName, txId);
+        if(json.containsKey("fee")){
+            String fee = json.getString("fee");
+            BigDecimal decimal = new BigDecimal("1000000");
+            BigDecimal feeNum = new BigDecimal(fee).divide(decimal, 6, RoundingMode.FLOOR);
+            amount =amount.add(feeNum);
+        }
+        BigDecimal subtract = feeWallet.getBalance().subtract(amount);
+
+        feeWallet.setBalance(subtract);
+        chainFeeWalletMapper.updateById(feeWallet);
+
+        //添加流水明细
+        ChainFlow chainFlow = new ChainFlow();
+        chainFlow.setNetName(netName);
+        chainFlow.setWalletType(2);
+        chainFlow.setAddress(feeWallet.getAddress());
+        chainFlow.setTxId(txId);
+        chainFlow.setTransferType(0);
+        chainFlow.setFlowWay(3);
+        chainFlow.setAmount(amount);
+        chainFlow.setTargetAddress(toAddress);
+        chainFlow.setCreateTime(System.currentTimeMillis());
+        chainFlow.setCoinName(coinName);
+
+        flowMapper.insert(chainFlow);
+    }
+
 
     public Result<IPage<GetGatherTasksDTO>> getGatherTasks(GetGatherTasksVO vo) {
         Result<IPage<GetGatherTasksDTO>> result = new Result<>();

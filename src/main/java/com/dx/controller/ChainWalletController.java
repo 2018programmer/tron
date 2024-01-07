@@ -34,6 +34,14 @@ public class ChainWalletController {
     }
 
     /**
+     * 更新矿工费钱包钱包状态
+     */
+    @PostMapping("/fee-wallet/stauts/update")
+    public Result updateFeeWalletStatus(@RequestBody UpdateHotWalletStatusDTO dto){
+        return walletService.updateFeeWalletStatus(dto);
+    }
+
+    /**
      * 获取冷钱包列表
      *
      */

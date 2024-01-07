@@ -50,4 +50,9 @@ public class ChainAddressIncome {
      */
     private String serial;
 
+    /**
+     * 监听时间
+     */
+    private Long createTime;
+
 }
