@@ -39,6 +39,10 @@ public class ChainGatherDetail {
      */
     private String coinName;
     /**
+     * 币种编码
+     */
+    private String coinCode;
+    /**
      * 归集数量
      */
     private BigDecimal amount;
@@ -47,7 +51,7 @@ public class ChainGatherDetail {
      */
     private Integer GatherStage;
     /**
-     * 状态
+     * 状态 0未开始 1进行中 2失败待重试 3已完成
      */
     private Integer GatherStatus;
     /**

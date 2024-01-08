@@ -17,6 +17,7 @@ import com.dx.mapper.ChainNetMapper;
 import com.dx.mapper.ChainPoolAddressMapper;
 import com.dx.vo.QueryPoolAddressVO;
 import com.dx.vo.UpdatePoolManageVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class ChainPoolAddressService {
 
 
@@ -176,5 +178,12 @@ public class ChainPoolAddressService {
             }
         }
         return result;
+    }
+
+    public ChainPoolAddress getAddress(String address){
+        LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainPoolAddress::getAddress,address);
+        return poolAddressMapper.selectOne(wrapper);
+
     }
 }

@@ -2,8 +2,10 @@ package com.dx.task;
 
 
 import com.dx.service.ChainPoolAddressService;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 @Slf4j
 @Component
@@ -13,9 +15,11 @@ public class AddressJob {
     private ChainPoolAddressService poolAddressService;
 
 
-    private static final  Integer num =300;
+    @Value("${base.address-num}")
+    private Integer num;
 
-    public void createAddressTask(){
+    @XxlJob(("createAddressTaskTRON"))
+    public void createAddressTaskTRON(){
         poolAddressService.autoCreateAddress(num);
     }
 }

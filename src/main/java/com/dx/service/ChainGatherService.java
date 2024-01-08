@@ -53,6 +53,9 @@ public class ChainGatherService {
     @Autowired
     private ChainFlowMapper flowMapper;
 
+    @Autowired
+    private ChainAssetsMapper assetsMapper;
+
 
     public Result manualGather(ManualGatherVO vo) {
         Result<Object> result = new Result<>();
@@ -69,29 +72,45 @@ public class ChainGatherService {
         hotwrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
         hotwrapper.eq(ChainHotWallet::getRunningStatus,1);
         List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
-        ChainHotWallet chainHotWallet = chainHotWallets.get(0);
+
         if(CollectionUtils.isEmpty(chainHotWallets)){
             result.error("没有可用热钱包！");
             return result;
         }
+        ChainHotWallet chainHotWallet = chainHotWallets.get(0);
         //创建归集明细
-
+        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
+        cwrapper.eq(ChainCoin::getCoinType,"base");
+        ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
         //获取资产表
-
-        //创建 对应明细
-
-        //计算数量
-
-        //保存
-        //创建归集任务
+        List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null);
+        if(CollectionUtils.isEmpty(assets)){
+            result.error("没有达到归集要求的地址");
+            return result;
+        }
         ChainGatherTask task = new ChainGatherTask();
         task.setGatherType(0);
         task.setAddress(chainHotWallet.getAddress());
         task.setTaskStatus(1);
         task.setCreateTime(System.currentTimeMillis());
         task.setNetName(chainHotWallet.getNetName());
-        task.setTotalNum(25);
+        task.setTotalNum(assets.size());
         gatherTaskMapper.insert(task);
+        //创建 对应明细
+        for (ChainAssets asset : assets) {
+            ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
+            chainGatherDetail.setGatherAddress(asset.getAddress());
+            chainGatherDetail.setGatherStatus(0);
+            chainGatherDetail.setAmount(asset.getBalance());
+            chainGatherDetail.setCoinName(asset.getCoinName());
+            chainGatherDetail.setCreateTime(System.currentTimeMillis());
+            chainGatherDetail.setTaskId(task.getId());
+            chainGatherDetail.setFeeAmount(BigDecimal.ZERO);
+            chainGatherDetail.setFeeCoinName(chainCoin.getCoinName());
+
+            gatherDetailMapper.insert(chainGatherDetail);
+        }
+
         result.setMessage("操作成功！");
         return result;
     }
