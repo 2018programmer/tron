@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,9 +155,4 @@ public class ChainAssetsService {
         return result;
     }
 
-    public void getHaveAssets(String netName){
-        LambdaQueryWrapper<ChainAssets> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainAssets::getNetName,netName);
-        //余额大于0
-    }
 }

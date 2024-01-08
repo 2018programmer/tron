@@ -15,6 +15,9 @@ public interface Constant {
 
         String CREATEADDRESS ="/createAddress";
 
+
+        String CREATEADDRESSBYNUM ="/createAddressBynum";
+
         String GETNOWBLOCK ="/getnowblock";
 
         String GETBLOCKBYNUM ="/getblockbynum";

@@ -1,14 +1,12 @@
 package com.dx.task;
 
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.dto.ContactDTO;
-import com.dx.dto.GetBlockDTO;
 import com.dx.entity.ChainAddressIncome;
 import com.dx.entity.ChainAssets;
 import com.dx.entity.ChainCoin;
@@ -18,14 +16,12 @@ import com.dx.mapper.ChainAssetsMapper;
 import com.dx.mapper.ChainCoinMapper;
 import com.dx.mapper.ChainPoolAddressMapper;
 import com.dx.service.ChainBasicService;
-import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +43,7 @@ public class monitorJob {
 
     @Autowired
     private ChainCoinMapper coinMapper;
-    @XxlJob("monitorTransferTRON")
+//    @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
         var numsql =0;
         var numOnline = 0;

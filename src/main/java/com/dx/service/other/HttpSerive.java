@@ -31,7 +31,17 @@ public class HttpSerive {
 
         return result;
     }
+    public JSONObject createAddressBynum(String netName,Integer num){
+        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.CREATEADDRESSBYNUM+"/"+num).execute().body();
+        JSONObject jsonObject = JSON.parseObject(body);
+        Boolean success = jsonObject.getBoolean("success");
+        if(Objects.isNull(success)||false==success){
+            throw new RuntimeException("生成地址失败");
+        }
+        JSONObject result = jsonObject.getJSONObject("result");
 
+        return result;
+    }
     public Integer getnowblock(String netName) {
 
         String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETNOWBLOCK).execute().body();

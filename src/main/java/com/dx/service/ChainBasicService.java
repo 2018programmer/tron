@@ -22,6 +22,9 @@ public class ChainBasicService {
         return httpSerive.createAddress(netName);
     }
 
+    public JSONObject createAddressBynum(String netName,Integer num){
+        return httpSerive.createAddressBynum(netName,num);
+    }
     public Integer getnowblock(String netName){
         return httpSerive.getnowblock(netName);
     }

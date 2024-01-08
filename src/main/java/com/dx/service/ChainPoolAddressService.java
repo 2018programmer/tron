@@ -1,5 +1,7 @@
 package com.dx.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -18,6 +20,7 @@ import com.dx.vo.UpdatePoolManageVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -36,6 +39,9 @@ public class ChainPoolAddressService {
 
     @Autowired
     private ChainPoolAddressMapper poolAddressMapper;
+
+    @Autowired
+    private ChainBasicService basicService;
 
     public Result<IPage<CoinManageDTO>> getPoolManage(String netName,Integer pageNum,Integer pageSize) {
         Result<IPage<CoinManageDTO>> result = new Result<>();
@@ -138,6 +144,37 @@ public class ChainPoolAddressService {
 
         result.setResult(getGatherNumDTO);
         result.setResult(getGatherNumDTO);
+        return result;
+    }
+
+    public Result  autoCreateAddress(Integer num){
+        Result<Object> result = new Result<>();
+        LambdaQueryWrapper<ChainNet> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainNet::getRunningStatus,1);
+        List<ChainNet> chainNets = netMapper.selectList(wrapper);
+        if(CollectionUtils.isEmpty(chainNets)){
+            return result;
+        }
+        for (ChainNet chainNet : chainNets) {
+            LambdaQueryWrapper<ChainPoolAddress> awrapper = Wrappers.lambdaQuery();
+            awrapper.eq(ChainPoolAddress::getNetName,chainNet.getNetName());
+            awrapper.eq(ChainPoolAddress::getIsAssigned,0);
+            int aNum = poolAddressMapper.selectCount(awrapper).intValue();
+            if(aNum>=num){
+                continue;
+            }
+            JSONObject json = basicService.createAddressBynum(chainNet.getNetName(), num-aNum);
+
+            List<ChainPoolAddress> list = JSON.parseArray(json.getString("list"), ChainPoolAddress.class);
+
+            for (ChainPoolAddress chainPoolAddress : list) {
+                chainPoolAddress.setCreateTime(System.currentTimeMillis());
+                chainPoolAddress.setNetName(chainNet.getNetName());
+                chainPoolAddress.setIsActivated(0);
+                chainPoolAddress.setIsAssigned(0);
+                poolAddressMapper.insert(chainPoolAddress);
+            }
+        }
         return result;
     }
 }
