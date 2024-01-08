@@ -2,6 +2,7 @@ package com.dx.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Constant;
@@ -10,6 +11,7 @@ import com.dx.dto.AssetHotDTO;
 import com.dx.entity.*;
 import com.dx.mapper.*;
 import com.dx.vo.FreezeBalanceVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -17,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ChainAssetsService {
@@ -40,19 +43,40 @@ public class ChainAssetsService {
     
     @Autowired
     private ChainFlowMapper flowMapper;
+    @Autowired
+    private ChainCoinMapper coinMapper;
 
 
 
     public Result<List<AssetHotDTO>> getHotwalletBalance(Integer type,Integer id) {
         Result<List<AssetHotDTO>> result = new Result<>();
+        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
+        cwrapper.eq(ChainCoin::getCoinType,"base");
+        ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
 
-        AssetHotDTO assetHotDTO = new AssetHotDTO();
-        assetHotDTO.setBalance(new BigDecimal("100"));
-        assetHotDTO.setId(1);
-        assetHotDTO.setCoinCode("TRX");
-        assetHotDTO.setCoinName("TRX");
+        ChainHotWallet chainHotWallet = hotWalletMapper.selectById(id);
+        LambdaQueryWrapper<ChainAssets> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainAssets::getAddress,chainHotWallet.getAddress());
+        if(ObjectUtils.isNotNull(type)){
+            if(1==type){
+                wrapper.eq(ChainAssets::getCoinCode,chainCoin.getCoinCode());
+            }
+            if(2==type){
+                wrapper.ne(ChainAssets::getCoinCode,chainCoin.getCoinCode());
+            }
+        }
         List<AssetHotDTO> list = new ArrayList<>();
-        list.add(assetHotDTO);
+        List<ChainAssets> chainAssets = assetsMapper.selectList(wrapper);
+        if(CollectionUtils.isEmpty(chainAssets)){
+            result.setResult(list);
+            return result;
+        }
+        for (ChainAssets chainAsset : chainAssets) {
+            AssetHotDTO assetHotDTO = new AssetHotDTO();
+            BeanUtils.copyProperties(chainAsset,assetHotDTO);
+            assetHotDTO.setId(id);
+            list.add(assetHotDTO);
+        }
 
         result.setResult(list);
         return result;

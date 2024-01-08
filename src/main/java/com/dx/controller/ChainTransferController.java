@@ -36,13 +36,4 @@ public class ChainTransferController {
     public Result<IPage<ChainAddressExpenses>> getAddressExpenses(GetAddressExpensesVO vo){
         return transferService.getAddressExpenses(vo);
     }
-
-    /**
-     * 获取链流水
-     */
-    @GetMapping("/flow/list/get")
-    public void getTransferFlow(){
-        transferService.getTransferFlow();
-    }
-
 }
