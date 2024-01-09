@@ -107,9 +107,7 @@ public class monitorJob {
                     balance.add(contactDTO.getAmount());
                     assetsMapper.updateById(chainAssets);
                 }
-
             }
-
         }
     }
 

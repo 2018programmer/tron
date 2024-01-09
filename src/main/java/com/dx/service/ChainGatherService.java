@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Constant;
+import com.dx.common.IdVO;
 import com.dx.common.Result;
 import com.dx.dto.GetGatherDetailDTO;
 import com.dx.dto.GetGatherDetailsDTO;
@@ -249,5 +250,12 @@ public class ChainGatherService {
         result.setResult(getGatherDetailsDTO);
 
         return result;
+    }
+
+    public Result cancelGatherTask(IdVO vo) {
+        Result<Object> result = new Result<>();
+
+        result.setMessage("操作成功！");
+        return  result;
     }
 }

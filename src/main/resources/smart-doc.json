@@ -1,5 +1,5 @@
 {
-  "serverUrl": "http://192.168.222.241:8087",
+  "serverUrl": "http://192.168.222.241:8087/blockchain-service",
   "isStrict": false, //是否开启严格模式
   "outPath": "target/doc",
   "projectName": "chain-service",//配置自己的项目名称
@@ -8,5 +8,5 @@
   "debugEnvName":"本地", //torna测试环境
   "replace": true,//推送torna时替换旧的文档,
   "tornaDebug": true,
-  "debugEnvUrl":"http://192.168.222.241:8087"//torna
+  "debugEnvUrl":"http://192.168.222.241:8087/blockchain-service"//torna
 }

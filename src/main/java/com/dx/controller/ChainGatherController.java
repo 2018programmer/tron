@@ -1,6 +1,7 @@
 package com.dx.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.dx.common.IdVO;
 import com.dx.common.Result;
 import com.dx.dto.GetGatherDetailsDTO;
 import com.dx.dto.GetGatherTasksDTO;
@@ -46,5 +47,15 @@ public class ChainGatherController {
     @GetMapping("/task/detail/list/get")
     public Result<GetGatherDetailsDTO> getGatherDetails(GetGatherDetailsVO vo){
         return gatherService.getGatherDetails(vo);
+    }
+
+    /**
+     * 取消任务
+     * @param vo
+     * @return
+     */
+    @PostMapping("/task/cancel")
+    public Result cancelGatherTask(IdVO vo){
+        return gatherService.cancelGatherTask(vo);
     }
 }

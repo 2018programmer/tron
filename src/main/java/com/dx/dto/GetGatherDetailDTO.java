@@ -44,13 +44,13 @@ public class GetGatherDetailDTO {
      */
     private BigDecimal amount;
     /**
-     * 阶段
+     * 阶段 1 转出矿工费 2回收数字币
      */
-    private Integer GatherStage;
+    private Integer gatherStage;
     /**
-     * 状态
+     * 状态 0未开始 1进行中 2失败待重试 3已完成
      */
-    private Integer GatherStatus;
+    private Integer gatherStatus;
     /**
      * 创建时间
      */

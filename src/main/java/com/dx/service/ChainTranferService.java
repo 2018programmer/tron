@@ -67,7 +67,4 @@ public class ChainTranferService {
 
     }
 
-    public void getTransferFlow() {
-
-    }
 }
