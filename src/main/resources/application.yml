@@ -1,54 +1,33 @@
-#nacos:
-#  discovery:
-#    namespace: 5bfe4d6c-22af-490b-8f58-92479f345f4a
-#    group: DEFAULT_GROUP
-#    server-addr: 192.168.222.110:30848
-#    username: nacos
-#    password: jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9
-#    autoRegister: true
-#  config:
-#    # nacos服务器地址
-#    server-addr: 192.168.222.110:30848
-#    username: nacos
-#    password: jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9
-#    # 配置所属命名空间的id，我们配置名称为dev的id，在命名空间列表查看id的值
-#    namespace: 5bfe4d6c-22af-490b-8f58-92479f345f4a
-#    type: yaml
-#    # 配置所属分组
-#    group: DEFAULT_GROUP
-#    auto-refresh: true
-#    # 后缀名，只支持 properties 和 yaml 类型
-#    dataId: nacos-test
-#    bootstrap:
-#      enable: true
-#      logEnable: true
-
+nacos:
+  discovery:
+    namespace: 5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14
+    group: DEFAULT_GROUP
+    server-addr: nacos-headless.wallet:8848
+    username: nacos
+    password: jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9
+    autoRegister: true
+  config:
+    username: nacos
+    password: jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9
+    # 配置所属命名空间的id，我们配置名称为dev的id，在命名空间列表查看id的值
+    namespace: 5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14
+    type: yaml
+    # 文件名，如果没有配置则默认为 ${spring.application.name}
+    # 配置所属分组
+    group: DEFAULT_GROUP
+    auto-refresh: true
+    # 后缀名，只支持 properties 和 yaml 类型
+    dataId: blockchain-service
+    bootstrap:
+      enable: true
+      logEnable: true
+    # nacos服务器地址
+    server-addr: nacos-headless.wallet:8848
+    # 配置自动刷新
+    refresh-enabled: true
+    # 启用远程同步配置
+    enable-remote-sync-config: true
 
 spring:
   application:
     name: blockchain-service
-  datasource:
-    url: jdbc:mysql://192.168.222.103:3306/blockchain_service?useSSL=false&useUnicode=true&characterEncoding=UTF-8
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 3AdUUfqmtWq3zXryBdWmvCW6K28R67AC
-#  jackson:
-#    # json 序列化排除值为 null 的属性
-#    default-property-inclusion: non_null
-
-mybatis-plus:
-  mapper-locations: classpath:mapper/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true
-  type-aliases-package: com.dx.entity
-
-server:
-  port: 8087
-  servlet:
-    context-path: /blockchain-service
-
-
-base:
-  url: http://localhost:8085
-  address-num: 300
