@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Constant;
 import com.dx.common.IdVO;
 import com.dx.common.Result;
+import com.dx.dto.GatherTotalDTO;
 import com.dx.dto.GetGatherDetailDTO;
 import com.dx.dto.GetGatherDetailsDTO;
 import com.dx.dto.GetGatherTasksDTO;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -232,9 +234,17 @@ public class ChainGatherService {
         getGatherDetailsDTO.setFeeAmount(BigDecimal.TWO);
         getGatherDetailsDTO.setNetName(chainGatherTask.getNetName());
         HashMap<String, BigDecimal> map = new HashMap<>();
-        map.put("USDT",new BigDecimal("101.289"));
-        map.put("TRX",new BigDecimal("38989.2998"));
-        getGatherDetailsDTO.setGatherMap(map);
+
+        List<GatherTotalDTO> totalList = new ArrayList<>();
+        GatherTotalDTO gatherTotalDTO = new GatherTotalDTO();
+        gatherTotalDTO.setCoinName("USDT");
+        gatherTotalDTO.setAmount(new BigDecimal("101.289"));
+        totalList.add(gatherTotalDTO);
+        GatherTotalDTO gatherTotalDTO1 = new GatherTotalDTO();
+        gatherTotalDTO1.setCoinName("TRX");
+        gatherTotalDTO.setAmount(new BigDecimal("38989.2998"));
+        totalList.add(gatherTotalDTO1);
+        getGatherDetailsDTO.setGatherList(totalList);
 
         LambdaQueryWrapper<ChainGatherDetail> dwrapper = Wrappers.lambdaQuery();
         dwrapper.eq(ChainGatherDetail::getTaskId,vo.getId());

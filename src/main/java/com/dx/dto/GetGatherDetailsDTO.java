@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 
 @Data
 public class GetGatherDetailsDTO implements Serializable {
@@ -25,7 +25,7 @@ public class GetGatherDetailsDTO implements Serializable {
     /**
      * 已归集k:币种  v:数量
      */
-    private Map<String,BigDecimal> gatherMap;
+    private List<GatherTotalDTO> gatherList;
 
     /**
      * 明细列表

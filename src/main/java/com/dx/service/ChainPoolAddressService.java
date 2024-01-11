@@ -9,12 +9,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.dto.*;
-import com.dx.entity.ChainCoin;
-import com.dx.entity.ChainNet;
-import com.dx.entity.ChainPoolAddress;
-import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainNetMapper;
-import com.dx.mapper.ChainPoolAddressMapper;
+import com.dx.entity.*;
+import com.dx.mapper.*;
 import com.dx.vo.QueryPoolAddressVO;
 import com.dx.vo.UpdatePoolManageVO;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +40,12 @@ public class ChainPoolAddressService {
 
     @Autowired
     private ChainBasicService basicService;
+
+    @Autowired
+    private ChainGatherTaskMapper gatherTaskMapper;
+
+    @Autowired
+    private ChainAssetsMapper assetsMapper;
 
     public Result<IPage<CoinManageDTO>> getPoolManage(String netName,Integer pageNum,Integer pageSize) {
         Result<IPage<CoinManageDTO>> result = new Result<>();
@@ -90,17 +92,23 @@ public class ChainPoolAddressService {
         for (ChainNet chainNet : chainNets) {
             PoolManageDTO poolManageDTO = new PoolManageDTO();
             poolManageDTO.setNetName(chainNet.getNetName());
-
-            if("TRON".equals(chainNet.getNetName())){
-                poolManageDTO.setTotalNum(12000);
-                poolManageDTO.setGatherStatus(0);
-                poolManageDTO.setNoAssignedNum(200);
-            }
-            if("ETH".equals(chainNet.getNetName())){
-                poolManageDTO.setTotalNum(100);
+            LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(ChainPoolAddress::getNetName,chainNet.getNetName());
+            Long total = poolAddressMapper.selectCount(wrapper);
+            wrapper.eq(ChainPoolAddress::getIsAssigned,0);
+            Long noNum = poolAddressMapper.selectCount(wrapper);
+            LambdaQueryWrapper<ChainGatherTask> twrapper = Wrappers.lambdaQuery();
+            twrapper.eq(ChainGatherTask::getNetName,chainNet.getNetName());
+            twrapper.eq(ChainGatherTask::getTaskStatus,1);
+            Long status = gatherTaskMapper.selectCount(twrapper);
+            poolManageDTO.setTotalNum(total.intValue());
+            if(status>=1){
                 poolManageDTO.setGatherStatus(1);
-                poolManageDTO.setNoAssignedNum(50);
+            }else {
+                poolManageDTO.setGatherStatus(0);
             }
+            poolManageDTO.setNoAssignedNum(noNum.intValue());
+
             poollist.add(poolManageDTO);
         }
         result.setResult(poollist);
@@ -141,7 +149,9 @@ public class ChainPoolAddressService {
     public Result<GetGatherNumDTO> getGatherNum(String netName) {
         Result<GetGatherNumDTO> result = new Result<>();
         GetGatherNumDTO getGatherNumDTO = new GetGatherNumDTO();
-        getGatherNumDTO.setNum(255);
+        List<ChainAssets> haveAssets = assetsMapper.getHaveAssets(netName, null);
+
+        getGatherNumDTO.setNum(haveAssets.size());
         getGatherNumDTO.setNetName(netName);
 
         result.setResult(getGatherNumDTO);

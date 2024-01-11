@@ -13,7 +13,7 @@ public class GetChainFlowsVO extends PageVO implements Serializable {
     /**
      * 开始时间 时间戳
      */
-    private Long BeginTime;
+    private Long beginTime;
 
     /**
      * 结束时间 时间戳
