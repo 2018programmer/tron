@@ -2,10 +2,13 @@ package com.dx.service.other;
 
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dx.common.Constant;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -13,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class HttpSerive {
 
     @Value("${base.url}")
@@ -55,17 +59,21 @@ public class HttpSerive {
         return result;
     }
 
-    public JSONObject getblockbynum(String netName,Integer num) {
+    public String getblockbynum(String netName,Integer num) {
         Map<String, Object> map = new HashMap<>();
         map.put("num",num);
         String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETBLOCKBYNUM).form(map).execute().body();
+        log.info("查询第{}区块，查询结果:{}",num,body);
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
             throw new RuntimeException("获取区块信息失败");
         }
-        JSONObject result = jsonObject.getJSONObject("result");
-        return result;
+        JSONArray jsonArray = jsonObject.getJSONObject("result").getJSONArray("data");
+        if(CollectionUtils.isEmpty(jsonArray)){
+            return null;
+        }
+        return jsonArray.toJSONString();
     }
 
     public String  transferContractCoins(String netName, String formAddress, String toaddress, String privateKey, String coinCode, BigDecimal amount) {

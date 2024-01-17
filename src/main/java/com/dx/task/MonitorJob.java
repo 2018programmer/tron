@@ -1,20 +1,13 @@
 package com.dx.task;
 
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.dto.ContactDTO;
-import com.dx.entity.ChainAddressIncome;
-import com.dx.entity.ChainAssets;
-import com.dx.entity.ChainCoin;
-import com.dx.entity.ChainPoolAddress;
-import com.dx.mapper.ChainAddressIncomeMapper;
-import com.dx.mapper.ChainAssetsMapper;
-import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainPoolAddressMapper;
+import com.dx.entity.*;
+import com.dx.mapper.*;
 import com.dx.service.ChainBasicService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class monitorJob {
+public class MonitorJob {
     
     @Autowired
     private ChainBasicService chainBasicService;
@@ -43,28 +36,44 @@ public class monitorJob {
 
     @Autowired
     private ChainCoinMapper coinMapper;
-//    @XxlJob("monitorTransferTRON")
+
+    @Autowired
+    private HitCounterMapper hitCounterMapper ;
+    @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
         var numsql =0;
+        HitCounter hit = hitCounterMapper.selectById(1);
+        numsql = hit.getCnt();
         var numOnline = 0;
-        while (0!=numOnline){
+        // 查询区块计数表 获取当前区块 没有则设值
+        Integer tronNum = chainBasicService.getnowblock("TRON");
+        if(ObjectUtils.isNotNull(tronNum)){
+            numOnline =tronNum;
+        }
 
-            // 查询区块计数表 获取当前区块 没有则设值
-            Integer tronNum = chainBasicService.getnowblock("TRON");
-            if(ObjectUtils.isNotNull(tronNum)){
-                numOnline =tronNum;
-            }
+        if(0==numOnline){
+            return;
         }
         if(numsql==0){
             numsql=numOnline;
+            hit.setCnt(numsql);
+            hitCounterMapper.updateById(hit);
         }
-        while (numsql>numOnline){
+        if (numsql>numOnline){
             return;
         }
-        for (int i = numsql; i <= numOnline; numsql++) {
+        for (int i = numsql; i <= numOnline; i++) {
             //获取区块信息
-            JSONObject tron = chainBasicService.getblockbynum("TRON", numsql);
-            List<ContactDTO> list = JSONUtil.toList(tron.toJSONString(), ContactDTO.class);
+            String tron = chainBasicService.getblockbynum("TRON", i);
+            if(ObjectUtils.isNull(tron)){
+                try{
+                    Thread.sleep(500);
+                }catch (Exception e){
+
+                }
+                continue;
+            }
+            List<ContactDTO> list = JSONUtil.toList(tron, ContactDTO.class);
             if(CollectionUtils.isEmpty(list)){
                 continue;
             }
@@ -109,6 +118,8 @@ public class monitorJob {
                 }
             }
         }
+        hit.setCnt(numOnline);
+        hitCounterMapper.updateById(hit);
     }
 
 }

@@ -29,7 +29,7 @@ public class ChainBasicService {
         return httpSerive.getnowblock(netName);
     }
 
-    public JSONObject getblockbynum(String netName,Integer num){
+    public String getblockbynum(String netName,Integer num){
         return httpSerive.getblockbynum(netName,num);
     }
 

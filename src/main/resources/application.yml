@@ -31,3 +31,46 @@ nacos:
 spring:
   application:
     name: blockchain-service
+
+#spring:
+#  application:
+#    name: blockchain-service
+#  datasource:
+#    url: jdbc:mysql://192.168.222.120:3306/blockchain_service?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    username: root
+#    password: 3AdUUfqmtWq3zXryBdWmvCW6K28R67AC
+##  jackson:
+##    # json 序列化排除值为 null 的属性
+##    default-property-inclusion: non_null
+#
+#mybatis-plus:
+#  mapper-locations: classpath:mapper/*.xml
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    map-underscore-to-camel-case: true
+#  type-aliases-package: com.dx.entity
+
+#xxl:
+#  job:
+#    admin:
+#      addresses: http://xxl-job-admin.wallet:8080/xxl-job-admin
+#    accessToken: abcdefg
+#    executor:
+#      appname: blockchain-service
+#      address:
+#      ip:
+#      port: 9888
+#      logpath: log
+#      logretentiondays: 3
+
+
+#server:
+#  port: 8080
+#  servlet:
+#    context-path: /blockchain-service
+#
+#
+#base:
+#  url: http://192.168.222.111:30024
+#  address-num: 300

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.PageVO;
 import com.dx.common.Result;
 import com.dx.dto.CoinDTO;
+import com.dx.task.MonitorJob;
 import com.dx.vo.UpdateMinNumVO;
 import com.dx.service.ChainCoinService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ChainCoinController {
 
     @Autowired
     private ChainCoinService chainCoinService;
+
+//    @Autowired
+//    private MonitorJob monitorJob;
 
     /**
      * 获取币种列表
@@ -34,4 +38,9 @@ public class ChainCoinController {
     public Result updateMinNum(@RequestBody UpdateMinNumVO vo){
         return chainCoinService.updateMinNum(vo);
     }
+
+//    @PostMapping("/getm")
+//    public void  getm(){
+//        monitorJob.monitorTransferTRON();
+//    }
 }
