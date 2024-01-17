@@ -49,6 +49,7 @@ public class HttpSerive {
     public Integer getnowblock(String netName) {
 
         String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETNOWBLOCK).execute().body();
+        log.info("查询最新区块，查询结果:{}",body);
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
