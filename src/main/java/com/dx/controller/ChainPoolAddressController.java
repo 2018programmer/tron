@@ -59,4 +59,14 @@ public class ChainPoolAddressController {
     public Result<GetGatherNumDTO> getGatherNum(String netName){
         return poolService.getGatherNum(netName);
     }
+
+    /**
+     * 获取用户对应地址
+     * @param userId
+     * @return
+     */
+    @GetMapping("/user-address/get")
+    public Result getUserAddress(String userId){
+        return poolService.matchUserAddress(userId);
+    }
 }

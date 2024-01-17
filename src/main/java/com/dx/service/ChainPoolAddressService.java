@@ -196,4 +196,23 @@ public class ChainPoolAddressService {
         return poolAddressMapper.selectOne(wrapper);
 
     }
+
+    public Result matchUserAddress(String userId) {
+        Result<Object> result = new Result<>();
+        LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainPoolAddress::getAssignedId,userId);
+        List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(wrapper);
+        if(!CollectionUtils.isEmpty(chainPoolAddresses)){
+            ChainPoolAddress chainPoolAddress = chainPoolAddresses.get(0);
+            result.setResult(chainPoolAddress.getAddress());
+            return result;
+        }
+        wrapper.clear();
+        wrapper.eq(ChainPoolAddress::getIsActivated,0);
+        wrapper.orderByAsc(ChainPoolAddress::getId);
+        wrapper.last("limit 8");
+        List<ChainPoolAddress> address = poolAddressMapper.selectList(wrapper);
+        result.setResult(address.get(0));
+        return result;
+    }
 }
