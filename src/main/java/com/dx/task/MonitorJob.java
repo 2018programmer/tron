@@ -13,6 +13,11 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,6 +44,9 @@ public class MonitorJob {
 
     @Autowired
     private HitCounterMapper hitCounterMapper ;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
     @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
         var numsql =0;
@@ -56,70 +64,76 @@ public class MonitorJob {
         }
         if(numsql==0){
             numsql=numOnline;
-            hit.setCnt(numsql);
-            hitCounterMapper.updateById(hit);
         }
         if (numsql>numOnline){
             return;
         }
         for (int i = numsql; i <= numOnline; i++) {
             //获取区块信息
+            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
             String tron = chainBasicService.getblockbynum("TRON", i);
             if(ObjectUtils.isNull(tron)){
-                try{
-                    Thread.sleep(500);
-                }catch (Exception e){
-
-                }
+                hit.setCnt(i+1);
+                hitCounterMapper.updateById(hit);
+                // 提交事务
+                transactionManager.commit(status);
                 continue;
             }
             List<ContactDTO> list = JSONUtil.toList(tron, ContactDTO.class);
-            if(CollectionUtils.isEmpty(list)){
-                continue;
-            }
             LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
             List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(wrapper);
-            for (ContactDTO contactDTO : list) {
-                //匹配信息 更新表数据 更新区块
-                List<ChainPoolAddress> collect = chainPoolAddresses.stream().filter(o -> o.getAddress().equals(contactDTO.getToAddress())).collect(Collectors.toList());
-                if(CollectionUtils.isEmpty(collect)){
-                    continue;
+            try {
+
+                for (ContactDTO contactDTO : list) {
+                    //匹配信息 更新表数据 更新区块
+                    List<ChainPoolAddress> collect = chainPoolAddresses.stream().filter(o -> o.getAddress().equals(contactDTO.getToAddress())).collect(Collectors.toList());
+                    if(CollectionUtils.isEmpty(collect)){
+                        continue;
+                    }
+                    ChainPoolAddress chainPoolAddress = collect.get(0);
+                    //添加收款监听记录
+                    ChainAddressIncome chainAddressIncome = new ChainAddressIncome();
+                    chainAddressIncome.setAddress(chainPoolAddress.getAddress());
+                    chainAddressIncome.setCreateTime(System.currentTimeMillis());
+                    LambdaQueryWrapper<ChainCoin> coinwrapper = Wrappers.lambdaQuery();
+                    coinwrapper.eq(ChainCoin::getCoinCode,contactDTO.getCoinCode());
+                    ChainCoin chainCoin = coinMapper.selectOne(coinwrapper);
+                    chainAddressIncome.setNetName(chainCoin.getNetName());
+                    chainAddressIncome.setTxId(contactDTO.getTxId());
+                    chainAddressIncome.setEffective(0);
+                    chainAddressIncome.setChainConfirm(1);
+                    chainAddressIncome.setCoinName(chainCoin.getCoinName());
+                    chainAddressIncome.setAmount(contactDTO.getAmount());
+                    incomeMapper.insert(chainAddressIncome);
+                    // 添加或更新资产记录
+                    LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
+                    aswrapper.eq(ChainAssets::getAddress,chainPoolAddress.getAddress());
+                    aswrapper.eq(ChainAssets::getCoinCode,contactDTO.getCoinCode());
+                    ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
+//                chainBasicService.
+                    if(ObjectUtils.isNull(chainAssets)){
+                        chainAssets =new ChainAssets();
+                        chainAssets.setAddress(chainPoolAddress.getAddress());
+                        chainAssets.setBalance(contactDTO.getAmount());
+                        chainAssets.setNetName(chainCoin.getNetName());
+                        chainAssets.setCoinCode(chainCoin.getCoinCode());
+                        chainAssets.setCoinName(chainCoin.getCoinName());
+                        assetsMapper.insert(chainAssets);
+                    }else {
+                        BigDecimal balance = chainAssets.getBalance();
+                        balance.add(contactDTO.getAmount());
+                        assetsMapper.updateById(chainAssets);
+                    }
                 }
-                ChainPoolAddress chainPoolAddress = collect.get(0);
-                //添加收款监听记录
-                ChainAddressIncome chainAddressIncome = new ChainAddressIncome();
-                chainAddressIncome.setAddress(chainPoolAddress.getAddress());
-                chainAddressIncome.setCreateTime(System.currentTimeMillis());
-                LambdaQueryWrapper<ChainCoin> coinwrapper = Wrappers.lambdaQuery();
-                coinwrapper.eq(ChainCoin::getCoinCode,contactDTO.getCoinCode());
-                ChainCoin chainCoin = coinMapper.selectOne(coinwrapper);
-                chainAddressIncome.setNetName(chainCoin.getNetName());
-                chainAddressIncome.setTxId(contactDTO.getTxId());
-                chainAddressIncome.setEffective(0);
-                chainAddressIncome.setChainConfirm(1);
-                incomeMapper.insert(chainAddressIncome);
-                // 添加或更新资产记录
-                LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
-                aswrapper.eq(ChainAssets::getAddress,chainPoolAddress.getAddress());
-                aswrapper.eq(ChainAssets::getCoinCode,contactDTO.getCoinCode());
-                ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
-                if(ObjectUtils.isNull(chainAssets)){
-                    chainAssets =new ChainAssets();
-                    chainAssets.setAddress(chainPoolAddress.getAddress());
-                    chainAssets.setBalance(contactDTO.getAmount());
-                    chainAssets.setNetName(chainCoin.getNetName());
-                    chainAssets.setCoinCode(chainCoin.getCoinCode());
-                    chainAssets.setCoinName(chainCoin.getCoinName());
-                    assetsMapper.insert(chainAssets);
-                }else {
-                    BigDecimal balance = chainAssets.getBalance();
-                    balance.add(contactDTO.getAmount());
-                    assetsMapper.updateById(chainAssets);
-                }
+                hit.setCnt(i+1);
+                hitCounterMapper.updateById(hit);
+                // 提交事务
+                transactionManager.commit(status);
+            } catch (Exception e) {
+                // 回滚事务
+                transactionManager.rollback(status);
             }
         }
-        hit.setCnt(numOnline);
-        hitCounterMapper.updateById(hit);
     }
 
 }

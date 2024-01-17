@@ -20,8 +20,8 @@ public class ChainCoinController {
     @Autowired
     private ChainCoinService chainCoinService;
 
-//    @Autowired
-//    private MonitorJob monitorJob;
+    @Autowired
+    private MonitorJob monitorJob;
 
     /**
      * 获取币种列表
@@ -39,8 +39,8 @@ public class ChainCoinController {
         return chainCoinService.updateMinNum(vo);
     }
 
-//    @PostMapping("/getm")
-//    public void  getm(){
-//        monitorJob.monitorTransferTRON();
-//    }
+    @PostMapping("/getm")
+    public void  getm(){
+        monitorJob.monitorTransferTRON();
+    }
 }
