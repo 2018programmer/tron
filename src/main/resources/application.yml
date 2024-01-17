@@ -17,7 +17,7 @@ nacos:
     group: DEFAULT_GROUP
     auto-refresh: true
     # 后缀名，只支持 properties 和 yaml 类型
-    dataId: blockchain-service
+    dataId: dx-blockchain-service
     bootstrap:
       enable: true
       logEnable: true
@@ -30,7 +30,7 @@ nacos:
 
 spring:
   application:
-    name: blockchain-service
+    name: dx-blockchain-service
 
 #spring:
 #  application:
