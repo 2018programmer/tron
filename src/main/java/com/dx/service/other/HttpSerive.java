@@ -133,7 +133,7 @@ public class HttpSerive {
     public JSONObject gettransactioninfo(String netName,String txId) {
         Map<String, Object> map = new HashMap<>();
         map.put("txId",txId);
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETTRANSACTIONINFO).form(map).execute().body();
+        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYBALANCE).form(map).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
@@ -141,5 +141,31 @@ public class HttpSerive {
         }
         JSONObject result = jsonObject.getJSONObject("result");
         return result;
+    }
+    public BigDecimal queryBalance(String netName,String address){
+        Map<String, Object> map = new HashMap<>();
+        map.put("address",address);
+        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETTRANSACTIONINFO).form(map).execute().body();
+        JSONObject jsonObject = JSON.parseObject(body);
+        Boolean success = jsonObject.getBoolean("success");
+        if(Objects.isNull(success)||false==success){
+            throw new RuntimeException("获取区块信息失败");
+        }
+        JSONObject result = jsonObject.getJSONObject("result");
+        return new BigDecimal(result.getString("amount"));
+    }
+
+    public BigDecimal queryContractBalance(String netName,String coinCode,String address){
+        Map<String, Object> map = new HashMap<>();
+        map.put("address",address);
+        map.put("coinCode",coinCode);
+        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYCONTRACTBALANCE).form(map).execute().body();
+        JSONObject jsonObject = JSON.parseObject(body);
+        Boolean success = jsonObject.getBoolean("success");
+        if(Objects.isNull(success)||false==success){
+            throw new RuntimeException("获取区块信息失败");
+        }
+        JSONObject result = jsonObject.getJSONObject("result");
+        return new BigDecimal(result.getString("amount"));
     }
 }

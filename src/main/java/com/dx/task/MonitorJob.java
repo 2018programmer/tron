@@ -100,7 +100,12 @@ public class MonitorJob {
                     ChainCoin chainCoin = coinMapper.selectOne(coinwrapper);
                     chainAddressIncome.setNetName(chainCoin.getNetName());
                     chainAddressIncome.setTxId(contactDTO.getTxId());
-                    chainAddressIncome.setEffective(0);
+                    if(chainCoin.getThreshold().compareTo(contactDTO.getAmount())>0){
+                        chainAddressIncome.setEffective(0);
+                    }else {
+                        chainAddressIncome.setEffective(1);
+                    }
+
                     chainAddressIncome.setChainConfirm(1);
                     chainAddressIncome.setCoinName(chainCoin.getCoinName());
                     chainAddressIncome.setAmount(contactDTO.getAmount());
@@ -110,7 +115,6 @@ public class MonitorJob {
                     aswrapper.eq(ChainAssets::getAddress,chainPoolAddress.getAddress());
                     aswrapper.eq(ChainAssets::getCoinCode,contactDTO.getCoinCode());
                     ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
-//                chainBasicService.
                     if(ObjectUtils.isNull(chainAssets)){
                         chainAssets =new ChainAssets();
                         chainAssets.setAddress(chainPoolAddress.getAddress());

@@ -50,34 +50,40 @@ public class ChainAssetsService {
 
     public Result<List<AssetHotDTO>> getHotwalletBalance(Integer type,Integer id) {
         Result<List<AssetHotDTO>> result = new Result<>();
-        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
-        cwrapper.eq(ChainCoin::getCoinType,"base");
-        ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+        List<ChainCoin> chainCoins = coinMapper.selectList(null);
+
+
 
         ChainHotWallet chainHotWallet = hotWalletMapper.selectById(id);
         LambdaQueryWrapper<ChainAssets> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainAssets::getAddress,chainHotWallet.getAddress());
-        if(ObjectUtils.isNotNull(type)){
-            if(1==type){
-                wrapper.eq(ChainAssets::getCoinCode,chainCoin.getCoinCode());
-            }
-            if(2==type){
-                wrapper.ne(ChainAssets::getCoinCode,chainCoin.getCoinCode());
-            }
-        }
         List<AssetHotDTO> list = new ArrayList<>();
-        List<ChainAssets> chainAssets = assetsMapper.selectList(wrapper);
-        if(CollectionUtils.isEmpty(chainAssets)){
-            result.setResult(list);
-            return result;
-        }
-        for (ChainAssets chainAsset : chainAssets) {
+        for (ChainCoin chainCoin : chainCoins) {
+            if(ObjectUtils.isNotNull(type)){
+                if(1==type){
+                    if(!"base".equals(chainCoin.getCoinType())){
+                        continue;
+                    }
+                }
+                if(2==type){
+                    if("base".equals(chainCoin.getCoinType())){
+                        continue;
+                    }
+                }
+            }
             AssetHotDTO assetHotDTO = new AssetHotDTO();
-            BeanUtils.copyProperties(chainAsset,assetHotDTO);
             assetHotDTO.setId(id);
+            BigDecimal amount =BigDecimal.ZERO;
+            if("base".equals(chainCoin.getCoinType())){
+                amount = basicService.queryBalance(chainCoin.getNetName(), chainHotWallet.getAddress());
+            }else {
+                amount = basicService.queryContractBalance(chainCoin.getNetName(), chainCoin.getCoinCode(), chainHotWallet.getAddress());
+            }
+            assetHotDTO.setBalance(amount);
+            assetHotDTO.setCoinCode(chainCoin.getCoinCode());
+            assetHotDTO.setCoinName(chainCoin.getCoinName());
             list.add(assetHotDTO);
         }
-
         result.setResult(list);
         return result;
     }

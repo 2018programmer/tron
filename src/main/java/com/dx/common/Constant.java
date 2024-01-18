@@ -28,5 +28,10 @@ public interface Constant {
         String GETTRANSACTIONINFO ="/gettransactioninfo";
         String TRANSFERCONTRACTCOINS ="/transferContractCoins";
         String TRANSFERBASECOINS ="/transferBaseCoins";
+
+        String QUERYBALANCE="/queryBalance";
+
+
+        String QUERYCONTRACTBALANCE="/queryContractBalance";
     }
 }
