@@ -48,8 +48,6 @@ public class ChainGatherService {
     
     @Autowired
     private ChainBasicService basicService;
-
-
     @Autowired
     private ChainFeeWalletMapper chainFeeWalletMapper;
 
@@ -116,92 +114,6 @@ public class ChainGatherService {
 
         result.setMessage("操作成功！");
         return result;
-    }
-
-    /**
-     * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
-     * @return
-     */
-    public String feeWalletCold(ChainFeeWallet feeWallet ,String toAddress,BigDecimal amount){
-        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainCoin::getNetName,feeWallet.getNetName());
-        wrapper.eq(ChainCoin::getCoinType,"base");
-        ChainCoin coin = coinMapper.selectOne(wrapper);
-        amount=amount.subtract(Constant.BaseUrl.trxfee);
-        //开始冷却
-        String txId  = basicService.transferBaseCoins(coin.getNetName(), feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
-
-        return txId;
-    }
-    /**
-     * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
-     * @return
-     */
-    public String addressToGather(String fromAddress ,String toAddress,String privateKey,String code,BigDecimal amount){
-        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainCoin::getCoinCode,code);
-        ChainCoin coin = coinMapper.selectOne(wrapper);
-        String txId = "";
-        if("base".equals(coin.getCoinType())){
-            //转矿工费
-            transferFee(Constant.BaseUrl.trxfee,fromAddress,coin.getNetName(),coin.getCoinName());
-            //开始归集 或者热钱包冷却
-            txId = basicService.transferBaseCoins(coin.getNetName(), fromAddress, toAddress, privateKey, amount);
-        }else {
-            //查询需要消耗的trx
-            String estimateenergy = basicService.estimateenergy(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), amount);
-            //转矿工费
-            transferFee(new BigDecimal(estimateenergy),fromAddress,coin.getNetName(),coin.getCoinName());
-            //开始归集 或者冷却
-            txId = basicService.transferContractCoins(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), amount);
-
-        }
-        return txId;
-    }
-
-    /**
-     * 转矿工费
-     * @return
-     */
-
-    public void transferFee(BigDecimal amount, String toAddress,String netName,String coinName){
-        LambdaQueryWrapper<ChainFeeWallet> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainFeeWallet::getRunningStatus,1);
-        //转账矿工费
-        BigDecimal add = amount.add(Constant.BaseUrl.trxfee);
-        wrapper.gt(ChainFeeWallet::getBalance,add);
-        List<ChainFeeWallet> chainFeeWallets = chainFeeWalletMapper.selectList(wrapper);
-        ChainFeeWallet feeWallet = chainFeeWallets.get(0);
-
-        String txId = basicService.transferBaseCoins(netName, feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
-
-        //查询交易结果
-        JSONObject json = basicService.gettransactioninfo(netName, txId);
-        if(json.containsKey("fee")){
-            String fee = json.getString("fee");
-            BigDecimal decimal = new BigDecimal("1000000");
-            BigDecimal feeNum = new BigDecimal(fee).divide(decimal, 6, RoundingMode.FLOOR);
-            amount =amount.add(feeNum);
-        }
-        BigDecimal subtract = feeWallet.getBalance().subtract(amount);
-
-        feeWallet.setBalance(subtract);
-        chainFeeWalletMapper.updateById(feeWallet);
-
-        //添加流水明细
-        ChainFlow chainFlow = new ChainFlow();
-        chainFlow.setNetName(netName);
-        chainFlow.setWalletType(2);
-        chainFlow.setAddress(feeWallet.getAddress());
-        chainFlow.setTxId(txId);
-        chainFlow.setTransferType(0);
-        chainFlow.setFlowWay(3);
-        chainFlow.setAmount(amount);
-        chainFlow.setTargetAddress(toAddress);
-        chainFlow.setCreateTime(System.currentTimeMillis());
-        chainFlow.setCoinName(coinName);
-
-        flowMapper.insert(chainFlow);
     }
 
 

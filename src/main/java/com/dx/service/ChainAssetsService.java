@@ -10,6 +10,7 @@ import com.dx.common.Result;
 import com.dx.dto.AssetHotDTO;
 import com.dx.entity.*;
 import com.dx.mapper.*;
+import com.dx.service.other.ChainOperateService;
 import com.dx.vo.FreezeBalanceVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class ChainAssetsService {
     private ChainAssetsMapper assetsMapper;
 
     @Autowired
-    private ChainGatherService gatherService;
+    private ChainOperateService operateService;
 
     @Autowired
     private ChainFeeWalletMapper feeWalletMapper;
@@ -103,7 +104,7 @@ public class ChainAssetsService {
             awrapper.eq(ChainAssets::getAddress,hotWallet.getAddress());
             awrapper.eq(ChainAssets::getCoinCode,code);
             ChainAssets chainAssets = assetsMapper.selectOne(awrapper);
-            String txId = gatherService.addressToGather(hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), code, chainAssets.getBalance());
+            String txId = operateService.addressToGather(hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), code, chainAssets.getBalance());
             if(StringUtils.isEmpty(txId)){
                 continue;
             }
@@ -140,7 +141,7 @@ public class ChainAssetsService {
         wrapper.eq(ChainColdWallet::getNetName,feeWallet.getNetName());
         ChainColdWallet wallet = coldWalletMapper.selectOne(wrapper);
         BigDecimal balance = feeWallet.getBalance();
-        String txId = gatherService.feeWalletCold(feeWallet, wallet.getAddress(), balance);
+        String txId = operateService.feeWalletCold(feeWallet, wallet.getAddress(), balance);
 
         if(StringUtils.isEmpty(txId)){
             result.error("冷却失败");

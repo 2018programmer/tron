@@ -13,6 +13,7 @@ import com.dx.mapper.ChainGatherTaskMapper;
 import com.dx.service.ChainBasicService;
 import com.dx.service.ChainGatherService;
 import com.dx.service.ChainPoolAddressService;
+import com.dx.service.other.ChainOperateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,7 @@ public class GatherJob {
     private ChainGatherDetailMapper gatherDetailMapper;
 
     @Autowired
-    private ChainGatherService gatherService;
+    private ChainOperateService operateService;
 
     @Autowired
     private ChainGatherTaskMapper gatherTaskMapper;
@@ -63,7 +64,7 @@ public class GatherJob {
 
         ChainPoolAddress address = poolAddressService.getAddress(chainGatherDetail.getGatherAddress());
 
-        String txId = gatherService.addressToGather(chainGatherTask.getAddress(), chainGatherDetail.getGatherAddress(), address.getPrivateKey(), chainGatherDetail.getCoinCode(), chainGatherDetail.getAmount());
+        String txId = operateService.addressToGather(chainGatherTask.getAddress(), chainGatherDetail.getGatherAddress(), address.getPrivateKey(), chainGatherDetail.getCoinCode(), chainGatherDetail.getAmount());
 
 
         JSONObject tron = basicService.gettransactioninfo("TRON", txId);

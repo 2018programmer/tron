@@ -164,6 +164,7 @@ public class ChainWalletService {
             for (ChainFeeWallet chainFeeWallet : chainFeeWallets) {
                 FeeWalletDTO feeWalletDTO = new FeeWalletDTO();
                 BeanUtils.copyProperties(chainFeeWallet,feeWalletDTO);
+                feeWalletDTO.setBalance(basicService.queryBalance(netName, chainFeeWallet.getAddress()).toString());
                 list.add(feeWalletDTO);
             }
         }
@@ -184,4 +185,5 @@ public class ChainWalletService {
         result.setMessage("操作成功");
         return result;
     }
+
 }
