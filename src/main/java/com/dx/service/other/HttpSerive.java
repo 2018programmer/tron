@@ -152,20 +152,25 @@ public class HttpSerive {
             throw new RuntimeException("获取区块信息失败");
         }
         JSONObject result = jsonObject.getJSONObject("result");
-        return new BigDecimal(result.getString("amount"));
+        if(result.isEmpty()){
+            return BigDecimal.ZERO;
+        }
+        return new BigDecimal(result.getString("balance"));
     }
 
     public BigDecimal queryContractBalance(String netName,String coinCode,String address){
         Map<String, Object> map = new HashMap<>();
         map.put("address",address);
-        map.put("coinCode",coinCode);
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYCONTRACTBALANCE).form(map).execute().body();
+        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYCONTRACTBALANCE+"/"+coinCode).form(map).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
             throw new RuntimeException("获取区块信息失败");
         }
         JSONObject result = jsonObject.getJSONObject("result");
-        return new BigDecimal(result.getString("amount"));
+        if(result.isEmpty()){
+            return BigDecimal.ZERO;
+        }
+        return new BigDecimal(result.getString("balance"));
     }
 }

@@ -75,7 +75,7 @@ public class ChainWalletService {
             BeanUtils.copyProperties(chainHotWallet,hotWalletDTO);
             hotWalletDTO.setInCount(0);
             hotWalletDTO.setOutCount(0);
-            hotWalletDTO.setBalance(BigDecimal.ZERO);
+            hotWalletDTO.setBalance(basicService.queryBalance(netName, chainHotWallet.getAddress()));
             hotWalletDTO.setConvertBalance(BigDecimal.ZERO);
             list.add(hotWalletDTO);
         }
