@@ -145,7 +145,7 @@ public class HttpSerive {
     public BigDecimal queryBalance(String netName,String address){
         Map<String, Object> map = new HashMap<>();
         map.put("address",address);
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYBALANCE).form(map).execute().body();
+        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYBASEBALANCE).form(map).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){

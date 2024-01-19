@@ -29,7 +29,7 @@ public interface Constant {
         String TRANSFERCONTRACTCOINS ="/transferContractCoins";
         String TRANSFERBASECOINS ="/transferBaseCoins";
 
-        String QUERYBALANCE="/queryBalance";
+        String QUERYBASEBALANCE="/queryBaseBalance";
 
 
         String QUERYCONTRACTBALANCE="/queryContractBalance";
