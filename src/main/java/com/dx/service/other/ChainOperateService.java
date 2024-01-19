@@ -2,11 +2,10 @@ package com.dx.service.other;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Constant;
-import com.dx.entity.ChainCoin;
-import com.dx.entity.ChainFeeWallet;
-import com.dx.entity.ChainFlow;
+import com.dx.entity.*;
 import com.dx.mapper.ChainCoinMapper;
 import com.dx.mapper.ChainFeeWalletMapper;
 import com.dx.mapper.ChainFlowMapper;
@@ -127,7 +126,7 @@ public class ChainOperateService {
     }
 
     /**
-     * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
+     * 矿工费冷却
      * @return
      */
     public String feeWalletCold(ChainFeeWallet feeWallet ,String toAddress,BigDecimal amount){
@@ -140,5 +139,84 @@ public class ChainOperateService {
         String txId  = basicService.transferBaseCoins(coin.getNetName(), feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
 
         return txId;
+    }
+
+    public void hotWalletCold(ChainColdWallet wallet, ChainHotWallet hotWallet,ChainCoin transCoin,ChainCoin baseCoin) {
+
+        //查主链币余额
+        BigDecimal bigDecimal = basicService.queryBalance(hotWallet.getNetName(), hotWallet.getAddress());
+        BigDecimal transAmount ;
+        String txId ="";
+        if(transCoin.getCoinCode().equals(baseCoin.getCoinCode())){
+            transAmount =bigDecimal;
+            if(bigDecimal.compareTo(Constant.BaseUrl.trxfee)<=0){
+                return;
+            }
+              txId= basicService.transferBaseCoins(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), bigDecimal.subtract(Constant.BaseUrl.trxfee));
+        }else {
+            //查合约币
+            BigDecimal amount = basicService.queryContractBalance(hotWallet.getNetName(), transCoin.getCoinCode(), hotWallet.getAddress());
+            transAmount =amount;
+            //查询需要消耗的trx
+            String estimateenergy = basicService.estimateenergy(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), amount);
+            if (amount.compareTo(new BigDecimal(estimateenergy))<0){
+                return;
+            }
+            //开始归集 或者冷却
+            txId = basicService.transferContractCoins(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), amount);
+
+        }
+
+        if(StringUtils.isEmpty(txId)){
+            return ;
+        }
+        JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
+        BigDecimal num6 = new BigDecimal("1000000");
+        BigDecimal coldFee =BigDecimal.ZERO;
+        if(json.containsKey("fee")){
+            String fee = json.getString("fee");
+            coldFee= new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
+            ChainFlow feeFlow = new ChainFlow();
+            feeFlow.setNetName(hotWallet.getNetName());
+            feeFlow.setWalletType(3);
+            feeFlow.setAddress(hotWallet.getAddress());
+            feeFlow.setTxId(txId);
+            feeFlow.setTransferType(0);
+            feeFlow.setFlowWay(3);
+            feeFlow.setAmount(coldFee);
+            feeFlow.setTargetAddress(hotWallet.getNetName());
+            feeFlow.setCreateTime(System.currentTimeMillis());
+            feeFlow.setCoinName(transCoin.getCoinName());
+            flowMapper.insert(feeFlow);
+
+        }
+        //添加流水明细
+        ChainFlow coldFlow = new ChainFlow();
+        coldFlow.setNetName(hotWallet.getNetName());
+        coldFlow.setWalletType(3);
+        coldFlow.setAddress(hotWallet.getAddress());
+        coldFlow.setTxId(txId);
+        coldFlow.setTransferType(0);
+        coldFlow.setFlowWay(5);
+        coldFlow.setTargetAddress(wallet.getAddress());
+        coldFlow.setCreateTime(System.currentTimeMillis());
+        coldFlow.setCoinName(transCoin.getCoinName());
+        BigDecimal subtract = transAmount.subtract(coldFee);
+        if("base".equals(transCoin.getCoinType())){
+
+            coldFlow.setAmount(subtract);
+            flowMapper.insert(coldFlow);
+        }else {
+            String result = json.getJSONObject("receipt").getString("result");
+            if("SUCCESS".equals(result)){
+                coldFlow.setAmount(subtract);
+                flowMapper.insert(coldFlow);
+            }
+        }
+
+
+
+
+
     }
 }

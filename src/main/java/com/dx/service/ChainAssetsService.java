@@ -99,36 +99,18 @@ public class ChainAssetsService {
         LambdaQueryWrapper<ChainColdWallet> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainColdWallet::getNetName,hotWallet.getNetName());
         ChainColdWallet wallet = coldWalletMapper.selectOne(wrapper);
+        LambdaQueryWrapper<ChainCoin> bwrapper = Wrappers.lambdaQuery();
+        bwrapper.eq(ChainCoin::getNetName,hotWallet.getNetName());
+        bwrapper.eq(ChainCoin::getCoinType,"base");
+        ChainCoin baseCoin = coinMapper.selectOne(bwrapper);
         for (String code : vo.getCoinCodeList()) {
-            LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
-            awrapper.eq(ChainAssets::getAddress,hotWallet.getAddress());
-            awrapper.eq(ChainAssets::getCoinCode,code);
-            ChainAssets chainAssets = assetsMapper.selectOne(awrapper);
-            String txId = operateService.addressToGather(hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), code, chainAssets.getBalance());
-            if(StringUtils.isEmpty(txId)){
-                continue;
-            }
-            JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
-            if(json.containsKey("result")&&"FAILED".equals(json.containsKey("result"))){
-                continue;
-            }
-            chainAssets.setBalance(BigDecimal.ZERO);
-            assetsMapper.updateById(chainAssets);
-            ChainFlow coldFlow = new ChainFlow();
-            coldFlow.setNetName(hotWallet.getNetName());
-            coldFlow.setWalletType(3);
-            coldFlow.setAddress(hotWallet.getAddress());
-            coldFlow.setTxId(txId);
-            coldFlow.setTransferType(0);
-            coldFlow.setFlowWay(5);
-            coldFlow.setAmount(chainAssets.getBalance());
-            coldFlow.setTargetAddress(wallet.getAddress());
-            coldFlow.setCreateTime(System.currentTimeMillis());
-            coldFlow.setCoinName(chainAssets.getCoinName());
-            flowMapper.insert(coldFlow);
-            result.setMessage("操作成功");
-        }
+            bwrapper.clear();
+            bwrapper.eq(ChainCoin::getNetName,hotWallet.getNetName());
+            bwrapper.eq(ChainCoin::getCoinCode,code);
+            ChainCoin transCoin = coinMapper.selectOne(bwrapper);
+            operateService.hotWalletCold(wallet, hotWallet,transCoin,baseCoin);
 
+        }
         result.setMessage("操作成功");
         return result;
 
@@ -163,11 +145,7 @@ public class ChainAssetsService {
             feeFlow.setCreateTime(System.currentTimeMillis());
             feeFlow.setCoinName(feeWallet.getCoinName());
             flowMapper.insert(feeFlow);
-        }else {
-            feeWallet.setBalance(Constant.BaseUrl.trxfee);
         }
-        feeWalletMapper.updateById(feeWallet);
-
         //添加流水明细
         ChainFlow coldFlow = new ChainFlow();
         coldFlow.setNetName(feeWallet.getNetName());
