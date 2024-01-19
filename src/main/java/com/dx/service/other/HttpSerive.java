@@ -108,7 +108,7 @@ public class HttpSerive {
         if(Objects.isNull(success)||false==success){
             throw new RuntimeException("请求交易失败");
         }
-        String result = jsonObject.getJSONObject("result").getString("txId");
+        String result = jsonObject.getString("result");
         return result;
     }
 
