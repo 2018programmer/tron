@@ -159,7 +159,7 @@ public class ChainOperateService {
             transAmount =amount;
             //查询需要消耗的trx
             String estimateenergy = basicService.estimateenergy(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), amount);
-            if (amount.compareTo(new BigDecimal(estimateenergy))<0){
+            if (bigDecimal.compareTo(new BigDecimal(estimateenergy))<0){
                 return;
             }
             //开始归集 或者冷却
