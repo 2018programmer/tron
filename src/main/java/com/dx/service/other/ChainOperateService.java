@@ -170,6 +170,13 @@ public class ChainOperateService {
         if(StringUtils.isEmpty(txId)){
             return ;
         }
+        if(!"base".equals(transCoin.getCoinType())){
+            try{
+                Thread.sleep(3000);
+            }catch (Exception e){
+
+            }
+        }
         JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
         BigDecimal num6 = new BigDecimal("1000000");
         BigDecimal coldFee =BigDecimal.ZERO;
@@ -208,7 +215,10 @@ public class ChainOperateService {
             flowMapper.insert(coldFlow);
         }else {
             String result = json.getJSONObject("receipt").getString("result");
-            if("SUCCESS".equals(result)){
+            if("SUCCESS".equals(result)){{
+                coldFlow.setAmount(subtract);
+                flowMapper.insert(coldFlow);
+            }
                 coldFlow.setAmount(subtract);
                 flowMapper.insert(coldFlow);
             }
