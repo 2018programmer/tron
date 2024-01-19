@@ -85,7 +85,7 @@ public class HttpSerive {
         req.put("privateKey",privateKey);
         req.put("amount",amount);
 
-        String body = HttpRequest.post(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.ESTIMATEENERGY+"/"+coinCode).body(req.toJSONString()).execute().body();
+        String body = HttpRequest.post(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.TRANSFERCONTRACTCOINS+"/"+coinCode).body(req.toJSONString()).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
