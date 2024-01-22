@@ -41,5 +41,5 @@ public class ChainPoolAddress {
     /**
      * 分配id
      */
-    private Integer assignedId;
+    private String assignedId;
 }

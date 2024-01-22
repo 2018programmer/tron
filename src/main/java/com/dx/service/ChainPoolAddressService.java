@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.dto.*;
 import com.dx.entity.*;
 import com.dx.mapper.*;
+import com.dx.vo.GetUserAddressVO;
 import com.dx.vo.QueryPoolAddressVO;
 import com.dx.vo.UpdatePoolManageVO;
 import lombok.extern.slf4j.Slf4j;
@@ -197,10 +199,14 @@ public class ChainPoolAddressService {
 
     }
 
-    public Result matchUserAddress(String userId) {
+    public Result matchUserAddress(GetUserAddressVO vo) {
         Result<Object> result = new Result<>();
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainPoolAddress::getAssignedId,userId);
+        wrapper.eq(ChainPoolAddress::getAssignedId,vo.getAssignedId());
+        wrapper.eq(ChainPoolAddress::getAssignType,vo.getAssignType());
+        if(StringUtils.isNotEmpty(vo.getNetName())){
+            wrapper.eq(ChainPoolAddress::getNetName,vo.getNetName());
+        }
         List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(wrapper);
         if(!CollectionUtils.isEmpty(chainPoolAddresses)){
             ChainPoolAddress chainPoolAddress = chainPoolAddresses.get(0);
@@ -212,7 +218,11 @@ public class ChainPoolAddressService {
         wrapper.orderByAsc(ChainPoolAddress::getId);
         wrapper.last("limit 8");
         List<ChainPoolAddress> address = poolAddressMapper.selectList(wrapper);
-        result.setResult(address.get(0));
+        ChainPoolAddress chainPoolAddress = address.get(0);
+        chainPoolAddress.setIsAssigned(1);
+        chainPoolAddress.setAssignedId(vo.getAssignedId());
+        poolAddressMapper.updateById(chainPoolAddress);
+        result.setResult(chainPoolAddress.getAddress());
         return result;
     }
 }

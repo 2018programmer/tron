@@ -5,9 +5,11 @@ import com.dx.common.Result;
 import com.dx.dto.*;
 import com.dx.service.ChainPoolAddressService;
 import com.dx.vo.GetPoolManageVO;
+import com.dx.vo.GetUserAddressVO;
 import com.dx.vo.QueryPoolAddressVO;
 import com.dx.vo.UpdatePoolManageVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,8 +67,8 @@ public class ChainPoolAddressController {
      * @param userId
      * @return
      */
-    @GetMapping("/user-address/get")
-    public Result getUserAddress(String userId){
-        return poolService.matchUserAddress(userId);
+    @PostMapping("/user-address/get")
+    public Result getUserAddress( @Validated  @RequestBody GetUserAddressVO vo){
+        return poolService.matchUserAddress(vo);
     }
 }
