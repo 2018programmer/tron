@@ -14,6 +14,7 @@ import com.dx.mapper.ChainCoinMapper;
 import com.dx.mapper.ChainColdWalletMapper;
 import com.dx.mapper.ChainFeeWalletMapper;
 import com.dx.mapper.ChainHotWalletMapper;
+import com.dx.vo.HotWalletExpensesVO;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,4 +187,9 @@ public class ChainWalletService {
         return result;
     }
 
+    public Result hotWalletExpenses(HotWalletExpensesVO vo) {
+        Result<Object> result = new Result<>();
+        result.setMessage("操作成功");
+        return result;
+    }
 }

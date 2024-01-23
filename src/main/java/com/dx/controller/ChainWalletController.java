@@ -4,6 +4,7 @@ import com.dx.common.Result;
 import com.dx.dto.*;
 import com.dx.entity.ChainColdWallet;
 import com.dx.service.ChainWalletService;
+import com.dx.vo.HotWalletExpensesVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,5 +86,13 @@ public class ChainWalletController {
         return walletService.getFeeWallets(netName);
     }
 
+    /**
+     * 出款
+     * @return
+     */
+    @PostMapping("/hot-wallet/expenses")
+    public Result hotWalletExpenses(HotWalletExpensesVO vo){
+        return walletService.hotWalletExpenses(vo);
+    }
 
 }

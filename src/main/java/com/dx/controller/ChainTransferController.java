@@ -36,4 +36,5 @@ public class ChainTransferController {
     public Result<IPage<ChainAddressExpenses>> getAddressExpenses(GetAddressExpensesVO vo){
         return transferService.getAddressExpenses(vo);
     }
+
 }
