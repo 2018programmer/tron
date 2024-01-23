@@ -2,7 +2,9 @@ package com.dx.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Result;
+import com.dx.dto.GetNetByNameDTO;
 import com.dx.dto.NetDTO;
 import com.dx.vo.UpdateNetStatusVO;
 import com.dx.entity.ChainCoin;
@@ -65,5 +67,23 @@ public class ChainNetService {
         return result;
         
         
+    }
+
+    public Result<GetNetByNameDTO> getNetByName(String netName, String coinName) {
+        Result<GetNetByNameDTO> result = new Result<>();
+        LambdaQueryWrapper<ChainNet> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainNet::getNetName,netName);
+        wrapper.eq(ChainNet::getRunningStatus,1);
+        ChainNet chainNet = netMapper.selectOne(wrapper);
+
+        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
+        cwrapper.eq(ChainCoin::getCoinName,coinName);
+        cwrapper.eq(ChainCoin::getNetName,netName);
+        ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+        GetNetByNameDTO getNetByNameDTO = new GetNetByNameDTO();
+        getNetByNameDTO.setRechargeNetConfirmNum(chainNet.getRechargeNetConfirmNum());
+        getNetByNameDTO.setMinNum(chainCoin.getMinNum());
+        result.setResult(getNetByNameDTO);
+        return result;
     }
 }

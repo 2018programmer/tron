@@ -1,7 +1,9 @@
 package com.dx.controller;
 
 import com.dx.common.Result;
+import com.dx.dto.GetNetByNameDTO;
 import com.dx.dto.NetDTO;
+import com.dx.entity.ChainNet;
 import com.dx.vo.UpdateNetStatusVO;
 import com.dx.service.ChainNetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,15 @@ public class ChainNetController {
     @GetMapping("/list/get")
     public Result<List<NetDTO>> getNets(){
         return chainNetService.getChainNet();
+    }
+
+    /**
+     * 通过名字获取主网
+     * @return
+     */
+    @GetMapping("/get-by-name")
+    public Result<GetNetByNameDTO> getNetByName(String netName, String coinName){
+        return chainNetService.getNetByName(netName,coinName);
     }
 
     /**
