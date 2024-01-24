@@ -18,10 +18,6 @@ public class GetUserAddressVO implements Serializable {
     @NotNull(message = "id不能为空")
     private String assignedId;
     /**
-     * 绑定名称
-     */
-    private String assignedName;
-    /**
      * 主网名称
      */
     @NotNull(message = "主网名称不能为空")
