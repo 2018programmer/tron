@@ -221,6 +221,7 @@ public class ChainPoolAddressService {
         ChainPoolAddress chainPoolAddress = address.get(0);
         chainPoolAddress.setIsAssigned(1);
         chainPoolAddress.setAssignedId(vo.getAssignedId());
+        chainPoolAddress.setAssignName(vo.getAssignedName());
         poolAddressMapper.updateById(chainPoolAddress);
         result.setResult(chainPoolAddress.getAddress());
         return result;

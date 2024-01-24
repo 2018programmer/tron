@@ -35,6 +35,10 @@ public class ChainPoolAddress {
      */
     private Integer assignType;
     /**
+     * 绑定名称
+     */
+    private String assignName;
+    /**
      * 主网名字
      */
     private String netName;
