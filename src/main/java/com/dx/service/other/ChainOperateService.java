@@ -223,10 +223,5 @@ public class ChainOperateService {
                 flowMapper.insert(coldFlow);
             }
         }
-
-
-
-
-
     }
 }

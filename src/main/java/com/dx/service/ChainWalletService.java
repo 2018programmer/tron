@@ -6,14 +6,8 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Result;
 import com.dx.dto.*;
-import com.dx.entity.ChainCoin;
-import com.dx.entity.ChainColdWallet;
-import com.dx.entity.ChainFeeWallet;
-import com.dx.entity.ChainHotWallet;
-import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainColdWalletMapper;
-import com.dx.mapper.ChainFeeWalletMapper;
-import com.dx.mapper.ChainHotWalletMapper;
+import com.dx.entity.*;
+import com.dx.mapper.*;
 import com.dx.vo.HotWalletExpensesVO;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +26,9 @@ public class ChainWalletService {
 
     @Autowired
     private ChainHotWalletMapper hotWalletMapper;
+
+    @Autowired
+    private ChainPoolAddressMapper chainPoolAddressMapper;
     
     @Autowired
     private ChainColdWalletMapper coldWalletMapper;
@@ -187,9 +184,47 @@ public class ChainWalletService {
         return result;
     }
 
-    public Result hotWalletExpenses(HotWalletExpensesVO vo) {
+    public Result hotWalletExpenses(HotWalletExpensesVO vo){
         Result<Object> result = new Result<>();
-        result.setMessage("操作成功");
+        LambdaQueryWrapper<ChainHotWallet> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
+
+        List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(wrapper);
+        if(CollectionUtils.isEmpty(chainHotWallets)){
+            result.error("没有热钱包");
+            return result;
+        }
+        LambdaQueryWrapper<ChainPoolAddress> awrapper = Wrappers.lambdaQuery();
+        awrapper.eq(ChainPoolAddress::getAddress,vo.getAddress());
+
+        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
+        cwrapper.eq(ChainCoin::getCoinName,vo.getCoinName());
+        cwrapper.eq(ChainCoin::getNetName,vo.getNetName());
+        ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+        String txId ="";
+        for (ChainHotWallet chainHotWallet : chainHotWallets) {
+
+            BigDecimal balance = basicService.queryContractBalance(chainCoin.getNetName(), chainCoin.getCoinCode(), chainHotWallet.getAddress());
+            if(vo.getAmount().compareTo(balance)>0){
+                continue;
+            }
+            String estimateenergy = basicService.estimateenergy(chainCoin.getNetName(), chainHotWallet.getAddress()
+                    , vo.getAddress(), chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
+            BigDecimal trx = basicService.queryBalance(chainCoin.getNetName(), vo.getAddress());
+            if (trx.compareTo(new BigDecimal(estimateenergy))<0){
+                continue;
+            }
+             txId= basicService.transferContractCoins(chainCoin.getNetName(), chainHotWallet.getAddress(), vo.getAddress()
+                    , chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
+            if(StringUtils.isNotEmpty(txId)){
+                try{
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                }
+                break;
+            }
+        }
+        result.setResult(txId);
         return result;
     }
 }

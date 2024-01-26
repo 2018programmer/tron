@@ -1,5 +1,6 @@
 package com.dx.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -24,6 +25,8 @@ public class ChainTranferService {
 
     @Autowired
     private ChainAddressExpensesMapper addressExpensesMapper;
+    @Autowired
+    private ChainBasicService basicService;
 
 
     public Result<IPage<ChainAddressIncome>> getAddressIncome(GetAddressIncomeVO vo) {
@@ -67,4 +70,15 @@ public class ChainTranferService {
 
     }
 
+    public Result getResultByTxId(String netName,String txId) {
+        Result<Object> result = new Result<>();
+        JSONObject json = basicService.gettransactioninfo(netName, txId);
+        String success = json.getJSONObject("receipt").getString("result");
+        if("SUCCESS".equals(success)){
+            result.setMessage("成功");
+        }else {
+            result.error("失败");
+        }
+        return result;
+    }
 }

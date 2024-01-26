@@ -37,4 +37,14 @@ public class ChainTransferController {
         return transferService.getAddressExpenses(vo);
     }
 
+    /**
+     * 通过交易id获取交易结果
+     * @param txId
+     * @return
+     */
+    @GetMapping("/result/get")
+    public Result  getResultByTxId(String netName,String txId){
+        return transferService.getResultByTxId(netName,txId);
+    }
+
 }
