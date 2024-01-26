@@ -184,14 +184,15 @@ public class ChainWalletService {
         return result;
     }
 
-    public Result hotWalletExpenses(HotWalletExpensesVO vo){
-        Result<Object> result = new Result<>();
+    public Result<HotWalletExpensesDTO> hotWalletExpenses(HotWalletExpensesVO vo){
+        Result<HotWalletExpensesDTO> result = new Result<>();
         LambdaQueryWrapper<ChainHotWallet> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
+        wrapper.eq(ChainHotWallet::getRunningStatus,1);
 
         List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(wrapper);
         if(CollectionUtils.isEmpty(chainHotWallets)){
-            result.error("没有热钱包");
+            result.error("热钱包为空");
             return result;
         }
         LambdaQueryWrapper<ChainPoolAddress> awrapper = Wrappers.lambdaQuery();
@@ -202,6 +203,7 @@ public class ChainWalletService {
         cwrapper.eq(ChainCoin::getNetName,vo.getNetName());
         ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
         String txId ="";
+        String address="";
         for (ChainHotWallet chainHotWallet : chainHotWallets) {
 
             BigDecimal balance = basicService.queryContractBalance(chainCoin.getNetName(), chainCoin.getCoinCode(), chainHotWallet.getAddress());
@@ -217,6 +219,7 @@ public class ChainWalletService {
              txId= basicService.transferContractCoins(chainCoin.getNetName(), chainHotWallet.getAddress(), vo.getAddress()
                     , chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
             if(StringUtils.isNotEmpty(txId)){
+                address= chainHotWallet.getAddress();
                 try{
                     Thread.sleep(1000);
                 }catch (Exception e){
@@ -224,7 +227,14 @@ public class ChainWalletService {
                 break;
             }
         }
-        result.setResult(txId);
+        if(StringUtils.isEmpty(txId)){
+            result.error("出款失败,检查热钱包余额");
+            return result;
+        }
+        HotWalletExpensesDTO hotWalletExpensesDTO = new HotWalletExpensesDTO();
+        hotWalletExpensesDTO.setTxId(txId);
+        hotWalletExpensesDTO.setAddress(address);
+        result.setResult(hotWalletExpensesDTO);
         return result;
     }
 }
