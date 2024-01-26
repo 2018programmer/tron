@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dx.common.Constant;
+import com.dx.vo.CreateOrderVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,13 @@ import java.util.Objects;
 public class HttpSerive {
 
     @Value("${base.url}")
-    private String url;
+    private String chainbaseUrl;
+
     /**
      * 生成地址
      */
     public JSONObject createAddress(String netName){
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.CREATEADDRESS).execute().body();
+        String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.CREATEADDRESS).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
@@ -36,7 +38,7 @@ public class HttpSerive {
         return result;
     }
     public JSONObject createAddressBynum(String netName,Integer num){
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.CREATEADDRESSBYNUM+"/"+num).execute().body();
+        String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.CREATEADDRESSBYNUM+"/"+num).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
@@ -48,7 +50,7 @@ public class HttpSerive {
     }
     public Integer getnowblock(String netName) {
 
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETNOWBLOCK).execute().body();
+        String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETNOWBLOCK).execute().body();
         log.info("查询最新区块，查询结果:{}",body);
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
@@ -63,7 +65,7 @@ public class HttpSerive {
     public String getblockbynum(String netName,Integer num) {
         Map<String, Object> map = new HashMap<>();
         map.put("num",num);
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETBLOCKBYNUM).form(map).execute().body();
+        String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETBLOCKBYNUM).form(map).execute().body();
         log.info("查询第{}区块，查询结果:{}",num,body);
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
@@ -85,7 +87,7 @@ public class HttpSerive {
         req.put("privateKey",privateKey);
         req.put("amount",amount);
 
-        String body = HttpRequest.post(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.TRANSFERCONTRACTCOINS+"/"+coinCode).body(req.toJSONString()).execute().body();
+        String body = HttpRequest.post(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.TRANSFERCONTRACTCOINS+"/"+coinCode).body(req.toJSONString()).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
@@ -102,7 +104,7 @@ public class HttpSerive {
         req.put("privateKey",privateKey);
         req.put("amount",amount);
 
-        String body = HttpRequest.post(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.ESTIMATEENERGY+"/"+coinCode).body(req.toJSONString()).execute().body();
+        String body = HttpRequest.post(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.ESTIMATEENERGY+"/"+coinCode).body(req.toJSONString()).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
@@ -120,7 +122,7 @@ public class HttpSerive {
         req.put("privateKey",privateKey);
         req.put("amount",amount);
 
-        String body = HttpRequest.post(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.TRANSFERBASECOINS).body(req.toJSONString()).execute().body();
+        String body = HttpRequest.post(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.TRANSFERBASECOINS).body(req.toJSONString()).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
@@ -133,7 +135,7 @@ public class HttpSerive {
     public JSONObject gettransactioninfo(String netName,String txId) {
         Map<String, Object> map = new HashMap<>();
         map.put("txId",txId);
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETTRANSACTIONINFO).form(map).execute().body();
+        String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETTRANSACTIONINFO).form(map).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
@@ -145,7 +147,7 @@ public class HttpSerive {
     public BigDecimal queryBalance(String netName,String address){
         Map<String, Object> map = new HashMap<>();
         map.put("address",address);
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYBASEBALANCE).form(map).execute().body();
+        String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYBASEBALANCE).form(map).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
@@ -161,7 +163,7 @@ public class HttpSerive {
     public BigDecimal queryContractBalance(String netName,String coinCode,String address){
         Map<String, Object> map = new HashMap<>();
         map.put("address",address);
-        String body = HttpRequest.get(url + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYCONTRACTBALANCE+"/"+coinCode).form(map).execute().body();
+        String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.QUERYCONTRACTBALANCE+"/"+coinCode).form(map).execute().body();
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){

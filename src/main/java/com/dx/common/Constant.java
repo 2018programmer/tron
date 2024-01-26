@@ -30,8 +30,9 @@ public interface Constant {
         String TRANSFERBASECOINS ="/transferBaseCoins";
 
         String QUERYBASEBALANCE="/queryBaseBalance";
-
-
         String QUERYCONTRACTBALANCE="/queryContractBalance";
+    }
+    interface OrderUrl{
+        String createOrder ="/merchant/back/recharge/create";
     }
 }

@@ -4,11 +4,14 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.dto.ContactDTO;
 import com.dx.entity.*;
 import com.dx.mapper.*;
+import com.dx.service.ApiService;
 import com.dx.service.ChainBasicService;
+import com.dx.vo.CreateOrderVO;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,8 @@ public class MonitorJob {
 
     @Autowired
     private PlatformTransactionManager transactionManager;
+    @Autowired
+    private ApiService apiService;
     @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
         var numsql =0;
@@ -110,6 +115,19 @@ public class MonitorJob {
                     chainAddressIncome.setCoinName(chainCoin.getCoinName());
                     chainAddressIncome.setAmount(contactDTO.getAmount());
                     incomeMapper.insert(chainAddressIncome);
+                    //记录流水
+                    ChainFlow chainFlow = new ChainFlow();
+                    chainFlow.setGroupId(String.valueOf(System.currentTimeMillis()));
+                    chainFlow.setAddress(contactDTO.getToAddress());
+                    chainFlow.setFlowWay(1);
+                    chainFlow.setAmount(contactDTO.getAmount());
+                    chainFlow.setTransferType(1);
+                    chainFlow.setCoinName(chainCoin.getCoinName());
+                    chainFlow.setTxId(contactDTO.getTxId());
+                    chainFlow.setWalletType(1);
+                    chainFlow.setTargetAddress(contactDTO.getFromAddress());
+                    chainFlow.setNetName(chainCoin.getNetName());
+                    chainFlow.setCreateTime(System.currentTimeMillis());
                     // 添加或更新资产记录
                     LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
                     aswrapper.eq(ChainAssets::getAddress,chainPoolAddress.getAddress());
@@ -128,6 +146,21 @@ public class MonitorJob {
                         balance.add(contactDTO.getAmount());
                         assetsMapper.updateById(chainAssets);
                     }
+                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())){
+                        CreateOrderVO createOrderVO = new CreateOrderVO();
+                        createOrderVO.setExchangeCurrency(chainCoin.getCoinName());
+                        createOrderVO.setAccountId(chainPoolAddress.getAssignedId());
+                        createOrderVO.setType(chainPoolAddress.getAssignType());
+                        createOrderVO.setExchangeAmount(contactDTO.getAmount());
+                        createOrderVO.setFromAddr(contactDTO.getFromAddress());
+                        createOrderVO.setToAddr(contactDTO.getToAddress());
+                        createOrderVO.setTranId(contactDTO.getTxId());
+                        createOrderVO.setMainNet(1);
+                        apiService.createOrder(createOrderVO);
+                    }
+                    //创建充值订单
+
+
                 }
                 hit.setCnt(i+1);
                 hitCounterMapper.updateById(hit);
