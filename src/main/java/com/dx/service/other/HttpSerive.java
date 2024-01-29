@@ -93,7 +93,7 @@ public class HttpSerive {
         if(Objects.isNull(success)||false==success){
             throw new RuntimeException("获取交易需要矿工费失败");
         }
-        String  result = jsonObject.getString("result");
+        String  result = jsonObject.getJSONObject("result").getString("txId");;
         return result;
     }
     public String  estimateenergy(String netName, String formAddress, String toaddress, String privateKey, String coinCode, BigDecimal amount) {

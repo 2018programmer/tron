@@ -234,6 +234,7 @@ public class ChainWalletService {
             }
              txId= basicService.transferContractCoins(chainCoin.getNetName(), chainHotWallet.getAddress(), vo.getAddress()
                     , chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
+
             if(StringUtils.isNotEmpty(txId)){
                 address= chainHotWallet.getAddress();
                 try{
@@ -255,6 +256,7 @@ public class ChainWalletService {
         chainAddressExpenses.setExpensesStatus(4);
         addressExpensesMapper.insert(chainAddressExpenses);
         ChainFlow chainFlow = new ChainFlow();
+        chainFlow.setGroupId(vo.getOrderId());
         chainFlow.setGroupId(vo.getOrderId());
         chainFlow.setAddress(address);
         chainFlow.setFlowWay(2);
