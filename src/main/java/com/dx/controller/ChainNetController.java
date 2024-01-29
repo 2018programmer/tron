@@ -39,6 +39,15 @@ public class ChainNetController {
     }
 
     /**
+     * 通过币种获取主网
+     * @return
+     */
+    @GetMapping("/get-by-coin")
+    public Result<List<GetNetByNameDTO>> getNetByCoin(String coinName){
+        return chainNetService.getNetByCoin(coinName);
+    }
+
+    /**
      * 修改主网运行状态
      */
     @PostMapping("/status/update")

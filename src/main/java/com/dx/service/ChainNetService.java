@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ChainNetService {
@@ -85,5 +86,27 @@ public class ChainNetService {
         getNetByNameDTO.setMinNum(chainCoin.getMinNum());
         result.setResult(getNetByNameDTO);
         return result;
+    }
+
+    public Result<List<GetNetByNameDTO>> getNetByCoin(String coinName) {
+        Result<List<GetNetByNameDTO>> result = new Result<>();
+        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
+        cwrapper.eq(ChainCoin::getCoinName,coinName);
+        List<ChainCoin> chainCoins = coinMapper.selectList(cwrapper);
+        List<GetNetByNameDTO> dtos = new ArrayList<>();
+        for (ChainCoin chainCoin : chainCoins) {
+            GetNetByNameDTO getNetByNameDTO = new GetNetByNameDTO();
+            getNetByNameDTO.setNetName(chainCoin.getNetName());
+            getNetByNameDTO.setMinNum(chainCoin.getMinNum());
+            LambdaQueryWrapper<ChainNet> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(ChainNet::getNetName,chainCoin.getNetName());
+            ChainNet chainNet = netMapper.selectOne(wrapper);
+            getNetByNameDTO.setRechargeNetConfirmNum(chainNet.getRechargeNetConfirmNum());
+            dtos.add(getNetByNameDTO);
+        }
+
+        result.setResult(dtos);
+        return result;
+
     }
 }

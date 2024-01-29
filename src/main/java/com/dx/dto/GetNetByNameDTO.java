@@ -7,6 +7,10 @@ import java.io.Serializable;
 @Data
 public class GetNetByNameDTO implements Serializable {
     /**
+     * 主网名称
+     */
+    private String netName;
+    /**
      * 充值网络确认数
      */
     private Integer rechargeNetConfirmNum;

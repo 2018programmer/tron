@@ -261,7 +261,7 @@ public class ChainWalletService {
         chainFlow.setAddress(address);
         chainFlow.setFlowWay(2);
         chainFlow.setAmount(vo.getAmount());
-        chainFlow.setTransferType(1);
+        chainFlow.setTransferType(0);
         chainFlow.setCoinName(chainCoin.getCoinName());
         chainFlow.setTxId(txId);
         chainFlow.setWalletType(3);
