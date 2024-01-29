@@ -23,4 +23,8 @@ public class HotWalletExpensesVO implements Serializable {
      * 数额
      */
     private BigDecimal amount;
+    /**
+     * 订单号
+     */
+    private String orderId;
 }

@@ -52,6 +52,9 @@ public class MonitorJob {
     private PlatformTransactionManager transactionManager;
     @Autowired
     private ApiService apiService;
+
+    @Autowired
+    private ChainFlowMapper flowMapper;
     @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
         var numsql =0;
@@ -128,6 +131,7 @@ public class MonitorJob {
                     chainFlow.setTargetAddress(contactDTO.getFromAddress());
                     chainFlow.setNetName(chainCoin.getNetName());
                     chainFlow.setCreateTime(System.currentTimeMillis());
+                    flowMapper.insert(chainFlow);
                     // 添加或更新资产记录
                     LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
                     aswrapper.eq(ChainAssets::getAddress,chainPoolAddress.getAddress());

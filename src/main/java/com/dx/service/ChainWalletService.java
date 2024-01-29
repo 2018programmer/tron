@@ -44,6 +44,11 @@ public class ChainWalletService {
     @Autowired
     private ChainCoinMapper coinMapper;
 
+    @Autowired
+    private ChainAddressExpensesMapper addressExpensesMapper;
+    @Autowired
+    private ChainFlowMapper flowMapper;
+
     public Result updateColdWallet(UpdateColdWalletDTO dto){
         Result<Object> result = new Result<>();
         ChainColdWallet chainColdWallet = coldWalletMapper.selectById(dto.getId());
@@ -207,6 +212,14 @@ public class ChainWalletService {
         ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
         String txId ="";
         String address="";
+        ChainAddressExpenses chainAddressExpenses = new ChainAddressExpenses();
+        chainAddressExpenses.setCoinName(chainCoin.getCoinName());
+        chainAddressExpenses.setNetName(chainCoin.getNetName());
+        chainAddressExpenses.setAmount(vo.getAmount());
+        chainAddressExpenses.setSerial(vo.getOrderId());
+        chainAddressExpenses.setCreateTime(System.currentTimeMillis());
+        chainAddressExpenses.setTryTime(1);
+
         for (ChainHotWallet chainHotWallet : chainHotWallets) {
 
             BigDecimal balance = basicService.queryContractBalance(chainCoin.getNetName(), chainCoin.getCoinCode(), chainHotWallet.getAddress());
@@ -230,10 +243,30 @@ public class ChainWalletService {
                 break;
             }
         }
+
+        chainAddressExpenses.setAddress(address);
+        chainAddressExpenses.setFinishTime(System.currentTimeMillis());
         if(StringUtils.isEmpty(txId)){
+            chainAddressExpenses.setExpensesStatus(3);
+            addressExpensesMapper.insert(chainAddressExpenses);
             result.error("出款失败,检查热钱包余额");
             return result;
         }
+        chainAddressExpenses.setExpensesStatus(4);
+        addressExpensesMapper.insert(chainAddressExpenses);
+        ChainFlow chainFlow = new ChainFlow();
+        chainFlow.setGroupId(vo.getOrderId());
+        chainFlow.setAddress(address);
+        chainFlow.setFlowWay(2);
+        chainFlow.setAmount(vo.getAmount());
+        chainFlow.setTransferType(1);
+        chainFlow.setCoinName(chainCoin.getCoinName());
+        chainFlow.setTxId(txId);
+        chainFlow.setWalletType(3);
+        chainFlow.setTargetAddress(vo.getAddress());
+        chainFlow.setNetName(chainCoin.getNetName());
+        chainFlow.setCreateTime(System.currentTimeMillis());
+        flowMapper.insert(chainFlow);
         HotWalletExpensesDTO hotWalletExpensesDTO = new HotWalletExpensesDTO();
         hotWalletExpensesDTO.setTxId(txId);
         hotWalletExpensesDTO.setAddress(address);
