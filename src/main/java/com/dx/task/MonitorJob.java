@@ -151,6 +151,7 @@ public class MonitorJob {
                         assetsMapper.updateById(chainAssets);
                     }
                     if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())){
+                        //创建充值订单
                         CreateOrderVO createOrderVO = new CreateOrderVO();
                         createOrderVO.setExchangeCurrency(chainCoin.getCoinName());
                         createOrderVO.setAccountId(chainPoolAddress.getAssignedId());
@@ -160,10 +161,9 @@ public class MonitorJob {
                         createOrderVO.setToAddr(contactDTO.getToAddress());
                         createOrderVO.setTranId(contactDTO.getTxId());
                         createOrderVO.setMainNet(1);
+                        log.info("充值订单请求参数:{}",createOrderVO);
                         apiService.createOrder(createOrderVO);
                     }
-                    //创建充值订单
-
 
                 }
                 hit.setCnt(i+1);
