@@ -204,9 +204,8 @@ public class ChainPoolAddressService {
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainPoolAddress::getAssignedId,vo.getAssignedId());
         wrapper.eq(ChainPoolAddress::getAssignType,vo.getAssignType());
-        if(StringUtils.isNotEmpty(vo.getNetName())){
-            wrapper.eq(ChainPoolAddress::getNetName,vo.getNetName());
-        }
+        wrapper.eq(ChainPoolAddress::getNetName,vo.getNetName());
+
         List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(wrapper);
         if(!CollectionUtils.isEmpty(chainPoolAddresses)){
             ChainPoolAddress chainPoolAddress = chainPoolAddresses.get(0);
@@ -214,7 +213,7 @@ public class ChainPoolAddressService {
             return result;
         }
         wrapper.clear();
-        wrapper.eq(ChainPoolAddress::getIsActivated,0);
+        wrapper.eq(ChainPoolAddress::getIsAssigned,0);
         wrapper.orderByAsc(ChainPoolAddress::getId);
         wrapper.last("limit 8");
         List<ChainPoolAddress> address = poolAddressMapper.selectList(wrapper);
