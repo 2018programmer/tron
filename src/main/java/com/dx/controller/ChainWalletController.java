@@ -91,7 +91,7 @@ public class ChainWalletController {
      * @return
      */
     @PostMapping("/hot-wallet/expenses")
-    public Result<HotWalletExpensesDTO> hotWalletExpenses(HotWalletExpensesVO vo){
+    public Result<HotWalletExpensesDTO> hotWalletExpenses(@RequestBody HotWalletExpensesVO vo){
         return walletService.hotWalletExpenses(vo);
     }
 
