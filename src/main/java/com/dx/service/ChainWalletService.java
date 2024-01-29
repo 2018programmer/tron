@@ -9,6 +9,7 @@ import com.dx.dto.*;
 import com.dx.entity.*;
 import com.dx.mapper.*;
 import com.dx.vo.HotWalletExpensesVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class ChainWalletService {
 
     @Autowired
@@ -185,6 +187,7 @@ public class ChainWalletService {
     }
 
     public Result<HotWalletExpensesDTO> hotWalletExpenses(HotWalletExpensesVO vo){
+        log.info("出款参数为:{}"+vo.toString());
         Result<HotWalletExpensesDTO> result = new Result<>();
         LambdaQueryWrapper<ChainHotWallet> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
