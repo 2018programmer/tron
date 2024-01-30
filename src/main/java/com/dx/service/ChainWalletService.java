@@ -74,12 +74,17 @@ public class ChainWalletService {
             result.error("没有数据");
             return result;
         }
+        LambdaQueryWrapper<ChainAddressExpenses> ewrapper = Wrappers.lambdaQuery();
         List<HotWalletDTO> list = new ArrayList<>();
         for (ChainHotWallet chainHotWallet : chainHotWallets) {
             HotWalletDTO hotWalletDTO = new HotWalletDTO();
             BeanUtils.copyProperties(chainHotWallet,hotWalletDTO);
+            ewrapper.clear();
+            ewrapper.eq(ChainAddressExpenses::getAddress,chainHotWallet.getAddress());
+            ewrapper.eq(ChainAddressExpenses::getExpensesStatus,4);
+            Long num = addressExpensesMapper.selectCount(ewrapper);
+            hotWalletDTO.setOutCount(num.intValue());
             hotWalletDTO.setInCount(0);
-            hotWalletDTO.setOutCount(0);
             hotWalletDTO.setConvertBalance(BigDecimal.ZERO);
             list.add(hotWalletDTO);
         }
