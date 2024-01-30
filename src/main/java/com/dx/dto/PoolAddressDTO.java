@@ -34,7 +34,7 @@ public class PoolAddressDTO implements Serializable {
     /**
      * 分配id
      */
-    private Integer assignId;
+    private String assignId;
     /**
      * 主网名称
      */

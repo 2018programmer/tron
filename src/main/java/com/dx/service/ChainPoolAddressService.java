@@ -139,6 +139,7 @@ public class ChainPoolAddressService {
         IPage<PoolAddressDTO> convert = page.convert(u -> {
             PoolAddressDTO poolAddressDTO = new PoolAddressDTO();
             BeanUtils.copyProperties(u, poolAddressDTO);
+            poolAddressDTO.setAssignId(u.getAssignedId());
             poolAddressDTO.setEstimateBalance(BigDecimal.ZERO);
             return poolAddressDTO;
         });
