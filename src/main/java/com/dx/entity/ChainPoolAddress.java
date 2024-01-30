@@ -31,7 +31,7 @@ public class ChainPoolAddress {
      */
     private Integer isActivated;
     /**
-     * 分配类型 0 无 1 商户 2用户
+     * 分配类型 0 无 1 商户 2钱包用户 3 钱包用户
      */
     private Integer assignType;
     /**

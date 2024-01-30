@@ -45,6 +45,7 @@ public class ChainTranferService {
         if(ObjectUtils.isNotNull(vo.getEffective())){
             wrapper.eq(ChainAddressIncome::getEffective,vo.getEffective());
         }
+        wrapper.orderByDesc(ChainAddressIncome::getAddress);
         IPage<ChainAddressIncome> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page = addressIncomeMapper.selectPage(page, wrapper);
 
