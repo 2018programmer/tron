@@ -37,6 +37,7 @@ public class ChainFlowService {
         if(ObjectUtils.isNotNull(vo.getEndTime())){
 
         }
+        wrapper.orderByDesc(ChainFlow::getId);
         IPage<ChainFlow> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page =flowMapper.selectPage(page,wrapper);
 
