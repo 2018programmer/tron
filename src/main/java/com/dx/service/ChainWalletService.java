@@ -246,6 +246,7 @@ public class ChainWalletService {
         chainAddressExpenses.setAddress(address);
         chainAddressExpenses.setFinishTime(System.currentTimeMillis());
         if(StringUtils.isEmpty(txId)){
+            chainAddressExpenses.setTxId(txId);
             chainAddressExpenses.setExpensesStatus(3);
             addressExpensesMapper.insert(chainAddressExpenses);
             result.error("出款失败,检查热钱包余额");

@@ -31,6 +31,11 @@ public class ChainAddressExpenses implements Serializable {
     private String serial;
 
     /**
+     * 交易id
+     */
+    private String txId;
+
+    /**
      *  状态 1 等待中 2处理中 3异常 4已完成
      */
     private Integer expensesStatus;
