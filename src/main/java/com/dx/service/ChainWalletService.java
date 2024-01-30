@@ -80,7 +80,6 @@ public class ChainWalletService {
             BeanUtils.copyProperties(chainHotWallet,hotWalletDTO);
             hotWalletDTO.setInCount(0);
             hotWalletDTO.setOutCount(0);
-            hotWalletDTO.setBalance(basicService.queryBalance(netName, chainHotWallet.getAddress()));
             hotWalletDTO.setConvertBalance(BigDecimal.ZERO);
             list.add(hotWalletDTO);
         }
@@ -169,7 +168,6 @@ public class ChainWalletService {
             for (ChainFeeWallet chainFeeWallet : chainFeeWallets) {
                 FeeWalletDTO feeWalletDTO = new FeeWalletDTO();
                 BeanUtils.copyProperties(chainFeeWallet,feeWalletDTO);
-                feeWalletDTO.setBalance(basicService.queryBalance(chainFeeWallet.getNetName(), chainFeeWallet.getAddress()).toString());
                 list.add(feeWalletDTO);
             }
         }
