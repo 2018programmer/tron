@@ -3,6 +3,7 @@ package com.dx.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 public class FeeWalletDTO implements Serializable {
@@ -23,7 +24,7 @@ public class FeeWalletDTO implements Serializable {
     /**
      * 余额
      */
-    private String balance;
+    private BigDecimal balance;
     /**
      * 启动状态 1:启用0:停用
      */
