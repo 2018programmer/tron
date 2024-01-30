@@ -45,7 +45,7 @@ public class ChainTranferService {
         if(ObjectUtils.isNotNull(vo.getEffective())){
             wrapper.eq(ChainAddressIncome::getEffective,vo.getEffective());
         }
-        wrapper.orderByDesc(ChainAddressIncome::getAddress);
+        wrapper.orderByDesc(ChainAddressIncome::getId);
         IPage<ChainAddressIncome> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page = addressIncomeMapper.selectPage(page, wrapper);
 
@@ -63,6 +63,7 @@ public class ChainTranferService {
         if(ObjectUtils.isNotNull(vo.getExpensesStatus())){
             wrapper.eq(ChainAddressExpenses::getExpensesStatus,vo.getExpensesStatus());
         }
+        wrapper.orderByDesc(ChainAddressExpenses::getId);
         IPage<ChainAddressExpenses> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page = addressExpensesMapper.selectPage(page, wrapper);
 
