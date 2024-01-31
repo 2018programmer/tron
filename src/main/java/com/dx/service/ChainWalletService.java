@@ -231,7 +231,7 @@ public class ChainWalletService {
             }
             String estimateenergy = basicService.estimateenergy(chainCoin.getNetName(), chainHotWallet.getAddress()
                     , vo.getAddress(), chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
-            BigDecimal trx = basicService.queryBalance(chainCoin.getNetName(), vo.getAddress());
+            BigDecimal trx = basicService.queryBalance(chainCoin.getNetName(), chainHotWallet.getAddress());
             if (trx.compareTo(new BigDecimal(estimateenergy))<0){
                 continue;
             }
@@ -251,12 +251,12 @@ public class ChainWalletService {
         chainAddressExpenses.setAddress(address);
         chainAddressExpenses.setFinishTime(System.currentTimeMillis());
         if(StringUtils.isEmpty(txId)){
-            chainAddressExpenses.setTxId(txId);
             chainAddressExpenses.setExpensesStatus(3);
             addressExpensesMapper.insert(chainAddressExpenses);
             result.error("出款失败,检查热钱包余额");
             return result;
         }
+        chainAddressExpenses.setTxId(txId);
         chainAddressExpenses.setExpensesStatus(4);
         addressExpensesMapper.insert(chainAddressExpenses);
         ChainFlow chainFlow = new ChainFlow();
