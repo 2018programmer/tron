@@ -150,7 +150,7 @@ public class MonitorJob {
                         balance.add(contactDTO.getAmount());
                         assetsMapper.updateById(chainAssets);
                     }
-                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())){
+                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getThreshold().compareTo(contactDTO.getAmount())<=0){
                         //创建充值订单
                         CreateOrderVO createOrderVO = new CreateOrderVO();
                         createOrderVO.setExchangeCurrency(chainCoin.getCoinName());
