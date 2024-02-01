@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.dx.common.NetEnum;
 import com.dx.common.Result;
 import com.dx.pojo.dto.*;
 import com.dx.entity.*;
@@ -27,10 +28,6 @@ public class ChainWalletService {
 
     @Autowired
     private ChainHotWalletMapper hotWalletMapper;
-
-    @Autowired
-    private ChainPoolAddressMapper chainPoolAddressMapper;
-    
     @Autowired
     private ChainColdWalletMapper coldWalletMapper;
 
@@ -42,6 +39,9 @@ public class ChainWalletService {
 
     @Autowired
     private ChainCoinMapper coinMapper;
+
+    @Autowired
+    private ChainAssetsMapper assetsMapper;
 
     @Autowired
     private ChainAddressExpensesMapper addressExpensesMapper;
@@ -74,6 +74,7 @@ public class ChainWalletService {
             return result;
         }
         LambdaQueryWrapper<ChainAddressExpenses> ewrapper = Wrappers.lambdaQuery();
+        LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
         List<HotWalletDTO> list = new ArrayList<>();
         for (ChainHotWallet chainHotWallet : chainHotWallets) {
             HotWalletDTO hotWalletDTO = new HotWalletDTO();
@@ -83,6 +84,15 @@ public class ChainWalletService {
             ewrapper.eq(ChainAddressExpenses::getExpensesStatus,4);
             Long num = addressExpensesMapper.selectCount(ewrapper);
             hotWalletDTO.setOutCount(num.intValue());
+            awrapper.clear();
+            awrapper.eq(ChainAssets::getAddress,chainHotWallet.getAddress());
+            awrapper.eq(ChainAssets::getCoinName, NetEnum.TRON.getBaseCoin());
+            ChainAssets chainAssets = assetsMapper.selectOne(awrapper);
+            if(Objects.isNull(chainAssets)){
+                hotWalletDTO.setBalance(BigDecimal.ZERO);
+            }else {
+                hotWalletDTO.setBalance(chainAssets.getBalance());
+            }
             hotWalletDTO.setInCount(0);
             hotWalletDTO.setConvertBalance(BigDecimal.ZERO);
             list.add(hotWalletDTO);
@@ -127,7 +137,6 @@ public class ChainWalletService {
         chainHotWallet.setPrivateKey(json.getString("privateKey"));
         chainHotWallet.setRunningStatus(0);
         chainHotWallet.setCreateTime(System.currentTimeMillis());
-        chainHotWallet.setBalance(BigDecimal.ZERO);
         hotWalletMapper.insert(chainHotWallet);
         result.setMessage("操作成功");
         return result;

@@ -28,10 +28,6 @@ public class ChainHotWallet {
      */
     private Integer runningStatus;
     /**
-     * 主币余额
-     */
-    private BigDecimal balance;
-    /**
      * 创建时间
      */
     private Long createTime;

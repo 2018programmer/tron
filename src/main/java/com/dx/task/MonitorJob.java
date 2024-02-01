@@ -36,10 +36,6 @@ public class MonitorJob {
 
     @Autowired
     private ChainAddressIncomeMapper incomeMapper;
-
-    @Autowired
-    private ChainAssetsMapper assetsMapper;
-
     @Autowired
     private ChainCoinMapper coinMapper;
 
@@ -130,24 +126,7 @@ public class MonitorJob {
                     chainFlow.setNetName(chainCoin.getNetName());
                     chainFlow.setCreateTime(System.currentTimeMillis());
                     flowMapper.insert(chainFlow);
-                    // 添加或更新资产记录
-                    LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
-                    aswrapper.eq(ChainAssets::getAddress,chainPoolAddress.getAddress());
-                    aswrapper.eq(ChainAssets::getCoinCode,contactDTO.getCoinCode());
-                    ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
-                    if(ObjectUtils.isNull(chainAssets)){
-                        chainAssets =new ChainAssets();
-                        chainAssets.setAddress(chainPoolAddress.getAddress());
-                        chainAssets.setBalance(contactDTO.getAmount());
-                        chainAssets.setNetName(chainCoin.getNetName());
-                        chainAssets.setCoinCode(chainCoin.getCoinCode());
-                        chainAssets.setCoinName(chainCoin.getCoinName());
-                        assetsMapper.insert(chainAssets);
-                    }else {
-                        BigDecimal balance = chainAssets.getBalance();
-                        balance.add(contactDTO.getAmount());
-                        assetsMapper.updateById(chainAssets);
-                    }
+
                     log.info("能否创建订单{},{}",StringUtils.isNotEmpty(chainPoolAddress.getAssignedId()),chainCoin.getThreshold().compareTo(contactDTO.getAmount())<=0);
                     if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getThreshold().compareTo(contactDTO.getAmount())<=0){
                         //创建充值订单

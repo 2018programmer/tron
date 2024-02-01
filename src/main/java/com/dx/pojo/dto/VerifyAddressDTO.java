@@ -15,7 +15,7 @@ public class VerifyAddressDTO implements Serializable {
      */
     private Integer assignedType;
     /**
-     * 地址是否正确
+     * 地址是否正确 0不正确 1正确
      */
     private Integer effective;
     /**
