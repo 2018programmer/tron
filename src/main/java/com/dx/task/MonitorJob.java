@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
@@ -150,6 +148,7 @@ public class MonitorJob {
                         balance.add(contactDTO.getAmount());
                         assetsMapper.updateById(chainAssets);
                     }
+                    log.info("能否创建订单{},{}",StringUtils.isNotEmpty(chainPoolAddress.getAssignedId()),chainCoin.getThreshold().compareTo(contactDTO.getAmount())<=0);
                     if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getThreshold().compareTo(contactDTO.getAmount())<=0){
                         //创建充值订单
                         CreateOrderVO createOrderVO = new CreateOrderVO();
