@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dx.common.NetEnum;
 import com.dx.common.Result;
 import com.dx.pojo.dto.*;
 import com.dx.entity.*;
@@ -139,13 +140,32 @@ public class ChainPoolAddressService {
             PoolAddressDTO poolAddressDTO = new PoolAddressDTO();
             BeanUtils.copyProperties(u, poolAddressDTO);
             poolAddressDTO.setAssignId(u.getAssignedId());
-            poolAddressDTO.setEstimateBalance(BigDecimal.ZERO);
+            poolAddressDTO.setEstimateBalance(getContractBalance(u.getAddress()));
             return poolAddressDTO;
         });
 
         result.setResult(convert);
 
         return result;
+    }
+
+    private BigDecimal getContractBalance(String address) {
+        LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
+        awrapper.eq(ChainAssets::getAddress,address);
+        List<ChainAssets> chainAssets = assetsMapper.selectList(awrapper);
+        BigDecimal amount =BigDecimal.ZERO;
+        if(CollectionUtils.isEmpty(chainAssets)){
+            return amount;
+        }
+        for (ChainAssets chainAsset : chainAssets) {
+            if(Objects.equals(chainAsset.getCoinName(), NetEnum.TRON.getBaseCoin())){
+                amount=amount.add(chainAsset.getBalance().multiply(new BigDecimal("0.81")));
+            }
+            if(Objects.equals(chainAsset.getCoinName(),"USDT")){
+                amount=amount.add(chainAsset.getBalance().multiply(new BigDecimal("7.12")));
+            }
+        }
+        return amount;
     }
 
     public Result<GetGatherNumDTO> getGatherNum(String netName) {
