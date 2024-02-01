@@ -251,7 +251,7 @@ public class ChainPoolAddressService {
         VerifyAddressDTO verifyAddressDTO = new VerifyAddressDTO();
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainPoolAddress::getAddress,address);
-        wrapper.eq(ChainPoolAddress::getAddress,netName);
+        wrapper.eq(ChainPoolAddress::getNetName,netName);
         wrapper.eq(ChainPoolAddress::getIsAssigned,1);
         ChainPoolAddress chainPoolAddress = poolAddressMapper.selectOne(wrapper);
         if(ObjectUtils.isNotNull(chainPoolAddress)){
