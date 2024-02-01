@@ -71,6 +71,7 @@ public class ChainGatherService {
         List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
 
         List<ChainHotWallet> collect = chainHotWallets.stream().filter(o -> o.getRunningStatus() == 1).collect(Collectors.toList());
+
         if(CollectionUtils.isEmpty(collect)){
             result.error("没有可用热钱包！");
             return result;
@@ -80,9 +81,11 @@ public class ChainGatherService {
         LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
         cwrapper.eq(ChainCoin::getCoinType,"base");
         ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+        List<String> addresses = collect.stream().map(ChainHotWallet::getAddress).collect(Collectors.toList());
         //获取资产表
         List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null);
-        if(CollectionUtils.isEmpty(assets)){
+        List<ChainAssets> haveAssets = assets.stream().filter(o -> addresses.contains(o.getAddress())).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(haveAssets)){
             result.error("没有达到归集要求的地址");
             return result;
         }
@@ -95,10 +98,7 @@ public class ChainGatherService {
         task.setTotalNum(assets.size());
         gatherTaskMapper.insert(task);
         //创建 对应明细
-        for (ChainAssets asset : assets) {
-            if(chainHotWallets.stream().anyMatch(o->o.getAddress().equals(asset.getAddress()))){
-                continue;
-            }
+        for (ChainAssets asset : haveAssets) {
             ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
             chainGatherDetail.setGatherAddress(asset.getAddress());
             chainGatherDetail.setGatherStatus(0);
