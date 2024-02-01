@@ -11,7 +11,7 @@ public class VerifyAddressDTO implements Serializable {
      */
     private String assignedId;
     /**
-     * 分配的类型 1 商户 2钱包用户 3 钱包用户
+     * 分配的类型 1 商户 2钱包用户 3 商户用户
      */
     private Integer assignedType;
     /**
