@@ -41,6 +41,8 @@ public class BalanceJob {
      */
     @XxlJob(("querybaseBalanceTRON"))
     public void querybaseBalanceTRON(){
+        log.info("查冷热钱包地址池链主币的余额--------------------------");
+        long start = System.currentTimeMillis();
         LambdaQueryWrapper<ChainFeeWallet> feeWrapper = new LambdaQueryWrapper<>();
         feeWrapper.eq(ChainFeeWallet::getNetName,NetEnum.TRON.getNetName());
         List<ChainFeeWallet> chainFeeWallets = feeWalletMapper.selectList(feeWrapper);
@@ -75,7 +77,8 @@ public class BalanceJob {
                 }
             }
         }
-
+        long end = System.currentTimeMillis();
+        log.info("查冷热钱包地址池链主币的余额结束--------------------------耗时{}",(end-start)/1000);
 
     }
 
@@ -85,6 +88,9 @@ public class BalanceJob {
      */
     @XxlJob("queryContractBalanceTRON")
     public void queryContractBalanceTRON(){
+        log.info("查冷热钱包地址池链合约主币的余额--------------------------");
+        long start = System.currentTimeMillis();
+
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainCoin::getNetName,NetEnum.TRON.getNetName());
         wrapper.eq(ChainCoin::getCoinType,"contract");
@@ -118,6 +124,8 @@ public class BalanceJob {
                 }
             }
         }
+        long end = System.currentTimeMillis();
+        log.info("查冷热钱包地址池链合约币的余额结束--------------------------耗时{}",(end-start)/1000);
     }
 
     private List<String> getAddressList(){
