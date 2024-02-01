@@ -1,8 +1,8 @@
 package com.dx.controller;
 
 import com.dx.common.Result;
-import com.dx.dto.AssetHotDTO;
-import com.dx.vo.FreezeBalanceVO;
+import com.dx.pojo.dto.AssetHotDTO;
+import com.dx.pojo.vo.FreezeBalanceVO;
 import com.dx.service.ChainAssetsService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;

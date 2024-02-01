@@ -5,16 +5,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
-import com.dx.dto.*;
+import com.dx.pojo.dto.*;
 import com.dx.entity.*;
 import com.dx.mapper.*;
-import com.dx.vo.GetUserAddressVO;
-import com.dx.vo.QueryPoolAddressVO;
-import com.dx.vo.UpdatePoolManageVO;
+import com.dx.pojo.vo.GetUserAddressVO;
+import com.dx.pojo.vo.QueryPoolAddressVO;
+import com.dx.pojo.vo.UpdatePoolManageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -225,5 +224,30 @@ public class ChainPoolAddressService {
         poolAddressMapper.updateById(chainPoolAddress);
         result.setResult(chainPoolAddress.getAddress());
         return result;
+    }
+
+    public Result<VerifyAddressDTO> verifyAddress(String address,String netName) {
+        Result<VerifyAddressDTO> result = new Result<>();
+        VerifyAddressDTO verifyAddressDTO = new VerifyAddressDTO();
+        LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainPoolAddress::getAddress,address);
+        wrapper.eq(ChainPoolAddress::getAddress,netName);
+        wrapper.eq(ChainPoolAddress::getIsAssigned,1);
+        ChainPoolAddress chainPoolAddress = poolAddressMapper.selectOne(wrapper);
+        if(ObjectUtils.isNotNull(chainPoolAddress)){
+            verifyAddressDTO.setIsAssigned(1);
+            verifyAddressDTO.setAssignedType(chainPoolAddress.getAssignType());
+            verifyAddressDTO.setAssignedId(chainPoolAddress.getAssignedId());
+        }else {
+            verifyAddressDTO.setIsAssigned(0);
+        }
+        if(basicService.verifyAddress(address,netName)){
+            verifyAddressDTO.setEffective(1);
+        }else {
+            verifyAddressDTO.setEffective(0);
+        }
+        result.setResult(verifyAddressDTO);
+        return result;
+
     }
 }

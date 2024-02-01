@@ -7,12 +7,11 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Constant;
 import com.dx.common.Result;
-import com.dx.dto.AssetHotDTO;
+import com.dx.pojo.dto.AssetHotDTO;
 import com.dx.entity.*;
 import com.dx.mapper.*;
 import com.dx.service.other.ChainOperateService;
-import com.dx.vo.FreezeBalanceVO;
-import org.springframework.beans.BeanUtils;
+import com.dx.pojo.vo.FreezeBalanceVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -20,7 +19,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class ChainAssetsService {

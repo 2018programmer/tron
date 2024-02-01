@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Result;
-import com.dx.dto.GetNetByNameDTO;
-import com.dx.dto.NetDTO;
-import com.dx.vo.UpdateNetStatusVO;
+import com.dx.pojo.dto.GetNetByNameDTO;
+import com.dx.pojo.dto.NetDTO;
+import com.dx.pojo.vo.UpdateNetStatusVO;
 import com.dx.entity.ChainCoin;
 import com.dx.entity.ChainNet;
 import com.dx.mapper.ChainCoinMapper;
@@ -18,7 +18,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ChainNetService {

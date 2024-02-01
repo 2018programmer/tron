@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dx.common.Constant;
-import com.dx.vo.CreateOrderVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -174,5 +173,17 @@ public class HttpSerive {
             return BigDecimal.ZERO;
         }
         return new BigDecimal(result.getString("balance"));
+    }
+
+    public Boolean verifyAddress(String netName, String address) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("address",address);
+        String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.VERIFYADDRESS).form(map).execute().body();
+        JSONObject jsonObject = JSON.parseObject(body);
+        Boolean success = jsonObject.getBoolean("success");
+        if(Objects.isNull(success)||false==success){
+            throw new RuntimeException("获取区块信息失败");
+        }
+        return jsonObject.getBoolean("result");
     }
 }

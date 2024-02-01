@@ -3,12 +3,12 @@ package com.dx.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.IdVO;
 import com.dx.common.Result;
-import com.dx.dto.GetGatherDetailsDTO;
-import com.dx.dto.GetGatherTasksDTO;
+import com.dx.pojo.dto.GetGatherDetailsDTO;
+import com.dx.pojo.dto.GetGatherTasksDTO;
 import com.dx.service.ChainGatherService;
-import com.dx.vo.GetGatherDetailsVO;
-import com.dx.vo.GetGatherTasksVO;
-import com.dx.vo.ManualGatherVO;
+import com.dx.pojo.vo.GetGatherDetailsVO;
+import com.dx.pojo.vo.GetGatherTasksVO;
+import com.dx.pojo.vo.ManualGatherVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

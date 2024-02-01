@@ -1,10 +1,9 @@
 package com.dx.controller;
 
 import com.dx.common.Result;
-import com.dx.dto.GetNetByNameDTO;
-import com.dx.dto.NetDTO;
-import com.dx.entity.ChainNet;
-import com.dx.vo.UpdateNetStatusVO;
+import com.dx.pojo.dto.GetNetByNameDTO;
+import com.dx.pojo.dto.NetDTO;
+import com.dx.pojo.vo.UpdateNetStatusVO;
 import com.dx.service.ChainNetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

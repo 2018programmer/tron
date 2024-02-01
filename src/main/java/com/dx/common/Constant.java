@@ -31,6 +31,8 @@ public interface Constant {
 
         String QUERYBASEBALANCE="/queryBaseBalance";
         String QUERYCONTRACTBALANCE="/queryContractBalance";
+
+        String VERIFYADDRESS="/verifyAddress";
     }
     interface OrderUrl{
         String createOrder ="/merchant/back/recharge/create";

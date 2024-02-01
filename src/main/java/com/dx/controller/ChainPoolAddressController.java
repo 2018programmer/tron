@@ -2,12 +2,12 @@ package com.dx.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
-import com.dx.dto.*;
+import com.dx.pojo.dto.*;
 import com.dx.service.ChainPoolAddressService;
-import com.dx.vo.GetPoolManageVO;
-import com.dx.vo.GetUserAddressVO;
-import com.dx.vo.QueryPoolAddressVO;
-import com.dx.vo.UpdatePoolManageVO;
+import com.dx.pojo.vo.GetPoolManageVO;
+import com.dx.pojo.vo.GetUserAddressVO;
+import com.dx.pojo.vo.QueryPoolAddressVO;
+import com.dx.pojo.vo.UpdatePoolManageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -70,5 +70,12 @@ public class ChainPoolAddressController {
     @PostMapping("/user-address/get")
     public Result getUserAddress( @Validated  @RequestBody GetUserAddressVO vo){
         return poolService.matchUserAddress(vo);
+    }
+    /**
+     * 检验地址是否在地址池中
+     */
+    @PostMapping("/address/verify")
+    public Result<VerifyAddressDTO> verifyAddress(String address,String netName){
+        return poolService.verifyAddress(address,netName);
     }
 }

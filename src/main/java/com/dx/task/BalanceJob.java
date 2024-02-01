@@ -2,7 +2,6 @@ package com.dx.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.dx.common.NetEnum;
-import com.dx.dto.HotWalletDTO;
 import com.dx.entity.ChainFeeWallet;
 import com.dx.entity.ChainHotWallet;
 import com.dx.mapper.ChainFeeWalletMapper;
@@ -10,14 +9,10 @@ import com.dx.mapper.ChainHotWalletMapper;
 import com.dx.service.ChainBasicService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j

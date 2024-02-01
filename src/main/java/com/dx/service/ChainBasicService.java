@@ -55,4 +55,9 @@ public class ChainBasicService {
     public BigDecimal queryContractBalance(String netName,String coinCode,String address){
         return httpSerive.queryContractBalance(netName,coinCode,address);
     }
+
+    public Boolean verifyAddress(String address, String netName) {
+
+        return httpSerive.verifyAddress(netName,address);
+    }
 }
