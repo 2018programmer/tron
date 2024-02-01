@@ -114,7 +114,7 @@ public class BalanceJob {
                 aswrapper.eq(ChainAssets::getCoinName,chainCoin.getCoinName());
                 ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
                 if(ObjectUtils.isNull(chainAssets)){
-                    if(ObjectUtils.isNull(chainAssets)) {
+                    if(amount.compareTo(BigDecimal.ZERO)>0) {
                         chainAssets = new ChainAssets();
                         chainAssets.setAddress(address);
                         chainAssets.setBalance(amount);
