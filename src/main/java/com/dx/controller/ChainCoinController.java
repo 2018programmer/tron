@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.PageVO;
 import com.dx.common.Result;
 import com.dx.pojo.dto.CoinDTO;
+import com.dx.task.BalanceJob;
 import com.dx.task.MonitorJob;
 import com.dx.pojo.vo.UpdateMinNumVO;
 import com.dx.service.ChainCoinService;
@@ -21,7 +22,7 @@ public class ChainCoinController {
     private ChainCoinService chainCoinService;
 
     @Autowired
-    private MonitorJob monitorJob;
+    private BalanceJob balanceJob;
 
     /**
      * 获取币种列表
@@ -41,6 +42,6 @@ public class ChainCoinController {
 
     @PostMapping("/getm")
     public void  getm(){
-        monitorJob.monitorTransferTRON();
+        balanceJob.queryContractBalanceTRON();
     }
 }

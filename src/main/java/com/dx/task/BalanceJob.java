@@ -63,14 +63,17 @@ public class BalanceJob {
                 aswrapper.eq(ChainAssets::getAddress,address);
                 aswrapper.eq(ChainAssets::getCoinName,NetEnum.TRON.getBaseCoin());
                 ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
-                if(ObjectUtils.isNull(chainAssets)&& amount.compareTo(BigDecimal.ZERO)>0){
-                    chainAssets =new ChainAssets();
-                    chainAssets.setAddress(address);
-                    chainAssets.setBalance(amount);
-                    chainAssets.setNetName(NetEnum.TRON.getNetName());
-                    chainAssets.setCoinCode("trx");
-                    chainAssets.setCoinName(NetEnum.TRON.getBaseCoin());
-                    assetsMapper.insert(chainAssets);
+                if(ObjectUtils.isNull(chainAssets)){
+                    if(amount.compareTo(BigDecimal.ZERO)>0){
+                        chainAssets =new ChainAssets();
+                        chainAssets.setAddress(address);
+                        chainAssets.setBalance(amount);
+                        chainAssets.setNetName(NetEnum.TRON.getNetName());
+                        chainAssets.setCoinCode("trx");
+                        chainAssets.setCoinName(NetEnum.TRON.getBaseCoin());
+                        assetsMapper.insert(chainAssets);
+                    }
+
                 }else {
                     chainAssets.setBalance(amount);
                     assetsMapper.updateById(chainAssets);
@@ -78,7 +81,7 @@ public class BalanceJob {
             }
         }
         long end = System.currentTimeMillis();
-        log.info("查冷热钱包地址池链主币的余额结束--------------------------耗时{}",(end-start)/1000);
+        log.info("查冷热钱包地址池链主币的余额结束--------------------------耗时{}秒",(end-start)/1000);
 
     }
 
@@ -110,14 +113,16 @@ public class BalanceJob {
                 aswrapper.eq(ChainAssets::getAddress,address);
                 aswrapper.eq(ChainAssets::getCoinName,chainCoin.getCoinName());
                 ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
-                if(ObjectUtils.isNull(chainAssets)&& amount.compareTo(BigDecimal.ZERO)>0){
-                    chainAssets =new ChainAssets();
-                    chainAssets.setAddress(address);
-                    chainAssets.setBalance(amount);
-                    chainAssets.setNetName(NetEnum.TRON.getNetName());
-                    chainAssets.setCoinCode(chainCoin.getCoinCode());
-                    chainAssets.setCoinName(chainCoin.getCoinName());
-                    assetsMapper.insert(chainAssets);
+                if(ObjectUtils.isNull(chainAssets)){
+                    if(ObjectUtils.isNull(chainAssets)) {
+                        chainAssets = new ChainAssets();
+                        chainAssets.setAddress(address);
+                        chainAssets.setBalance(amount);
+                        chainAssets.setNetName(NetEnum.TRON.getNetName());
+                        chainAssets.setCoinCode(chainCoin.getCoinCode());
+                        chainAssets.setCoinName(chainCoin.getCoinName());
+                        assetsMapper.insert(chainAssets);
+                    }
                 }else {
                     chainAssets.setBalance(amount);
                     assetsMapper.updateById(chainAssets);
@@ -125,7 +130,7 @@ public class BalanceJob {
             }
         }
         long end = System.currentTimeMillis();
-        log.info("查冷热钱包地址池链合约币的余额结束--------------------------耗时{}",(end-start)/1000);
+        log.info("查冷热钱包地址池链合约币的余额结束--------------------------耗时{}秒",(end-start)/1000);
     }
 
     private List<String> getAddressList(){
