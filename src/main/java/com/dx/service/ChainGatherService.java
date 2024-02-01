@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -67,10 +68,10 @@ public class ChainGatherService {
         }
         LambdaQueryWrapper<ChainHotWallet> hotwrapper = Wrappers.lambdaQuery();
         hotwrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
-        hotwrapper.eq(ChainHotWallet::getRunningStatus,1);
         List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
 
-        if(CollectionUtils.isEmpty(chainHotWallets)){
+        List<ChainHotWallet> collect = chainHotWallets.stream().filter(o -> o.getRunningStatus() == 1).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(collect)){
             result.error("没有可用热钱包！");
             return result;
         }
@@ -95,10 +96,13 @@ public class ChainGatherService {
         gatherTaskMapper.insert(task);
         //创建 对应明细
         for (ChainAssets asset : assets) {
+            if(chainHotWallets.stream().anyMatch(o->o.getAddress().equals(asset.getAddress()))){
+                continue;
+            }
             ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
             chainGatherDetail.setGatherAddress(asset.getAddress());
             chainGatherDetail.setGatherStatus(0);
-            chainGatherDetail.setAmount(asset.getBalance());
+            chainGatherDetail.setAmount(BigDecimal.ZERO);
             chainGatherDetail.setCoinName(asset.getCoinName());
             chainGatherDetail.setCreateTime(System.currentTimeMillis());
             chainGatherDetail.setTaskId(task.getId());
