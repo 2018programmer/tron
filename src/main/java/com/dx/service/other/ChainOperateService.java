@@ -66,7 +66,7 @@ public class ChainOperateService {
      * @return
      */
 
-    public String transferFee(BigDecimal amount, String toAddress,String netName,String coinName){
+    public String transferFee(BigDecimal amount, String toAddress,String netName,String coinName,Integer taskId){
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         //转账矿工费
         BigDecimal add = amount.add(Constant.BaseUrl.trxfee);
@@ -100,6 +100,7 @@ public class ChainOperateService {
         chainFlow.setTransferType(0);
         chainFlow.setFlowWay(3);
         chainFlow.setAmount(amount);
+        chainFlow.setGroupId(taskId.toString());
         chainFlow.setTargetAddress(toAddress);
         chainFlow.setCreateTime(System.currentTimeMillis());
         chainFlow.setCoinName(coinName);
@@ -116,14 +117,14 @@ public class ChainOperateService {
      * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
      * @return
      */
-    public JSONObject addressToGather(String fromAddress ,String toAddress,String privateKey,String code){
+    public JSONObject addressToGather(String fromAddress ,String toAddress,String privateKey,String code,Integer taskId){
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainCoin::getCoinCode,code);
         ChainCoin coin = coinMapper.selectOne(wrapper);
         JSONObject jsonObject = new JSONObject();
         if("base".equals(coin.getCoinType())){
             //转矿工费
-            String feeAddress = transferFee(Constant.BaseUrl.trxfee, fromAddress, coin.getNetName(), coin.getCoinName());
+            String feeAddress = transferFee(Constant.BaseUrl.trxfee, fromAddress, coin.getNetName(), coin.getCoinName(),taskId);
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
@@ -139,7 +140,7 @@ public class ChainOperateService {
             //查询需要消耗的trx
             String estimateenergy = basicService.estimateenergy(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), balance);
             //转矿工费
-            String feeAddress = transferFee(new BigDecimal(estimateenergy), fromAddress, coin.getNetName(), coin.getCoinName());
+            String feeAddress = transferFee(new BigDecimal(estimateenergy), fromAddress, coin.getNetName(), coin.getCoinName(),taskId);
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
