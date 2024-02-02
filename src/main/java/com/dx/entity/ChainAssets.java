@@ -25,7 +25,7 @@ public class ChainAssets {
     /**
      * 资产类型 1 热钱包 2 地址池
      */
-    private String assetType;
+    private Integer assetType;
     /**
      * 币种名称
      */

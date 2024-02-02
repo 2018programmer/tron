@@ -39,7 +39,7 @@ public class ChainGatherTask {
      */
     private String netName;
     /**
-     * 任务状态  1进行中  5已完成
+     * 任务状态  1进行中 3取消 5已完成
      */
     private Integer taskStatus;
     /**

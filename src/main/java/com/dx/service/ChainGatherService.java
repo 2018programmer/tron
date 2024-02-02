@@ -1,6 +1,7 @@
 package com.dx.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -42,15 +43,6 @@ public class ChainGatherService {
 
     @Autowired
     private ChainHotWalletMapper hotWalletMapper;
-    
-    @Autowired
-    private ChainBasicService basicService;
-    @Autowired
-    private ChainFeeWalletMapper chainFeeWalletMapper;
-
-    @Autowired
-    private ChainFlowMapper flowMapper;
-
     @Autowired
     private ChainAssetsMapper assetsMapper;
 
@@ -70,10 +62,8 @@ public class ChainGatherService {
         hotwrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
         List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
 
-        List<ChainHotWallet> collect = chainHotWallets.stream().filter(o -> o.getRunningStatus() == 1).collect(Collectors.toList());
-
-        if(CollectionUtils.isEmpty(collect)){
-            result.error("没有可用热钱包！");
+        if(CollectionUtils.isEmpty(chainHotWallets)){
+            result.error("没有可用热钱包！请先新增");
             return result;
         }
         ChainHotWallet chainHotWallet = chainHotWallets.get(0);
@@ -81,11 +71,9 @@ public class ChainGatherService {
         LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
         cwrapper.eq(ChainCoin::getCoinType,"base");
         ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
-        List<String> addresses = collect.stream().map(ChainHotWallet::getAddress).collect(Collectors.toList());
         //获取资产表
         List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null);
-        List<ChainAssets> haveAssets = assets.stream().filter(o -> addresses.contains(o.getAddress())).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(haveAssets)){
+        if(CollectionUtils.isEmpty(assets)){
             result.error("没有达到归集要求的地址");
             return result;
         }
@@ -98,7 +86,7 @@ public class ChainGatherService {
         task.setTotalNum(assets.size());
         gatherTaskMapper.insert(task);
         //创建 对应明细
-        for (ChainAssets asset : haveAssets) {
+        for (ChainAssets asset : assets) {
             ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
             chainGatherDetail.setGatherAddress(asset.getAddress());
             chainGatherDetail.setGatherStatus(0);
@@ -176,6 +164,19 @@ public class ChainGatherService {
 
     public Result cancelGatherTask(IdVO vo) {
         Result<Object> result = new Result<>();
+        ChainGatherTask chainGatherTask = gatherTaskMapper.selectById(vo.getId());
+        if(chainGatherTask.getTaskStatus() == 3 || chainGatherTask.getTaskStatus() == 5){
+            result.error("任务已完成或已取消，无法取消！");
+            return result;
+        }
+        chainGatherTask.setGatherType(3);
+        gatherTaskMapper.updateById(chainGatherTask);
+        //归集子任务取消
+        LambdaUpdateWrapper<ChainGatherDetail> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(ChainGatherDetail::getTaskId,vo.getId());
+        wrapper.eq(ChainGatherDetail::getGatherStatus,0);
+        wrapper.set(ChainGatherDetail::getGatherStatus,4);
+        gatherDetailMapper.update(wrapper);
 
         result.setMessage("操作成功！");
         return  result;

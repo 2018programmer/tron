@@ -6,5 +6,5 @@ import java.io.Serializable;
 
 @Data
 public class IdVO implements Serializable {
-    private String id;
+    private Integer id;
 }

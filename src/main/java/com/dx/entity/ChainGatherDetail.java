@@ -54,7 +54,7 @@ public class ChainGatherDetail {
      */
     private Integer GatherStage;
     /**
-     * 状态 0未开始 1进行中 2失败待重试 3已完成
+     * 状态 0未开始 1进行中 2失败待重试 3已完成 4已取消
      */
     private Integer GatherStatus;
     /**

@@ -15,7 +15,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -42,6 +41,7 @@ public class BalanceJob {
     @XxlJob(("querybaseBalanceTRON"))
     public void querybaseBalanceTRON(){
         log.info("查冷热钱包地址池链主币的余额--------------------------");
+        //矿工费钱包
         long start = System.currentTimeMillis();
         LambdaQueryWrapper<ChainFeeWallet> feeWrapper = new LambdaQueryWrapper<>();
         feeWrapper.eq(ChainFeeWallet::getNetName,NetEnum.TRON.getNetName());
@@ -52,23 +52,57 @@ public class BalanceJob {
                 feeWalletMapper.updateById(chainFeeWallet);
             }
         }
+        //热钱包
+        LambdaQueryWrapper<ChainHotWallet> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChainHotWallet::getNetName, NetEnum.TRON.getNetName());
+        List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(wrapper);
 
-        List<String> addressList = getAddressList();
-
-        if(!CollectionUtils.isEmpty(addressList)){
-            for (String address : addressList) {
-                BigDecimal amount = basicService.queryBalance(NetEnum.TRON.getNetName(), address);
+        if(!CollectionUtils.isEmpty(chainHotWallets)) {
+            for (ChainHotWallet chainHotWallet : chainHotWallets) {
+                BigDecimal amount = basicService.queryBalance(NetEnum.TRON.getNetName(), chainHotWallet.getAddress());
                 // 添加或更新资产记录
                 LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
-                aswrapper.eq(ChainAssets::getAddress,address);
+                aswrapper.eq(ChainAssets::getAddress, chainHotWallet.getAddress());
+                aswrapper.eq(ChainAssets::getCoinName, NetEnum.TRON.getBaseCoin());
+                ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
+                if (ObjectUtils.isNull(chainAssets)) {
+                    if (amount.compareTo(BigDecimal.ZERO) > 0) {
+                        chainAssets = new ChainAssets();
+                        chainAssets.setAddress(chainHotWallet.getAddress());
+                        chainAssets.setBalance(amount);
+                        chainAssets.setAssetType(1);
+                        chainAssets.setNetName(NetEnum.TRON.getNetName());
+                        chainAssets.setCoinCode("trx");
+                        chainAssets.setCoinName(NetEnum.TRON.getBaseCoin());
+                        assetsMapper.insert(chainAssets);
+                    }
+
+                } else {
+                    chainAssets.setBalance(amount);
+                    assetsMapper.updateById(chainAssets);
+                }
+            }
+        }
+        //地址池
+        LambdaQueryWrapper<ChainPoolAddress> aWrapper = Wrappers.lambdaQuery();
+        aWrapper.eq(ChainPoolAddress::getNetName,NetEnum.TRON.getNetName());
+        aWrapper.eq(ChainPoolAddress::getIsAssigned,1);
+        List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(aWrapper);
+        if(!CollectionUtils.isEmpty(chainPoolAddresses)){
+            for (ChainPoolAddress poolAddress : chainPoolAddresses) {
+                BigDecimal amount = basicService.queryBalance(NetEnum.TRON.getNetName(), poolAddress.getAddress());
+                // 添加或更新资产记录
+                LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
+                aswrapper.eq(ChainAssets::getAddress,poolAddress.getAddress());
                 aswrapper.eq(ChainAssets::getCoinName,NetEnum.TRON.getBaseCoin());
                 ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
                 if(ObjectUtils.isNull(chainAssets)){
                     if(amount.compareTo(BigDecimal.ZERO)>0){
                         chainAssets =new ChainAssets();
-                        chainAssets.setAddress(address);
+                        chainAssets.setAddress(poolAddress.getAddress());
                         chainAssets.setBalance(amount);
                         chainAssets.setNetName(NetEnum.TRON.getNetName());
+                        chainAssets.setAssetType(2);
                         chainAssets.setCoinCode("trx");
                         chainAssets.setCoinName(NetEnum.TRON.getBaseCoin());
                         assetsMapper.insert(chainAssets);
@@ -101,54 +135,73 @@ public class BalanceJob {
         if(CollectionUtils.isEmpty(chainCoins)){
             return;
         }
-        List<String> addressList = getAddressList();
-        if (CollectionUtils.isEmpty(addressList)){
-            return;
-        }
         for (ChainCoin chainCoin : chainCoins) {
-            for (String address : addressList) {
-                BigDecimal amount = basicService.queryContractBalance(NetEnum.TRON.getNetName(), chainCoin.getCoinCode(), address);
-                // 添加或更新资产记录
-                LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
-                aswrapper.eq(ChainAssets::getAddress,address);
-                aswrapper.eq(ChainAssets::getCoinName,chainCoin.getCoinName());
-                ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
-                if(ObjectUtils.isNull(chainAssets)){
-                    if(amount.compareTo(BigDecimal.ZERO)>0) {
-                        chainAssets = new ChainAssets();
-                        chainAssets.setAddress(address);
+            //热钱包
+            LambdaQueryWrapper<ChainHotWallet> hwrapper = new LambdaQueryWrapper<>();
+            hwrapper.eq(ChainHotWallet::getNetName, NetEnum.TRON.getNetName());
+            List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hwrapper);
+            if (!CollectionUtils.isEmpty(chainHotWallets)){
+                for (ChainHotWallet hot : chainHotWallets) {
+                    BigDecimal amount = basicService.queryContractBalance(NetEnum.TRON.getNetName(), chainCoin.getCoinCode(), hot.getAddress());
+                    // 添加或更新资产记录
+                    LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
+                    aswrapper.eq(ChainAssets::getAddress,hot.getAddress());
+                    aswrapper.eq(ChainAssets::getCoinName,chainCoin.getCoinName());
+                    ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
+                    if(ObjectUtils.isNull(chainAssets)){
+                        if(amount.compareTo(BigDecimal.ZERO)>0) {
+                            chainAssets = new ChainAssets();
+                            chainAssets.setAddress(hot.getAddress());
+                            chainAssets.setBalance(amount);
+                            chainAssets.setAssetType(1);
+                            chainAssets.setNetName(NetEnum.TRON.getNetName());
+                            chainAssets.setCoinCode(chainCoin.getCoinCode());
+                            chainAssets.setCoinName(chainCoin.getCoinName());
+                            assetsMapper.insert(chainAssets);
+                        }
+                    }else {
                         chainAssets.setBalance(amount);
-                        chainAssets.setNetName(NetEnum.TRON.getNetName());
-                        chainAssets.setCoinCode(chainCoin.getCoinCode());
-                        chainAssets.setCoinName(chainCoin.getCoinName());
-                        assetsMapper.insert(chainAssets);
+                        assetsMapper.updateById(chainAssets);
                     }
-                }else {
-                    chainAssets.setBalance(amount);
-                    assetsMapper.updateById(chainAssets);
                 }
             }
+
+            //地址池
+            LambdaQueryWrapper<ChainPoolAddress> aWrapper = Wrappers.lambdaQuery();
+            aWrapper.eq(ChainPoolAddress::getNetName,NetEnum.TRON.getNetName());
+            aWrapper.eq(ChainPoolAddress::getIsAssigned,1);
+            List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(aWrapper);
+            if (!CollectionUtils.isEmpty(chainPoolAddresses)){
+                for (ChainPoolAddress pool : chainPoolAddresses) {
+                    BigDecimal amount = basicService.queryContractBalance(NetEnum.TRON.getNetName(), chainCoin.getCoinCode(), pool.getAddress());
+                    // 添加或更新资产记录
+                    LambdaQueryWrapper<ChainAssets> aswrapper = Wrappers.lambdaQuery();
+                    aswrapper.eq(ChainAssets::getAddress,pool.getAddress());
+                    aswrapper.eq(ChainAssets::getCoinName,chainCoin.getCoinName());
+                    ChainAssets chainAssets = assetsMapper.selectOne(aswrapper);
+                    if(ObjectUtils.isNull(chainAssets)){
+                        if(amount.compareTo(BigDecimal.ZERO)>0) {
+                            chainAssets = new ChainAssets();
+                            chainAssets.setAddress(pool.getAddress());
+                            chainAssets.setBalance(amount);
+                            chainAssets.setAssetType(2);
+                            chainAssets.setNetName(NetEnum.TRON.getNetName());
+                            chainAssets.setCoinCode(chainCoin.getCoinCode());
+                            chainAssets.setCoinName(chainCoin.getCoinName());
+                            assetsMapper.insert(chainAssets);
+                        }
+                    }else {
+                        chainAssets.setBalance(amount);
+                        assetsMapper.updateById(chainAssets);
+                    }
+                }
+            }
+
         }
         long end = System.currentTimeMillis();
         log.info("查冷热钱包地址池链合约币的余额结束--------------------------耗时{}秒",(end-start)/1000);
     }
 
-    private List<String> getAddressList(){
-        LambdaQueryWrapper<ChainHotWallet> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ChainHotWallet::getNetName, NetEnum.TRON.getNetName());
-        List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(wrapper);
-        List<String> hotAddressList = chainHotWallets.stream().map(ChainHotWallet::getAddress).collect(Collectors.toList());
-
-        LambdaQueryWrapper<ChainPoolAddress> aWrapper = Wrappers.lambdaQuery();
-        aWrapper.eq(ChainPoolAddress::getNetName,NetEnum.TRON.getNetName());
-        aWrapper.eq(ChainPoolAddress::getIsAssigned,1);
-        List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(aWrapper);
-        List<String> poolAddressList = chainPoolAddresses.stream().map(ChainPoolAddress::getAddress).collect(Collectors.toList());
-
-        hotAddressList.addAll(poolAddressList);
-
-        return hotAddressList;
-    }
 
 
 }
