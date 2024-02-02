@@ -96,6 +96,7 @@ public class ChainGatherService {
             chainGatherDetail.setCoinName(asset.getCoinName());
             chainGatherDetail.setCreateTime(System.currentTimeMillis());
             chainGatherDetail.setTaskId(task.getId());
+            chainGatherDetail.setTryTime(0);
             chainGatherDetail.setFeeAmount(BigDecimal.ZERO);
             chainGatherDetail.setFeeCoinName(chainCoin.getCoinName());
 

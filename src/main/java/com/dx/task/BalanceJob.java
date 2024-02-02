@@ -38,7 +38,7 @@ public class BalanceJob {
     /**
      * 查冷热钱包 地址池 链主币的余额
      */
-    @XxlJob(("querybaseBalanceTRON"))
+    @XxlJob("querybaseBalanceTRON")
     public void querybaseBalanceTRON(){
         log.info("查冷热钱包地址池链主币的余额--------------------------");
         //矿工费钱包

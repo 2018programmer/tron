@@ -13,9 +13,13 @@ import com.dx.service.ChainBasicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,6 +35,10 @@ public class ChainOperateService {
     private ChainFlowMapper flowMapper;
     @Autowired
     private ChainCoinMapper coinMapper;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
 
     /**
      * 查询有足够钱的矿工费
@@ -59,7 +67,7 @@ public class ChainOperateService {
      */
 
     public String transferFee(BigDecimal amount, String toAddress,String netName,String coinName){
-
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         //转账矿工费
         BigDecimal add = amount.add(Constant.BaseUrl.trxfee);
         ChainFeeWallet feeWallet = getFeeEnoughWallet(netName, add);
@@ -71,6 +79,12 @@ public class ChainOperateService {
         String txId = basicService.transferBaseCoins(netName, feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
         //查询交易结果
         JSONObject json = basicService.gettransactioninfo(netName, txId);
+        try{
+            Thread.sleep(2500);
+        }catch (Exception e){
+
+        }
+
         if(json.containsKey("fee")){
             String fee = json.getString("fee");
             BigDecimal decimal = new BigDecimal("1000000");
@@ -90,39 +104,52 @@ public class ChainOperateService {
         chainFlow.setCreateTime(System.currentTimeMillis());
         chainFlow.setCoinName(coinName);
         flowMapper.insert(chainFlow);
-        return txId;
+        transactionManager.commit(status);
+        if (StringUtils.isNotEmpty(feeWallet.getAddress())){
+            return feeWallet.getAddress();
+        }else {
+            return null;
+        }
     }
 
     /**
      * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
      * @return
      */
-    public String addressToGather(String fromAddress ,String toAddress,String privateKey,String code,BigDecimal amount){
+    public JSONObject addressToGather(String fromAddress ,String toAddress,String privateKey,String code){
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainCoin::getCoinCode,code);
         ChainCoin coin = coinMapper.selectOne(wrapper);
-        String txId = "";
+        JSONObject jsonObject = new JSONObject();
         if("base".equals(coin.getCoinType())){
             //转矿工费
-            String tx = transferFee(Constant.BaseUrl.trxfee, fromAddress, coin.getNetName(), coin.getCoinName());
-            if(Objects.isNull(tx)){
-                return txId;
+            String feeAddress = transferFee(Constant.BaseUrl.trxfee, fromAddress, coin.getNetName(), coin.getCoinName());
+            if(Objects.isNull(feeAddress)){
+                return jsonObject;
             }
+            BigDecimal balance = basicService.queryBalance(coin.getNetName(), fromAddress);
             //开始归集 或者热钱包冷却
-            txId = basicService.transferBaseCoins(coin.getNetName(), fromAddress, toAddress, privateKey, amount);
+            String txId = basicService.transferBaseCoins(coin.getNetName(), fromAddress, toAddress, privateKey, balance);
+            jsonObject.put("txId",txId);
+            jsonObject.put("balance",balance);
+            jsonObject.put("feeAddress",feeAddress);
         }else {
+            //查合约币
+            BigDecimal balance = basicService.queryContractBalance(fromAddress, code, toAddress);
             //查询需要消耗的trx
-            String estimateenergy = basicService.estimateenergy(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), amount);
+            String estimateenergy = basicService.estimateenergy(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), balance);
             //转矿工费
-            String tx = transferFee(new BigDecimal(estimateenergy), fromAddress, coin.getNetName(), coin.getCoinName());
-            if(Objects.isNull(tx)){
-                return txId;
+            String feeAddress = transferFee(new BigDecimal(estimateenergy), fromAddress, coin.getNetName(), coin.getCoinName());
+            if(Objects.isNull(feeAddress)){
+                return jsonObject;
             }
             //开始归集 或者冷却
-            txId = basicService.transferContractCoins(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), amount);
-
+            String txId = basicService.transferContractCoins(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), balance);
+            jsonObject.put("txId",txId);
+            jsonObject.put("balance",balance);
+            jsonObject.put("feeAddress",feeAddress);
         }
-        return txId;
+        return jsonObject;
     }
 
     /**

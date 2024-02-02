@@ -58,6 +58,10 @@ public class ChainGatherDetail {
      */
     private Integer GatherStatus;
     /**
+     * 重试次数
+     */
+    private Integer tryTime;
+    /**
      * 创建时间
      */
     private Long  createTime;

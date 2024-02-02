@@ -140,7 +140,11 @@ public class MonitorJob {
                         createOrderVO.setTranId(contactDTO.getTxId());
                         createOrderVO.setMainNet(1);
                         log.info("充值订单请求参数:{}",createOrderVO);
-                        apiService.createOrder(createOrderVO);
+                        //新建进程调用创建订单
+                        Thread thread = new Thread(() -> {
+                            apiService.createOrder(createOrderVO);
+                        });
+                        thread.run();
                     }
 
                 }
