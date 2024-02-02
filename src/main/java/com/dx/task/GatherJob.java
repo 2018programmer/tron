@@ -92,7 +92,7 @@ public class GatherJob {
             cwrapper.eq(ChainCoin::getCoinName,nowTask.getCoinName());
             cwrapper.eq(ChainCoin::getNetName, NetEnum.TRON.getNetName());
             ChainCoin transCoin = coinMapper.selectOne(cwrapper);
-            JSONObject jsonObject = operateService.addressToGather(chainGatherTask.getAddress(), nowTask.getGatherAddress(), address.getPrivateKey(), transCoin.getCoinCode());
+            JSONObject jsonObject = operateService.addressToGather(nowTask.getGatherAddress(), chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode());
             String txId = jsonObject.getString("txId");
             if(ObjectUtils.isNotEmpty(txId)){
                 try{
