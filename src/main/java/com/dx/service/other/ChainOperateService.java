@@ -135,7 +135,7 @@ public class ChainOperateService {
             jsonObject.put("feeAddress",feeAddress);
         }else {
             //查合约币
-            BigDecimal balance = basicService.queryContractBalance(fromAddress, code, toAddress);
+            BigDecimal balance = basicService.queryContractBalance(coin.getNetName(), code, toAddress);
             //查询需要消耗的trx
             String estimateenergy = basicService.estimateenergy(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), balance);
             //转矿工费
