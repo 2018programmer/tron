@@ -142,9 +142,11 @@ public class GatherJob {
             e.printStackTrace();
             nowTask.setGatherStatus(2);
             log.info("归集失败任务id{},子任务id{},当前尝试次数{},归集地址{}",nowTask.getTaskId(),nowTask.getId(),nowTask.getTryTime(),nowTask.getGatherAddress());
-            gatherDetailMapper.updateById(nowTask);
         }
         gatherDetailMapper.updateById(nowTask);
-        log.info("归集成功任务id{},子任务id{}",nowTask.getTaskId(),nowTask.getId());
+        if (3==nowTask.getGatherStatus()){
+            log.info("归集成功任务id{},子任务id{}",nowTask.getTaskId(),nowTask.getId());
+        }
+
     }
 }
