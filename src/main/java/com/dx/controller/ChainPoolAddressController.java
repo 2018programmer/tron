@@ -8,6 +8,7 @@ import com.dx.pojo.vo.GetPoolManageVO;
 import com.dx.pojo.vo.GetUserAddressVO;
 import com.dx.pojo.vo.QueryPoolAddressVO;
 import com.dx.pojo.vo.UpdatePoolManageVO;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -74,8 +75,8 @@ public class ChainPoolAddressController {
     /**
      * 检验地址是否在地址池中 type 1:只检验地址格式是否正确 2:都检验
      */
-    @PostMapping("/address/verify")
-    public Result<VerifyAddressDTO> verifyAddress(String address,String netName,Integer type){
+    @GetMapping("/address/verify")
+    public Result<VerifyAddressDTO> verifyAddress(@NotNull String address,@NotNull String netName, Integer type){
         return poolService.verifyAddress(address,netName,type);
     }
 }
