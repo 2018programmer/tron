@@ -25,6 +25,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -172,8 +174,8 @@ public class ChainPoolAddressService {
         Result<GetGatherNumDTO> result = new Result<>();
         GetGatherNumDTO getGatherNumDTO = new GetGatherNumDTO();
         List<ChainAssets> haveAssets = assetsMapper.getHaveAssets(netName, null);
-
-        getGatherNumDTO.setNum(haveAssets.size());
+        Set<String> collect = haveAssets.stream().map(ChainAssets::getAddress).collect(Collectors.toSet());
+        getGatherNumDTO.setNum(collect.size());
         getGatherNumDTO.setNetName(netName);
         result.setResult(getGatherNumDTO);
         return result;
