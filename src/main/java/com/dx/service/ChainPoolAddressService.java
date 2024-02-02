@@ -246,9 +246,18 @@ public class ChainPoolAddressService {
         return result;
     }
 
-    public Result<VerifyAddressDTO> verifyAddress(String address,String netName) {
+    public Result<VerifyAddressDTO> verifyAddress(String address,String netName,Integer type) {
         Result<VerifyAddressDTO> result = new Result<>();
         VerifyAddressDTO verifyAddressDTO = new VerifyAddressDTO();
+        if(basicService.verifyAddress(address,netName)){
+            verifyAddressDTO.setEffective(1);
+        }else {
+            verifyAddressDTO.setEffective(0);
+        }
+        if(ObjectUtils.isNotNull(type)&&1==type){
+            result.setResult(verifyAddressDTO);
+            return result;
+        }
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainPoolAddress::getAddress,address);
         wrapper.eq(ChainPoolAddress::getNetName,netName);
@@ -261,11 +270,7 @@ public class ChainPoolAddressService {
         }else {
             verifyAddressDTO.setIsAssigned(0);
         }
-        if(basicService.verifyAddress(address,netName)){
-            verifyAddressDTO.setEffective(1);
-        }else {
-            verifyAddressDTO.setEffective(0);
-        }
+
         result.setResult(verifyAddressDTO);
         return result;
 

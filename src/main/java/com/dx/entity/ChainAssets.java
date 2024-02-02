@@ -23,6 +23,10 @@ public class ChainAssets {
      */
     private String coinCode;
     /**
+     * 资产类型 1 热钱包 2 地址池
+     */
+    private String assetType;
+    /**
      * 币种名称
      */
     private String coinName;

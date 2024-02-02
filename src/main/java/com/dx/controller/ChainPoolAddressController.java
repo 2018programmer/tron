@@ -72,10 +72,10 @@ public class ChainPoolAddressController {
         return poolService.matchUserAddress(vo);
     }
     /**
-     * 检验地址是否在地址池中
+     * 检验地址是否在地址池中 type 1:只检验地址格式是否正确 2:都检验
      */
     @PostMapping("/address/verify")
-    public Result<VerifyAddressDTO> verifyAddress(String address,String netName){
-        return poolService.verifyAddress(address,netName);
+    public Result<VerifyAddressDTO> verifyAddress(String address,String netName,Integer type){
+        return poolService.verifyAddress(address,netName,type);
     }
 }
