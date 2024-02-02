@@ -175,8 +175,6 @@ public class ChainPoolAddressService {
 
         getGatherNumDTO.setNum(haveAssets.size());
         getGatherNumDTO.setNetName(netName);
-
-        result.setResult(getGatherNumDTO);
         result.setResult(getGatherNumDTO);
         return result;
     }

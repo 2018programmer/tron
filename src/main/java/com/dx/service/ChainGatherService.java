@@ -90,7 +90,7 @@ public class ChainGatherService {
             ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
             chainGatherDetail.setGatherAddress(asset.getAddress());
             chainGatherDetail.setGatherStatus(0);
-            chainGatherDetail.setAmount(BigDecimal.ZERO);
+            chainGatherDetail.setAmount(asset.getBalance());
             chainGatherDetail.setCoinName(asset.getCoinName());
             chainGatherDetail.setCreateTime(System.currentTimeMillis());
             chainGatherDetail.setTaskId(task.getId());
