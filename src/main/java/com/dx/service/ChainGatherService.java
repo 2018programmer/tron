@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,7 +84,8 @@ public class ChainGatherService {
         task.setTaskStatus(1);
         task.setCreateTime(System.currentTimeMillis());
         task.setNetName(chainHotWallet.getNetName());
-        task.setTotalNum(assets.size());
+        Set<String> collect = assets.stream().map(ChainAssets::getAddress).collect(Collectors.toSet());
+        task.setTotalNum(collect.size());
         gatherTaskMapper.insert(task);
         //创建 对应明细
         for (ChainAssets asset : assets) {
