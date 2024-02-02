@@ -12,8 +12,7 @@ public interface ChainAssetsMapper extends BaseMapper<ChainAssets> {
     /**
      * 获取资产大于阀值的资产
      * @param netName
-     * @param coinCode
      * @return
      */
-    List<ChainAssets> getHaveAssets(String netName, String coinCode);
+    List<ChainAssets> getHaveAssets(String netName, String coinName);
 }

@@ -6,12 +6,12 @@
     <select id="getHaveAssets" resultType="com.dx.entity.ChainAssets">
         SELECT x.* FROM chain_assets x left join chain_coin c on x.coin_code =c.coin_code
             where x.balance >=c.threshold
-            and x.asset_type = 1
+            and x.asset_type = 2
             <if test="netName != null">
                 and x.net_name = #{netName}
             </if>
-            <if test="coinCode != null">
-                and x.coin_code = #{coinCode}
+            <if test="coinName != null">
+                and x.coin_Name = #{coinName}
             </if>
     </select>
 
