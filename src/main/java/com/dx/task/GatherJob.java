@@ -112,8 +112,8 @@ public class GatherJob {
                 gatherFlow.setWalletType(3);
                 gatherFlow.setAddress(chainGatherTask.getAddress());
                 gatherFlow.setTxId(txId);
-                gatherFlow.setTransferType(0);
-                gatherFlow.setFlowWay(3);
+                gatherFlow.setTransferType(1);
+                gatherFlow.setFlowWay(4);
                 gatherFlow.setAmount(jsonObject.getBigDecimal("balance"));
                 gatherFlow.setTargetAddress(nowTask.getGatherAddress());
                 gatherFlow.setCreateTime(System.currentTimeMillis());
