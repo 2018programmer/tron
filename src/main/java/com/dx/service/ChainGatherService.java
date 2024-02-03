@@ -92,9 +92,9 @@ public class ChainGatherService {
             ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
             chainGatherDetail.setGatherAddress(asset.getAddress());
             chainGatherDetail.setGatherStatus(0);
+            chainGatherDetail.setGatherStage(0);
             chainGatherDetail.setAmount(BigDecimal.ZERO);
             chainGatherDetail.setCoinName(asset.getCoinName());
-            chainGatherDetail.setCreateTime(System.currentTimeMillis());
             chainGatherDetail.setTaskId(task.getId());
             chainGatherDetail.setTryTime(0);
             chainGatherDetail.setFeeAmount(BigDecimal.ZERO);

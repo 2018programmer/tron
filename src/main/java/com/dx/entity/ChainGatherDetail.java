@@ -50,7 +50,7 @@ public class ChainGatherDetail {
      */
     private BigDecimal amount;
     /**
-     * 阶段
+     * 阶段 0未开始 1转矿工费 2 回收货币 3归集成功
      */
     private Integer GatherStage;
     /**

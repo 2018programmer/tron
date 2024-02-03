@@ -116,35 +116,40 @@ public class ChainOperateService {
      * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
      * @return
      */
-    public JSONObject addressToGather(String fromAddress ,String toAddress,String privateKey,String code,Integer taskId){
+    public JSONObject addressToGather(ChainGatherDetail nowtask,String toAddress,String privateKey,String code){
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainCoin::getCoinCode,code);
         ChainCoin coin = coinMapper.selectOne(wrapper);
         JSONObject jsonObject = new JSONObject();
         if("base".equals(coin.getCoinType())){
             //转矿工费
-            String feeAddress = transferFee(Constant.BaseUrl.trxfee, fromAddress, coin.getNetName(), coin.getCoinName(),taskId);
+            String feeAddress = transferFee(Constant.BaseUrl.trxfee, nowtask.getGatherAddress(), coin.getNetName(), coin.getCoinName(), nowtask.getTaskId());
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
-            BigDecimal balance = basicService.queryBalance(coin.getNetName(), fromAddress);
+            nowtask.setGatherStage(2);
+            transactionManager.commit(status);
+            BigDecimal balance = basicService.queryBalance(coin.getNetName(), nowtask.getGatherAddress());
             //开始归集 或者热钱包冷却
-            String txId = basicService.transferBaseCoins(coin.getNetName(), fromAddress, toAddress, privateKey, balance);
+            String txId = basicService.transferBaseCoins(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, balance);
             jsonObject.put("txId",txId);
             jsonObject.put("balance",balance);
             jsonObject.put("feeAddress",feeAddress);
         }else {
             //查合约币
-            BigDecimal balance = basicService.queryContractBalance(coin.getNetName(), code, fromAddress);
+            BigDecimal balance = basicService.queryContractBalance(coin.getNetName(), code, nowtask.getGatherAddress());
             //查询需要消耗的trx
-            String estimateenergy = basicService.estimateenergy(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), balance);
+            String estimateenergy = basicService.estimateenergy(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, coin.getCoinCode(), balance);
             //转矿工费
-            String feeAddress = transferFee(new BigDecimal(estimateenergy), fromAddress, coin.getNetName(), coin.getCoinName(),taskId);
+            String feeAddress = transferFee(new BigDecimal(estimateenergy), nowtask.getGatherAddress(), coin.getNetName(), coin.getCoinName(),nowtask.getTaskId());
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
+            nowtask.setGatherStage(2);
+            transactionManager.commit(status);
             //开始归集 或者冷却
-            String txId = basicService.transferContractCoins(coin.getNetName(), fromAddress, toAddress, privateKey, coin.getCoinCode(), balance);
+            String txId = basicService.transferContractCoins(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, coin.getCoinCode(), balance);
             jsonObject.put("txId",txId);
             jsonObject.put("balance",balance);
             jsonObject.put("feeAddress",feeAddress);

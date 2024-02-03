@@ -18,6 +18,9 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -46,8 +49,12 @@ public class GatherJob {
     private ChainCoinMapper coinMapper;
     @Autowired
     private ChainFlowMapper flowMapper;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
     @XxlJob("executeGather")
     public void executeGather(){
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         LambdaQueryWrapper<ChainGatherTask> twrapper = Wrappers.lambdaQuery();
         twrapper.eq(ChainGatherTask::getTaskStatus,1);
         twrapper.eq(ChainGatherTask::getNetName,NetEnum.TRON.getNetName());
@@ -86,14 +93,19 @@ public class GatherJob {
         }
         long start = System.currentTimeMillis();
         log.info("开始归集任务id{},子任务id{},当前常识次数{},归集地址{}",nowTask.getTaskId(),nowTask.getId(),nowTask.getTryTime()+1,nowTask.getGatherAddress());
+        //开始执行该子任务,并且更改阶段
+        nowTask.setGatherStage(1);
+        nowTask.setGatherStatus(1);
+        nowTask.setCreateTime(System.currentTimeMillis());
         nowTask.setTryTime(nowTask.getTryTime()+1);
+        transactionManager.commit(status);
         try{
             ChainPoolAddress address = poolAddressService.getAddress(nowTask.getGatherAddress());
             LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
             cwrapper.eq(ChainCoin::getCoinName,nowTask.getCoinName());
             cwrapper.eq(ChainCoin::getNetName, NetEnum.TRON.getNetName());
             ChainCoin transCoin = coinMapper.selectOne(cwrapper);
-            JSONObject jsonObject = operateService.addressToGather(nowTask.getGatherAddress(), chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode(),nowTask.getTaskId());
+            JSONObject jsonObject = operateService.addressToGather(nowTask, chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode());
             String txId = jsonObject.getString("txId");
             if(ObjectUtils.isNotEmpty(txId)){
 
@@ -126,6 +138,7 @@ public class GatherJob {
                 if("base".equals(transCoin.getCoinType())){
                     flowMapper.insert(gatherFlow);
                     nowTask.setGatherStatus(3);
+                    nowTask.setGatherStage(3);
                     nowTask.setFinishTime(System.currentTimeMillis());
                     nowTask.setAmount(jsonObject.getBigDecimal("balance"));
                 }else {
@@ -133,6 +146,7 @@ public class GatherJob {
                     if("SUCCESS".equals(result)){
                         flowMapper.insert(gatherFlow);
                         nowTask.setGatherStatus(3);
+                        nowTask.setGatherStage(3);
                         nowTask.setFinishTime(System.currentTimeMillis());
                         nowTask.setAmount(jsonObject.getBigDecimal("balance"));
                     }
