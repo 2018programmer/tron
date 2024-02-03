@@ -34,6 +34,10 @@ public class GetGatherDetailDTO {
      */
     private BigDecimal feeAmount;
     /**
+     * 常识次数
+     */
+    private Integer tryTime;
+    /**
      * 币种名称
      */
     private String coinName;

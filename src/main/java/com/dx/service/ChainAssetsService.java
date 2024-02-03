@@ -107,7 +107,6 @@ public class ChainAssetsService {
             bwrapper.eq(ChainCoin::getCoinCode,code);
             ChainCoin transCoin = coinMapper.selectOne(bwrapper);
             operateService.hotWalletCold(wallet, hotWallet,transCoin,baseCoin);
-
         }
         result.setMessage("操作成功");
         return result;
