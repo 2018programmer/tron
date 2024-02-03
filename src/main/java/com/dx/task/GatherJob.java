@@ -54,12 +54,14 @@ public class GatherJob {
     private PlatformTransactionManager transactionManager;
     @XxlJob("executeGather")
     public void executeGather(){
+        log.info("开始扫描归集任务");
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         LambdaQueryWrapper<ChainGatherTask> twrapper = Wrappers.lambdaQuery();
         twrapper.eq(ChainGatherTask::getTaskStatus,1);
         twrapper.eq(ChainGatherTask::getNetName,NetEnum.TRON.getNetName());
         ChainGatherTask chainGatherTask = gatherTaskMapper.selectOne(twrapper);
         if(ObjectUtils.isNull(chainGatherTask)){
+            log.info("没有归集任务");
             return;
         }
         //扫描任务明细
@@ -76,19 +78,17 @@ public class GatherJob {
             wrapper.le(ChainGatherDetail::getTryTime,5);
             wrapper.orderByAsc(ChainGatherDetail::getTryTime);
             chainGatherDetails = gatherDetailMapper.selectList(wrapper);
-            if(CollectionUtils.isEmpty(chainGatherDetails)){
-                chainGatherTask.setTaskStatus(5);
-                chainGatherTask.setEndTime(System.currentTimeMillis());
-                gatherTaskMapper.updateById(chainGatherTask);
-                return;
-            }else {
+            if(!CollectionUtils.isEmpty(chainGatherDetails)){
                 nowTask=chainGatherDetails.get(0);
+                return;
             }
-
         }else {
             nowTask = chainGatherDetails.get(0);
         }
         if(ObjectUtils.isNull(nowTask)){
+            chainGatherTask.setTaskStatus(5);
+            chainGatherTask.setEndTime(System.currentTimeMillis());
+            gatherTaskMapper.updateById(chainGatherTask);
             return;
         }
         long start = System.currentTimeMillis();
