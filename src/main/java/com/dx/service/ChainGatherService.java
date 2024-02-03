@@ -114,10 +114,14 @@ public class ChainGatherService {
         IPage<ChainGatherTask> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page = gatherTaskMapper.selectPage(page, wrapper);
 
+        LambdaQueryWrapper<ChainGatherDetail> dwrapper = Wrappers.lambdaQuery();
         IPage<GetGatherTasksDTO> convert = page.convert(u -> {
             GetGatherTasksDTO getGatherTasksDTO = new GetGatherTasksDTO();
             BeanUtils.copyProperties(u, getGatherTasksDTO);
-            getGatherTasksDTO.setFinishNum(0);
+            dwrapper.clear();
+            dwrapper.eq(ChainGatherDetail::getTaskId,u.getId()).eq(ChainGatherDetail::getGatherStatus,3);
+            Long aLong = gatherDetailMapper.selectCount(dwrapper);
+            getGatherTasksDTO.setFinishNum(aLong.intValue());
             return getGatherTasksDTO;
         });
 
