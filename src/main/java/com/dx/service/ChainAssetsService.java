@@ -101,14 +101,22 @@ public class ChainAssetsService {
         bwrapper.eq(ChainCoin::getNetName,hotWallet.getNetName());
         bwrapper.eq(ChainCoin::getCoinType,"base");
         ChainCoin baseCoin = coinMapper.selectOne(bwrapper);
+        String msg="";
         for (String code : vo.getCoinCodeList()) {
             bwrapper.clear();
             bwrapper.eq(ChainCoin::getNetName,hotWallet.getNetName());
             bwrapper.eq(ChainCoin::getCoinCode,code);
             ChainCoin transCoin = coinMapper.selectOne(bwrapper);
-            operateService.hotWalletCold(wallet, hotWallet,transCoin,baseCoin);
+            msg =operateService.hotWalletCold(wallet, hotWallet,transCoin,baseCoin);
+            if (!StringUtils.isEmpty(msg)){
+                break;
+            }
         }
-        result.setMessage("操作成功");
+        if(StringUtils.isEmpty(msg)){
+            result.error("操作成功");
+        }else {
+            result.error(msg);
+        }
         return result;
 
     }
