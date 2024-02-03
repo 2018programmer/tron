@@ -173,7 +173,7 @@ public class ChainOperateService {
         return txId;
     }
 
-    public void hotWalletCold(ChainColdWallet wallet, ChainHotWallet hotWallet,ChainCoin transCoin,ChainCoin baseCoin) {
+    public String hotWalletCold(ChainColdWallet wallet, ChainHotWallet hotWallet,ChainCoin transCoin,ChainCoin baseCoin) {
 
         //查主链币余额
         BigDecimal bigDecimal = basicService.queryBalance(hotWallet.getNetName(), hotWallet.getAddress());
@@ -182,7 +182,7 @@ public class ChainOperateService {
         if(transCoin.getCoinCode().equals(baseCoin.getCoinCode())){
             transAmount =bigDecimal;
             if(bigDecimal.compareTo(Constant.BaseUrl.trxfee)<=0){
-                return;
+                return "任务终止请补充至少"+Constant.BaseUrl.trxfee+"矿工费";
             }
               txId= basicService.transferBaseCoins(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), bigDecimal.subtract(Constant.BaseUrl.trxfee));
         }else {
@@ -191,8 +191,9 @@ public class ChainOperateService {
             transAmount =amount;
             //查询需要消耗的trx
             String estimateenergy = basicService.estimateenergy(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), amount);
-            if (bigDecimal.compareTo(new BigDecimal(estimateenergy))<0){
-                return;
+            BigDecimal fee = new BigDecimal(estimateenergy);
+            if (bigDecimal.compareTo(fee)<0){
+                return "任务终止请补充至少"+fee.subtract(bigDecimal)+"矿工费";
             }
             //开始归集 或者冷却
             txId = basicService.transferContractCoins(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), amount);
@@ -200,7 +201,7 @@ public class ChainOperateService {
         }
 
         if(StringUtils.isEmpty(txId)){
-            return ;
+            return null;
         }
         if(!"base".equals(transCoin.getCoinType())){
             try{
@@ -252,6 +253,6 @@ public class ChainOperateService {
                 flowMapper.insert(coldFlow);
             }
         }
-
+        return null;
     }
 }
