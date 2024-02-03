@@ -242,13 +242,11 @@ public class ChainOperateService {
             flowMapper.insert(coldFlow);
         }else {
             String result = json.getJSONObject("receipt").getString("result");
-            if("SUCCESS".equals(result)){{
-                coldFlow.setAmount(subtract);
-                flowMapper.insert(coldFlow);
-            }
+            if("SUCCESS".equals(result)){
                 coldFlow.setAmount(subtract);
                 flowMapper.insert(coldFlow);
             }
         }
+
     }
 }
