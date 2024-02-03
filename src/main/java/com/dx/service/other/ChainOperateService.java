@@ -78,13 +78,12 @@ public class ChainOperateService {
         }
         String txId = basicService.transferBaseCoins(netName, feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
         //查询交易结果
-        JSONObject json = basicService.gettransactioninfo(netName, txId);
         try{
-            Thread.sleep(2500);
+            Thread.sleep(3000);
         }catch (Exception e){
 
         }
-
+        JSONObject json = basicService.gettransactioninfo(netName, txId);
         if(json.containsKey("fee")){
             String fee = json.getString("fee");
             BigDecimal decimal = new BigDecimal("1000000");

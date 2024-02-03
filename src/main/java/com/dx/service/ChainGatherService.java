@@ -129,28 +129,29 @@ public class ChainGatherService {
         Result<GetGatherDetailsDTO> result = new Result<>();
         GetGatherDetailsDTO getGatherDetailsDTO = new GetGatherDetailsDTO();
         ChainGatherTask chainGatherTask = gatherTaskMapper.selectById(vo.getId());
-        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainCoin::getNetName,chainGatherTask.getNetName());
-        wrapper.eq(ChainCoin::getCoinType,"base");
-        ChainCoin chainCoin = coinMapper.selectOne(wrapper);
-        getGatherDetailsDTO.setFeeName(chainCoin.getCoinName());
-        getGatherDetailsDTO.setFeeAmount(BigDecimal.TWO);
-        getGatherDetailsDTO.setNetName(chainGatherTask.getNetName());
-        HashMap<String, BigDecimal> map = new HashMap<>();
-
-        List<GatherTotalDTO> totalList = new ArrayList<>();
-        GatherTotalDTO gatherTotalDTO = new GatherTotalDTO();
-        gatherTotalDTO.setCoinName("USDT");
-        gatherTotalDTO.setAmount(new BigDecimal("101.289"));
-        totalList.add(gatherTotalDTO);
-        GatherTotalDTO gatherTotalDTO1 = new GatherTotalDTO();
-        gatherTotalDTO1.setCoinName("TRX");
-        gatherTotalDTO.setAmount(new BigDecimal("38989.2998"));
-        totalList.add(gatherTotalDTO1);
-        getGatherDetailsDTO.setGatherList(totalList);
-
         LambdaQueryWrapper<ChainGatherDetail> dwrapper = Wrappers.lambdaQuery();
         dwrapper.eq(ChainGatherDetail::getTaskId,vo.getId());
+        List<ChainGatherDetail> chainGatherDetails = gatherDetailMapper.selectList(dwrapper);
+        getGatherDetailsDTO.setFeeName(chainGatherDetails.get(0).getFeeCoinName());
+        BigDecimal totalBalance = chainGatherDetails.stream()
+                .map(ChainGatherDetail::getFeeAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        getGatherDetailsDTO.setFeeAmount(totalBalance);
+        getGatherDetailsDTO.setNetName(chainGatherTask.getNetName());
+        List<GatherTotalDTO> totalList = new ArrayList<>();
+        Set<String> collect = chainGatherDetails.stream().map(ChainGatherDetail::getCoinName).collect(Collectors.toSet());
+        for (String s : collect) {
+            GatherTotalDTO gatherTotalDTO = new GatherTotalDTO();
+            gatherTotalDTO.setCoinName(s);
+            BigDecimal reduce = chainGatherDetails.stream().filter(u -> u.getCoinName().equals(s)).map(ChainGatherDetail::getFeeAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            gatherTotalDTO.setAmount(reduce);
+            totalList.add(gatherTotalDTO);
+        }
+
+        getGatherDetailsDTO.setGatherList(totalList);
+
+
         IPage<ChainGatherDetail> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page=gatherDetailMapper.selectPage(page,dwrapper);
         IPage<GetGatherDetailDTO> convert = page.convert(u -> {

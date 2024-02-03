@@ -84,6 +84,7 @@ public class GatherJob {
         if(ObjectUtils.isNull(nowTask)){
             return;
         }
+        long start = System.currentTimeMillis();
         log.info("开始归集任务id{},子任务id{},当前常识次数{},归集地址{}",nowTask.getTaskId(),nowTask.getId(),nowTask.getTryTime()+1,nowTask.getGatherAddress());
         nowTask.setTryTime(nowTask.getTryTime()+1);
         try{
@@ -95,10 +96,9 @@ public class GatherJob {
             JSONObject jsonObject = operateService.addressToGather(nowTask.getGatherAddress(), chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode(),nowTask.getTaskId());
             String txId = jsonObject.getString("txId");
             if(ObjectUtils.isNotEmpty(txId)){
-                try{
-                    Thread.sleep(2500);
-                }catch (Exception e){
-                }
+
+                Thread.sleep(3000);
+
                 //解析记录 更新流水 和子任务
                 JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
                 BigDecimal num6 = new BigDecimal("1000000");
@@ -142,12 +142,14 @@ public class GatherJob {
         }catch (Exception e){
             e.printStackTrace();
             nowTask.setGatherStatus(2);
-            log.info("归集失败任务id{},子任务id{},当前尝试次数{},归集地址{}",nowTask.getTaskId(),nowTask.getId(),nowTask.getTryTime(),nowTask.getGatherAddress());
         }
         gatherDetailMapper.updateById(nowTask);
         if (3==nowTask.getGatherStatus()){
             log.info("归集成功任务id{},子任务id{}",nowTask.getTaskId(),nowTask.getId());
+        }else {
+            log.info("归集失败任务id{},子任务id{},当前尝试次数{},归集地址{}",nowTask.getTaskId(),nowTask.getId(),nowTask.getTryTime(),nowTask.getGatherAddress());
         }
-
+        long end = System.currentTimeMillis();
+        log.info("归集耗时{}秒",(end-start)/1000);
     }
 }
