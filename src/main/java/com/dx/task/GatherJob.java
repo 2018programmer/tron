@@ -127,12 +127,14 @@ public class GatherJob {
                     flowMapper.insert(gatherFlow);
                     nowTask.setGatherStatus(3);
                     nowTask.setFinishTime(System.currentTimeMillis());
+                    nowTask.setAmount(jsonObject.getBigDecimal("balance"));
                 }else {
                     String result = json.getJSONObject("receipt").getString("result");
                     if("SUCCESS".equals(result)){
                         flowMapper.insert(gatherFlow);
                         nowTask.setGatherStatus(3);
                         nowTask.setFinishTime(System.currentTimeMillis());
+                        nowTask.setAmount(jsonObject.getBigDecimal("balance"));
                     }
                 }
 
