@@ -216,20 +216,19 @@ public class ChainOperateService {
         if(json.containsKey("fee")){
             String fee = json.getString("fee");
             coldFee= new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
-            ChainFlow feeFlow = new ChainFlow();
-            feeFlow.setNetName(hotWallet.getNetName());
-            feeFlow.setWalletType(3);
-            feeFlow.setAddress(hotWallet.getAddress());
-            feeFlow.setTxId(txId);
-            feeFlow.setTransferType(0);
-            feeFlow.setFlowWay(3);
-            feeFlow.setAmount(coldFee);
-            feeFlow.setTargetAddress(hotWallet.getNetName());
-            feeFlow.setCreateTime(System.currentTimeMillis());
-            feeFlow.setCoinName(transCoin.getCoinName());
-            flowMapper.insert(feeFlow);
-
         }
+        ChainFlow feeFlow = new ChainFlow();
+        feeFlow.setNetName(hotWallet.getNetName());
+        feeFlow.setWalletType(3);
+        feeFlow.setAddress(hotWallet.getAddress());
+        feeFlow.setTxId(txId);
+        feeFlow.setTransferType(0);
+        feeFlow.setFlowWay(3);
+        feeFlow.setAmount(coldFee);
+        feeFlow.setTargetAddress(hotWallet.getNetName());
+        feeFlow.setCreateTime(System.currentTimeMillis());
+        feeFlow.setCoinName(transCoin.getCoinName());
+        flowMapper.insert(feeFlow);
         //添加流水明细
         ChainFlow coldFlow = new ChainFlow();
         coldFlow.setNetName(hotWallet.getNetName());
