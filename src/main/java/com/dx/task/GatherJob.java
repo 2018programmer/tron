@@ -80,7 +80,6 @@ public class GatherJob {
             chainGatherDetails = gatherDetailMapper.selectList(wrapper);
             if(!CollectionUtils.isEmpty(chainGatherDetails)){
                 nowTask=chainGatherDetails.get(0);
-                return;
             }
         }else {
             nowTask = chainGatherDetails.get(0);
