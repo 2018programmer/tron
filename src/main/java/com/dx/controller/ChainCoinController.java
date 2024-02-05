@@ -5,6 +5,7 @@ import com.dx.common.PageVO;
 import com.dx.common.Result;
 import com.dx.pojo.dto.CoinDTO;
 import com.dx.task.BalanceJob;
+import com.dx.task.GatherJob;
 import com.dx.task.MonitorJob;
 import com.dx.pojo.vo.UpdateMinNumVO;
 import com.dx.service.ChainCoinService;
@@ -22,7 +23,7 @@ public class ChainCoinController {
     private ChainCoinService chainCoinService;
 
     @Autowired
-    private BalanceJob balanceJob;
+    private GatherJob balanceJob;
 
     /**
      * 获取币种列表
@@ -42,6 +43,6 @@ public class ChainCoinController {
 
     @PostMapping("/getm")
     public void  getm(){
-        balanceJob.queryContractBalanceTRON();
+        balanceJob.executeGather();
     }
 }

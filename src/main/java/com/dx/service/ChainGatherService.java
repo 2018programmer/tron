@@ -84,8 +84,7 @@ public class ChainGatherService {
         task.setTaskStatus(1);
         task.setCreateTime(System.currentTimeMillis());
         task.setNetName(chainHotWallet.getNetName());
-        Set<String> collect = assets.stream().map(ChainAssets::getAddress).collect(Collectors.toSet());
-        task.setTotalNum(collect.size());
+        task.setTotalNum(assets.size());
         gatherTaskMapper.insert(task);
         //创建 对应明细
         for (ChainAssets asset : assets) {
@@ -111,6 +110,7 @@ public class ChainGatherService {
     public Result<IPage<GetGatherTasksDTO>> getGatherTasks(GetGatherTasksVO vo) {
         Result<IPage<GetGatherTasksDTO>> result = new Result<>();
         LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
+        wrapper.orderByDesc(ChainGatherTask::getId);
         IPage<ChainGatherTask> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page = gatherTaskMapper.selectPage(page, wrapper);
 

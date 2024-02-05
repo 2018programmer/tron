@@ -88,6 +88,7 @@ public class GatherJob {
             chainGatherTask.setTaskStatus(5);
             chainGatherTask.setEndTime(System.currentTimeMillis());
             gatherTaskMapper.updateById(chainGatherTask);
+            transactionManager.commit(status);
             return;
         }
         long start = System.currentTimeMillis();

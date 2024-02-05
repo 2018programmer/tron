@@ -60,7 +60,14 @@ public class ChainPoolAddressService {
         IPage<CoinManageDTO> convert = page.convert(u -> {
             CoinManageDTO coinManageDTO = new CoinManageDTO();
             BeanUtils.copyProperties(u, coinManageDTO);
-            coinManageDTO.setTotalBalance(BigDecimal.ZERO);
+            LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
+            awrapper.eq(ChainAssets::getNetName,u.getCoinName());
+            awrapper.eq(ChainAssets::getCoinName,u.getCoinName());
+            List<ChainAssets> chainAssets = assetsMapper.selectList(awrapper);
+            BigDecimal reduce = chainAssets.stream()
+                    .map(ChainAssets::getBalance)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            coinManageDTO.setTotalBalance(reduce);
             return coinManageDTO;
         });
         result.setResult(convert);
