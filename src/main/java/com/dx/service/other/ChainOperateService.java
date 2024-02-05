@@ -9,17 +9,18 @@ import com.dx.entity.*;
 import com.dx.mapper.ChainCoinMapper;
 import com.dx.mapper.ChainFeeWalletMapper;
 import com.dx.mapper.ChainFlowMapper;
+import com.dx.mapper.ChainGatherDetailMapper;
 import com.dx.service.ChainBasicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,6 +36,9 @@ public class ChainOperateService {
     private ChainFlowMapper flowMapper;
     @Autowired
     private ChainCoinMapper coinMapper;
+
+    @Autowired
+    private ChainGatherDetailMapper gatherDetailMapper;
 
     @Autowired
     private PlatformTransactionManager transactionManager;
@@ -66,8 +70,9 @@ public class ChainOperateService {
      * @return
      */
 
+    @Transactional
     public String transferFee(BigDecimal amount, String toAddress,String netName,String coinName,Integer taskId){
-        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+
         //转账矿工费
         BigDecimal add = amount.add(Constant.BaseUrl.trxfee);
         ChainFeeWallet feeWallet = getFeeEnoughWallet(netName, add);
@@ -90,6 +95,7 @@ public class ChainOperateService {
             BigDecimal feeNum = new BigDecimal(fee).divide(decimal, 6, RoundingMode.FLOOR);
             amount =amount.add(feeNum);
         }
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         //添加流水明细
         ChainFlow chainFlow = new ChainFlow();
         chainFlow.setNetName(netName);
@@ -116,8 +122,9 @@ public class ChainOperateService {
      * TRON点对点归集  该过程只变动矿工费钱包 和对应流水
      * @return
      */
+    @Transactional
     public JSONObject addressToGather(ChainGatherDetail nowtask,String toAddress,String privateKey,String code){
-        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainCoin::getCoinCode,code);
         ChainCoin coin = coinMapper.selectOne(wrapper);
@@ -128,7 +135,9 @@ public class ChainOperateService {
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
+            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
             nowtask.setGatherStage(2);
+            gatherDetailMapper.updateById(nowtask);
             transactionManager.commit(status);
             BigDecimal balance = basicService.queryBalance(coin.getNetName(), nowtask.getGatherAddress());
             //开始归集 或者热钱包冷却
@@ -146,7 +155,9 @@ public class ChainOperateService {
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
+            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
             nowtask.setGatherStage(2);
+            gatherDetailMapper.updateById(nowtask);
             transactionManager.commit(status);
             //开始归集 或者冷却
             String txId = basicService.transferContractCoins(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, coin.getCoinCode(), balance);

@@ -19,7 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
@@ -52,10 +54,14 @@ public class GatherJob {
 
     @Autowired
     private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    TransactionDefinition transactionDefinition;
+
     @XxlJob("executeGather")
     public void executeGather(){
         log.info("开始扫描归集任务");
-        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+
         LambdaQueryWrapper<ChainGatherTask> twrapper = Wrappers.lambdaQuery();
         twrapper.eq(ChainGatherTask::getTaskStatus,1);
         twrapper.eq(ChainGatherTask::getNetName,NetEnum.TRON.getNetName());
@@ -71,6 +77,7 @@ public class GatherJob {
         wrapper.orderByDesc(ChainGatherDetail::getId);
         List<ChainGatherDetail> chainGatherDetails = gatherDetailMapper.selectList(wrapper);
         ChainGatherDetail nowTask =null;
+        TransactionStatus status = transactionManager.getTransaction(transactionDefinition);
         if(CollectionUtils.isEmpty(chainGatherDetails)){
             wrapper.clear();
             wrapper.eq(ChainGatherDetail::getGatherStatus,2);
@@ -88,7 +95,6 @@ public class GatherJob {
             chainGatherTask.setTaskStatus(5);
             chainGatherTask.setEndTime(System.currentTimeMillis());
             gatherTaskMapper.updateById(chainGatherTask);
-            transactionManager.commit(status);
             return;
         }
         long start = System.currentTimeMillis();
@@ -98,7 +104,14 @@ public class GatherJob {
         nowTask.setGatherStatus(1);
         nowTask.setCreateTime(System.currentTimeMillis());
         nowTask.setTryTime(nowTask.getTryTime()+1);
+        gatherDetailMapper.updateById(nowTask);
         transactionManager.commit(status);
+        execute(nowTask,chainGatherTask,start);
+    }
+
+
+    @Transactional
+    public void execute(ChainGatherDetail nowTask, ChainGatherTask chainGatherTask,Long start) {
         try{
             ChainPoolAddress address = poolAddressService.getAddress(nowTask.getGatherAddress());
             LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
