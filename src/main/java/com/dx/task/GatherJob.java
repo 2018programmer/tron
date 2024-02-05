@@ -61,7 +61,7 @@ public class GatherJob {
     @XxlJob("executeGather")
     public void executeGather(){
         log.info("开始扫描归集任务");
-
+        TransactionStatus status = transactionManager.getTransaction(transactionDefinition);
         LambdaQueryWrapper<ChainGatherTask> twrapper = Wrappers.lambdaQuery();
         twrapper.eq(ChainGatherTask::getTaskStatus,1);
         twrapper.eq(ChainGatherTask::getNetName,NetEnum.TRON.getNetName());
@@ -77,7 +77,7 @@ public class GatherJob {
         wrapper.orderByDesc(ChainGatherDetail::getId);
         List<ChainGatherDetail> chainGatherDetails = gatherDetailMapper.selectList(wrapper);
         ChainGatherDetail nowTask =null;
-        TransactionStatus status = transactionManager.getTransaction(transactionDefinition);
+
         if(CollectionUtils.isEmpty(chainGatherDetails)){
             wrapper.clear();
             wrapper.eq(ChainGatherDetail::getGatherStatus,2);

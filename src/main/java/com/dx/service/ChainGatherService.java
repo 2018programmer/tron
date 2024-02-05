@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -170,6 +171,7 @@ public class ChainGatherService {
         return result;
     }
 
+    @Transactional
     public Result cancelGatherTask(IdVO vo) {
         Result<Object> result = new Result<>();
         ChainGatherTask chainGatherTask = gatherTaskMapper.selectById(vo.getId());
@@ -177,12 +179,12 @@ public class ChainGatherService {
             result.error("任务已完成或已取消，无法取消！");
             return result;
         }
-        chainGatherTask.setGatherType(3);
+        chainGatherTask.setTaskStatus(3);
         gatherTaskMapper.updateById(chainGatherTask);
         //归集子任务取消
         LambdaUpdateWrapper<ChainGatherDetail> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(ChainGatherDetail::getTaskId,vo.getId());
-        wrapper.eq(ChainGatherDetail::getGatherStatus,0);
+        wrapper.eq(ChainGatherDetail::getGatherStatus,0).or().eq(ChainGatherDetail::getGatherStatus,2);
         wrapper.set(ChainGatherDetail::getGatherStatus,4);
         gatherDetailMapper.update(wrapper);
 
