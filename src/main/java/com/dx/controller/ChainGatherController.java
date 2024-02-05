@@ -55,7 +55,7 @@ public class ChainGatherController {
      * @return
      */
     @PostMapping("/task/cancel")
-    public Result cancelGatherTask(IdVO vo){
+    public Result cancelGatherTask(@RequestBody IdVO vo){
         return gatherService.cancelGatherTask(vo);
     }
 }
