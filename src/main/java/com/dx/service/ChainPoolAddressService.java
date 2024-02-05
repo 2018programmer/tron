@@ -61,7 +61,7 @@ public class ChainPoolAddressService {
             CoinManageDTO coinManageDTO = new CoinManageDTO();
             BeanUtils.copyProperties(u, coinManageDTO);
             LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
-            awrapper.eq(ChainAssets::getNetName,u.getCoinName());
+            awrapper.eq(ChainAssets::getNetName,u.getNetName());
             awrapper.eq(ChainAssets::getCoinName,u.getCoinName());
             List<ChainAssets> chainAssets = assetsMapper.selectList(awrapper);
             BigDecimal reduce = chainAssets.stream()
