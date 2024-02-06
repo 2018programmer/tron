@@ -110,15 +110,14 @@ public class GatherJob {
         execute(nowTask,chainGatherTask,start);
     }
 
-
-    @Transactional
     public void execute(ChainGatherDetail nowTask, ChainGatherTask chainGatherTask,Long start) {
-        try{
+
             ChainPoolAddress address = poolAddressService.getAddress(nowTask.getGatherAddress());
             LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
             cwrapper.eq(ChainCoin::getCoinName,nowTask.getCoinName());
             cwrapper.eq(ChainCoin::getNetName, NetEnum.TRON.getNetName());
             ChainCoin transCoin = coinMapper.selectOne(cwrapper);
+        try{
             JSONObject jsonObject = operateService.addressToGather(nowTask, chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode());
             String txId = jsonObject.getString("txId");
             if(ObjectUtils.isNotEmpty(txId)){

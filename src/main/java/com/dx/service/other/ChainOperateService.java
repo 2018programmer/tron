@@ -69,8 +69,6 @@ public class ChainOperateService {
      * 转矿工费
      * @return
      */
-
-    @Transactional
     public String transferFee(BigDecimal amount, String toAddress,String netName,String coinName,Integer taskId){
 
         //转账矿工费
@@ -135,10 +133,8 @@ public class ChainOperateService {
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
-            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
             nowtask.setGatherStage(2);
             gatherDetailMapper.updateById(nowtask);
-            transactionManager.commit(status);
             BigDecimal balance = basicService.queryBalance(coin.getNetName(), nowtask.getGatherAddress());
             //开始归集 或者热钱包冷却
             String txId = basicService.transferBaseCoins(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, balance);
@@ -155,10 +151,7 @@ public class ChainOperateService {
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
-            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
             nowtask.setGatherStage(2);
-            gatherDetailMapper.updateById(nowtask);
-            transactionManager.commit(status);
             //开始归集 或者冷却
             String txId = basicService.transferContractCoins(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, coin.getCoinCode(), balance);
             jsonObject.put("txId",txId);
