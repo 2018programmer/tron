@@ -135,22 +135,23 @@ public class ChainAssetsService {
             return result;
         }
         JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
-        
+        ChainFlow feeFlow = new ChainFlow();
+        feeFlow.setNetName(feeWallet.getNetName());
+        feeFlow.setWalletType(2);
+        feeFlow.setAddress(feeWallet.getAddress());
+        feeFlow.setTxId(txId);
+        feeFlow.setTransferType(0);
+        feeFlow.setFlowWay(3);
         if(json.containsKey("fee")){
-            feeWallet.setBalance(BigDecimal.ZERO);
-            ChainFlow feeFlow = new ChainFlow();
-            feeFlow.setNetName(feeWallet.getNetName());
-            feeFlow.setWalletType(2);
-            feeFlow.setAddress(feeWallet.getAddress());
-            feeFlow.setTxId(txId);
-            feeFlow.setTransferType(0);
-            feeFlow.setFlowWay(3);
             feeFlow.setAmount(Constant.BaseUrl.trxfee);
-            feeFlow.setTargetAddress(feeWallet.getNetName());
-            feeFlow.setCreateTime(System.currentTimeMillis());
-            feeFlow.setCoinName(feeWallet.getCoinName());
-            flowMapper.insert(feeFlow);
+        }else {
+            feeFlow.setAmount(BigDecimal.ZERO);
         }
+        feeFlow.setTargetAddress(feeWallet.getNetName());
+        feeFlow.setCreateTime(System.currentTimeMillis());
+        feeFlow.setCoinName(feeWallet.getCoinName());
+        flowMapper.insert(feeFlow);
+
         //添加流水明细
         ChainFlow coldFlow = new ChainFlow();
         coldFlow.setNetName(feeWallet.getNetName());
