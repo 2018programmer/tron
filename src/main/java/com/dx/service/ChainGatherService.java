@@ -62,6 +62,7 @@ public class ChainGatherService {
         }
         LambdaQueryWrapper<ChainHotWallet> hotwrapper = Wrappers.lambdaQuery();
         hotwrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
+        hotwrapper.eq(ChainHotWallet::getRunningStatus,1);
         List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
 
         if(CollectionUtils.isEmpty(chainHotWallets)){

@@ -48,6 +48,9 @@ public class ChainWalletService {
     @Autowired
     private ChainFlowMapper flowMapper;
 
+    @Autowired
+    private ChainGatherTaskMapper gatherTaskMapper;
+
     public Result updateColdWallet(UpdateColdWalletDTO dto){
         Result<Object> result = new Result<>();
         ChainColdWallet chainColdWallet = coldWalletMapper.selectById(dto.getId());
@@ -125,6 +128,14 @@ public class ChainWalletService {
         ChainHotWallet chainHotWallet = hotWalletMapper.selectById(dto.getId());
         if(Objects.isNull(chainHotWallet)){
             result.error("没有数据");
+            return result;
+        }
+        LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainGatherTask::getAddress,chainHotWallet.getAddress());
+        wrapper.eq(ChainGatherTask::getTaskStatus,1);
+        List<ChainGatherTask> chainGatherTasks = gatherTaskMapper.selectList(wrapper);
+        if(!CollectionUtils.isEmpty(chainGatherTasks)){
+            result.error("该地址有归集任务在运行,请等待结束");
             return result;
         }
         chainHotWallet.setRunningStatus(dto.getRunningStatus());
