@@ -130,6 +130,7 @@ public class ChainPoolAddressService {
         Result<IPage<PoolAddressDTO>> result = new Result<>();
 
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainPoolAddress::getNetName,vo.getNetName());
         if(ObjectUtils.isNotNull(vo.getAssignId())){
             wrapper.eq(ChainPoolAddress::getAssignedId,vo.getIsAssigned());
         }

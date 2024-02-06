@@ -148,7 +148,7 @@ public class ChainGatherService {
         for (String s : collect) {
             GatherTotalDTO gatherTotalDTO = new GatherTotalDTO();
             gatherTotalDTO.setCoinName(s);
-            BigDecimal reduce = chainGatherDetails.stream().filter(u -> u.getCoinName().equals(s)).map(ChainGatherDetail::getFeeAmount)
+            BigDecimal reduce = chainGatherDetails.stream().filter(u -> u.getCoinName().equals(s)).map(ChainGatherDetail::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             gatherTotalDTO.setAmount(reduce);
             totalList.add(gatherTotalDTO);

@@ -59,7 +59,7 @@ public class ChainPoolAddressController {
      * 获取归集数量(用余额的数量)
      */
     @GetMapping("/gather-num/get")
-    public Result<GetGatherNumDTO> getGatherNum(String netName){
+    public Result<GetGatherNumDTO> getGatherNum(@NotNull String netName){
         return poolService.getGatherNum(netName);
     }
 
