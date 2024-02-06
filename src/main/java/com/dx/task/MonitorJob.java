@@ -97,7 +97,7 @@ public class MonitorJob {
                     chainAddressIncome.setAddress(chainPoolAddress.getAddress());
                     chainAddressIncome.setCreateTime(System.currentTimeMillis());
                     LambdaQueryWrapper<ChainCoin> coinwrapper = Wrappers.lambdaQuery();
-                    coinwrapper.eq(ChainCoin::getCoinName,contactDTO.getCoinCode());
+                    coinwrapper.eq(ChainCoin::getCoinCode,contactDTO.getCoinCode());
                     ChainCoin chainCoin = coinMapper.selectOne(coinwrapper);
                     chainAddressIncome.setNetName(chainCoin.getNetName());
                     chainAddressIncome.setTxId(contactDTO.getTxId());
