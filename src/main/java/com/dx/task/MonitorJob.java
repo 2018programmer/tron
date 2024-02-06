@@ -57,7 +57,8 @@ public class MonitorJob {
         // 查询区块计数表 获取当前区块 没有则设值
         Integer tronNum = chainBasicService.getnowblock("TRON");
         if(ObjectUtils.isNotNull(tronNum)){
-            numOnline =tronNum;
+            //延迟5块 方便监听区分哪些是归集打的钱
+            numOnline =tronNum-5;
         }
 
         if(0==numOnline){
@@ -86,6 +87,12 @@ public class MonitorJob {
             try {
 
                 for (ContactDTO contactDTO : list) {
+                    LambdaQueryWrapper<ChainFlow> fwrapper = Wrappers.lambdaQuery();
+                    fwrapper.eq(ChainFlow::getTxId,contactDTO.getTxId());
+                    List<ChainFlow> chainFlows = flowMapper.selectList(fwrapper);
+                    if(CollectionUtils.isNotEmpty(chainFlows)){
+                        continue;
+                    }
                     //匹配信息 更新表数据 更新区块
                     List<ChainPoolAddress> collect = chainPoolAddresses.stream().filter(o -> o.getAddress().equals(contactDTO.getToAddress())).collect(Collectors.toList());
                     if(CollectionUtils.isEmpty(collect)){
