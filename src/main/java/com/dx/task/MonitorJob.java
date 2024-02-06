@@ -152,6 +152,7 @@ public class MonitorJob {
                 // 提交事务
                 transactionManager.commit(status);
             } catch (Exception e) {
+                transactionManager.rollback(status);
                 e.printStackTrace();
             }
         }
