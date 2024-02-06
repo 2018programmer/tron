@@ -132,7 +132,7 @@ public class ChainPoolAddressService {
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainPoolAddress::getNetName,vo.getNetName());
         if(ObjectUtils.isNotNull(vo.getAssignId())){
-            wrapper.eq(ChainPoolAddress::getAssignedId,vo.getIsAssigned());
+            wrapper.eq(ChainPoolAddress::getAssignedId,vo.getAssignId());
         }
         if(ObjectUtils.isNotNull(vo.getIsActivated())){
             wrapper.eq(ChainPoolAddress::getIsActivated,vo.getIsActivated());

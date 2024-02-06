@@ -127,7 +127,13 @@ public class ChainAssetsService {
         LambdaQueryWrapper<ChainColdWallet> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainColdWallet::getNetName,feeWallet.getNetName());
         ChainColdWallet wallet = coldWalletMapper.selectOne(wrapper);
-        BigDecimal balance = feeWallet.getBalance();
+
+        BigDecimal balance = basicService.queryBalance(feeWallet.getNetName(), feeWallet.getAddress());
+        if(balance.compareTo(Constant.BaseUrl.trxfee)<=0){
+            result.error("必须余额大于"+Constant.BaseUrl.trxfee+"才可冷却");
+            return result;
+        }
+        balance=balance.subtract(Constant.BaseUrl.trxfee);
         String txId = operateService.feeWalletCold(feeWallet, wallet.getAddress(), balance);
 
         if(StringUtils.isEmpty(txId)){

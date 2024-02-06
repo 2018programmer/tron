@@ -166,13 +166,9 @@ public class ChainOperateService {
      * @return
      */
     public String feeWalletCold(ChainFeeWallet feeWallet ,String toAddress,BigDecimal amount){
-        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainCoin::getNetName,feeWallet.getNetName());
-        wrapper.eq(ChainCoin::getCoinType,"base");
-        ChainCoin coin = coinMapper.selectOne(wrapper);
-        amount=amount.subtract(Constant.BaseUrl.trxfee);
+
         //开始冷却
-        String txId  = basicService.transferBaseCoins(coin.getNetName(), feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
+        String txId  = basicService.transferBaseCoins(feeWallet.getNetName(), feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
 
         return txId;
     }

@@ -31,5 +31,5 @@ public class QueryPoolAddressVO extends PageVO implements Serializable {
     /**
      * 分配id
      */
-    private Integer assignId;
+    private String assignId;
 }
