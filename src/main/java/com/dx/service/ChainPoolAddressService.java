@@ -63,6 +63,7 @@ public class ChainPoolAddressService {
             LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
             awrapper.eq(ChainAssets::getNetName,u.getNetName());
             awrapper.eq(ChainAssets::getCoinName,u.getCoinName());
+            awrapper.eq(ChainAssets::getAssetType,2);
             List<ChainAssets> chainAssets = assetsMapper.selectList(awrapper);
             BigDecimal reduce = chainAssets.stream()
                     .map(ChainAssets::getBalance)
