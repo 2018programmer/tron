@@ -112,6 +112,12 @@ public class ChainGatherService {
     public Result<IPage<GetGatherTasksDTO>> getGatherTasks(GetGatherTasksVO vo) {
         Result<IPage<GetGatherTasksDTO>> result = new Result<>();
         LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
+        if(ObjectUtils.isNotNull(vo.getBeginTime())){
+            wrapper.ge(ChainGatherTask::getCreateTime, vo.getBeginTime());
+        }
+        if (ObjectUtils.isNotNull(vo.getEndTime())){
+            wrapper.le(ChainGatherTask::getCreateTime, vo.getEndTime());
+        }
         wrapper.orderByDesc(ChainGatherTask::getId);
         IPage<ChainGatherTask> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page = gatherTaskMapper.selectPage(page, wrapper);

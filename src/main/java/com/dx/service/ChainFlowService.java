@@ -30,10 +30,10 @@ public class ChainFlowService {
             wrapper.eq(ChainFlow::getTransferType,vo.getTransferType());
         }
         if(ObjectUtils.isNotNull(vo.getBeginTime())){
-
+            wrapper.ge(ChainFlow::getCreateTime,vo.getBeginTime());
         }
         if(ObjectUtils.isNotNull(vo.getEndTime())){
-
+            wrapper.le(ChainFlow::getCreateTime,vo.getEndTime());
         }
         wrapper.orderByDesc(ChainFlow::getId);
         IPage<ChainFlow> page = new Page<>(vo.getPageNum(), vo.getPageSize());
