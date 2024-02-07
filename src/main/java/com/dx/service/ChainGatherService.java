@@ -124,7 +124,7 @@ public class ChainGatherService {
             dwrapper.eq(ChainGatherDetail::getTaskId,u.getId()).eq(ChainGatherDetail::getGatherStatus,3);
             Long aLong = gatherDetailMapper.selectCount(dwrapper);
             if(ObjectUtils.isNotNull(u.getEndTime())){
-                getGatherTasksDTO.setTotalTime(DateUtil.formatBetween(new Date(u.getCreateTime()), new Date(u.getEndTime()), BetweenFormatter.Level.SECOND);
+                getGatherTasksDTO.setTotalTime(DateUtil.formatBetween(new Date(u.getCreateTime()), new Date(u.getEndTime()), BetweenFormatter.Level.SECOND));
 
             }
             getGatherTasksDTO.setFinishNum(aLong.intValue());
