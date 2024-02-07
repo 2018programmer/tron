@@ -30,7 +30,7 @@ public class ChainCoin {
     /**
      * 最小收款数
      */
-    private Integer minNum;
+    private BigDecimal minNum;
     /**
      * 自动归集 0:关闭 1:开启
      */

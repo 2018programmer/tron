@@ -3,6 +3,7 @@ package com.dx.pojo.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 public class GetNetByNameDTO implements Serializable {
@@ -18,6 +19,6 @@ public class GetNetByNameDTO implements Serializable {
     /**
      * 最小收款数
      */
-    private Integer minNum;
+    private BigDecimal minNum;
 
 }
