@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.entity.ChainAddressExpenses;
 import com.dx.entity.ChainAddressIncome;
+import com.dx.pojo.vo.ConfirmOrderVO;
 import com.dx.pojo.vo.GetAddressExpensesVO;
 import com.dx.pojo.vo.GetAddressIncomeVO;
 import com.dx.service.ChainTranferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,4 +49,12 @@ public class ChainTransferController {
         return transferService.getResultByTxId(netName,txId);
     }
 
+    /**
+     * 确认充值
+     * @return
+     */
+    @PostMapping("/income/confirm")
+    public Result  confirmOrder(ConfirmOrderVO vo){
+        return transferService.confirmOrder(vo);
+    }
 }

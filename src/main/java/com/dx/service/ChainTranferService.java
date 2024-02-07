@@ -2,6 +2,7 @@ package com.dx.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -10,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.entity.ChainAddressExpenses;
 import com.dx.mapper.ChainAddressExpensesMapper;
+import com.dx.pojo.vo.ConfirmOrderVO;
 import com.dx.pojo.vo.GetAddressExpensesVO;
 import com.dx.pojo.vo.GetAddressIncomeVO;
 import com.dx.entity.ChainAddressIncome;
@@ -81,6 +83,15 @@ public class ChainTranferService {
         }else {
             result.error("失败");
         }
+        return result;
+    }
+
+    public Result confirmOrder(ConfirmOrderVO vo) {
+        Result<Object> result = new Result<>();
+        LambdaUpdateWrapper<ChainAddressIncome> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(ChainAddressIncome::getTxId, vo.getTxId());
+        wrapper.set(ChainAddressIncome::getSerial, vo.getSerial());
+        addressIncomeMapper.update(wrapper);
         return result;
     }
 }

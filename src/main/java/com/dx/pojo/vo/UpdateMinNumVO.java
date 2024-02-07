@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 public class UpdateMinNumVO implements Serializable {
@@ -13,5 +14,5 @@ public class UpdateMinNumVO implements Serializable {
      * 最小收款数
      */
     @NotNull
-    private Integer minNum;
+    private BigDecimal minNum;
 }
