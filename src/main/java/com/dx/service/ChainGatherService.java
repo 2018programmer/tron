@@ -1,9 +1,12 @@
 package com.dx.service;
 
+import cn.hutool.core.date.BetweenFormatter;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.IdVO;
@@ -24,10 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,6 +123,10 @@ public class ChainGatherService {
             dwrapper.clear();
             dwrapper.eq(ChainGatherDetail::getTaskId,u.getId()).eq(ChainGatherDetail::getGatherStatus,3);
             Long aLong = gatherDetailMapper.selectCount(dwrapper);
+            if(ObjectUtils.isNotNull(u.getEndTime())){
+                getGatherTasksDTO.setTotalTime(DateUtil.formatBetween(new Date(u.getCreateTime()), new Date(u.getEndTime()), BetweenFormatter.Level.SECOND);
+
+            }
             getGatherTasksDTO.setFinishNum(aLong.intValue());
             return getGatherTasksDTO;
         });
@@ -163,6 +167,10 @@ public class ChainGatherService {
         IPage<GetGatherDetailDTO> convert = page.convert(u -> {
             GetGatherDetailDTO getGatherDetailDTO = new GetGatherDetailDTO();
             BeanUtils.copyProperties(u, getGatherDetailDTO);
+            if(ObjectUtils.isNotNull(u.getFinishTime())){
+                getGatherDetailDTO.setTotalTime(DateUtil.formatBetween(new Date(u.getCreateTime()), new Date(u.getFinishTime()), BetweenFormatter.Level.SECOND));
+
+            }
             return getGatherDetailDTO;
         });
         getGatherDetailsDTO.setDetails(convert);
