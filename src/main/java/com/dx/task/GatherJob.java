@@ -55,13 +55,10 @@ public class GatherJob {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    @Autowired
-    TransactionDefinition transactionDefinition;
-
     @XxlJob("executeGather")
     public void executeGather(){
         log.info("开始扫描归集任务");
-        TransactionStatus status = transactionManager.getTransaction(transactionDefinition);
+
         LambdaQueryWrapper<ChainGatherTask> twrapper = Wrappers.lambdaQuery();
         twrapper.eq(ChainGatherTask::getTaskStatus,1);
         twrapper.eq(ChainGatherTask::getNetName,NetEnum.TRON.getNetName());
@@ -70,6 +67,9 @@ public class GatherJob {
             log.info("没有归集任务");
             return;
         }
+        DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
+        defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(defaultTransactionDefinition);
         //扫描任务明细
         LambdaQueryWrapper<ChainGatherDetail> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainGatherDetail::getGatherStatus,0);
