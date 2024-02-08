@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -93,7 +94,9 @@ public class ChainOperateService {
             BigDecimal feeNum = new BigDecimal(fee).divide(decimal, 6, RoundingMode.FLOOR);
             amount =amount.add(feeNum);
         }
-        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+        DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
+        defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(defaultTransactionDefinition);
         //添加流水明细
         ChainFlow chainFlow = new ChainFlow();
         chainFlow.setNetName(netName);
