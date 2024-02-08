@@ -131,6 +131,7 @@ public class ChainOperateService {
         ChainCoin coin = coinMapper.selectOne(wrapper);
         JSONObject jsonObject = new JSONObject();
         if("base".equals(coin.getCoinType())){
+            BigDecimal balance = basicService.queryBalance(coin.getNetName(), nowtask.getGatherAddress());
             //转矿工费
             String feeAddress = transferFee(Constant.BaseUrl.trxfee, nowtask.getGatherAddress(), coin.getNetName(), coin.getCoinName(), nowtask.getTaskId());
             if(Objects.isNull(feeAddress)){
@@ -138,7 +139,7 @@ public class ChainOperateService {
             }
             nowtask.setGatherStage(2);
             gatherDetailMapper.updateById(nowtask);
-            BigDecimal balance = basicService.queryBalance(coin.getNetName(), nowtask.getGatherAddress());
+
             //开始归集 或者热钱包冷却
             String txId = basicService.transferBaseCoins(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, balance);
             jsonObject.put("txId",txId);
