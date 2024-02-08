@@ -54,6 +54,7 @@ public class ChainOperateService {
     public ChainFeeWallet getFeeEnoughWallet(String netName, BigDecimal amount){
         LambdaQueryWrapper<ChainFeeWallet> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ChainFeeWallet::getNetName,netName);
+        wrapper.eq(ChainFeeWallet::getRunningStatus,1);
 
         List<ChainFeeWallet> chainFeeWallets = feeWalletMapper.selectList(wrapper);
 

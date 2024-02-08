@@ -235,6 +235,14 @@ public class ChainWalletService {
     public Result<HotWalletExpensesDTO> hotWalletExpenses(HotWalletExpensesVO vo){
         log.info("出款参数为:{}"+vo.toString());
         Result<HotWalletExpensesDTO> result = new Result<>();
+        LambdaQueryWrapper<ChainAddressExpenses> ewrapper = Wrappers.lambdaQuery();
+        ewrapper.eq(ChainAddressExpenses::getExpensesStatus,4);
+        ewrapper.eq(ChainAddressExpenses::getSerial,vo.getOrderId());
+        List<ChainAddressExpenses> addressExpenses = addressExpensesMapper.selectList(ewrapper);
+        if(!CollectionUtils.isEmpty(addressExpenses)){
+            result.error("请勿重复出款");
+            return result;
+        }
         LambdaQueryWrapper<ChainHotWallet> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
         wrapper.eq(ChainHotWallet::getRunningStatus,1);
