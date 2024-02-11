@@ -7,10 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.NetEnum;
 import com.dx.entity.*;
-import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainFlowMapper;
-import com.dx.mapper.ChainGatherDetailMapper;
-import com.dx.mapper.ChainGatherTaskMapper;
+import com.dx.mapper.*;
 import com.dx.service.ChainBasicService;
 import com.dx.service.ChainPoolAddressService;
 import com.dx.service.other.ChainOperateService;
@@ -54,6 +51,71 @@ public class GatherJob {
 
     @Autowired
     private PlatformTransactionManager transactionManager;
+    @Autowired
+    private ChainNetMapper netMapper;
+    @Autowired
+    private ChainHotWalletMapper hotWalletMapper;
+    @Autowired
+    private ChainAssetsMapper assetsMapper;
+
+    @XxlJob("autoGather")
+    public void autoGather(){
+        LambdaQueryWrapper<ChainNet> nwrapper = Wrappers.lambdaQuery();
+        nwrapper.eq(ChainNet::getRunningStatus,1);
+        List<ChainNet> chainNets = netMapper.selectList(nwrapper);
+        for (ChainNet chainNet : chainNets) {
+            LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(ChainGatherTask::getNetName,chainNet.getNetName());
+            wrapper.eq(ChainGatherTask::getTaskStatus,1);
+            List<ChainGatherTask> chainGatherTasks = gatherTaskMapper.selectList(wrapper);
+
+            if(CollectionUtils.isNotEmpty(chainGatherTasks)){
+                continue;
+            }
+            LambdaQueryWrapper<ChainHotWallet> hotwrapper = Wrappers.lambdaQuery();
+            hotwrapper.eq(ChainHotWallet::getNetName,chainNet.getNetName());
+            hotwrapper.eq(ChainHotWallet::getRunningStatus,1);
+            List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
+
+            if(CollectionUtils.isEmpty(chainHotWallets)){
+                continue;
+            }
+            ChainHotWallet chainHotWallet = chainHotWallets.get(0);
+            //创建归集明细
+            LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
+            cwrapper.eq(ChainCoin::getCoinType,"base");
+            ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+            //获取资产表
+            List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null);
+            if(CollectionUtils.isEmpty(assets)){
+                continue;
+            }
+            ChainGatherTask task = new ChainGatherTask();
+            task.setGatherType(0);
+            task.setAddress(chainHotWallet.getAddress());
+            task.setTaskStatus(1);
+            task.setCreateTime(System.currentTimeMillis());
+            task.setNetName(chainHotWallet.getNetName());
+            task.setTotalNum(assets.size());
+            gatherTaskMapper.insert(task);
+            //创建 对应明细
+            for (ChainAssets asset : assets) {
+                ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
+                chainGatherDetail.setGatherAddress(asset.getAddress());
+                chainGatherDetail.setGatherStatus(0);
+                chainGatherDetail.setGatherStage(0);
+                chainGatherDetail.setAmount(BigDecimal.ZERO);
+                chainGatherDetail.setCoinName(asset.getCoinName());
+                chainGatherDetail.setTaskId(task.getId());
+                chainGatherDetail.setTryTime(0);
+                chainGatherDetail.setFeeAmount(BigDecimal.ZERO);
+                chainGatherDetail.setFeeCoinName(chainCoin.getCoinName());
+
+                gatherDetailMapper.insert(chainGatherDetail);
+            }
+        }
+
+    }
 
     @XxlJob("executeGather")
     public void executeGather(){
