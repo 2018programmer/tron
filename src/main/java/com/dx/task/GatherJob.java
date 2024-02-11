@@ -119,55 +119,62 @@ public class GatherJob {
             ChainCoin transCoin = coinMapper.selectOne(cwrapper);
         try{
             JSONObject jsonObject = operateService.addressToGather(nowTask, chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode());
-            String txId = jsonObject.getString("txId");
-            if(ObjectUtils.isNotEmpty(txId)){
+            if(ObjectUtils.isNull(jsonObject)){
+                nowTask.setGatherStatus(3);
+                nowTask.setGatherStage(3);
+                nowTask.setFinishTime(System.currentTimeMillis());
+            }else {
+                String txId = jsonObject.getString("txId");
+                if(ObjectUtils.isNotEmpty(txId)){
 
-                Thread.sleep(3000);
+                    Thread.sleep(3000);
 
-                //解析记录 更新流水 和子任务
-                JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
-                BigDecimal num6 = new BigDecimal("1000000");
-                BigDecimal gatherFee =BigDecimal.ZERO;
-                if(json.containsKey("fee")) {
-                    String fee = json.getString("fee");
-                    gatherFee = new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
-                }
-                ChainFlow gatherFlow = new ChainFlow();
-                gatherFlow.setNetName("TRON");
-                gatherFlow.setWalletType(3);
-                gatherFlow.setAddress(chainGatherTask.getAddress());
-                gatherFlow.setTxId(txId);
-                gatherFlow.setTransferType(1);
-                gatherFlow.setFlowWay(4);
-                gatherFlow.setAmount(jsonObject.getBigDecimal("balance"));
-                gatherFlow.setTargetAddress(nowTask.getGatherAddress());
-                gatherFlow.setCreateTime(System.currentTimeMillis());
-                gatherFlow.setGroupId(chainGatherTask.getId().toString());
-                gatherFlow.setCoinName(transCoin.getCoinName());
-                nowTask.setGatherStatus(2);
-                nowTask.setTxId(txId);
-                nowTask.setFeeAmount(nowTask.getFeeAmount().add(gatherFee));
-                nowTask.setFeeAddress(jsonObject.getString("feeAddress"));
-                if("base".equals(transCoin.getCoinType())){
-                    flowMapper.insert(gatherFlow);
-                    nowTask.setGatherStatus(3);
-                    nowTask.setGatherStage(3);
-                    nowTask.setFinishTime(System.currentTimeMillis());
-                    nowTask.setAmount(jsonObject.getBigDecimal("balance"));
-                }else {
-                    String result = json.getJSONObject("receipt").getString("result");
-                    if("SUCCESS".equals(result)){
+                    //解析记录 更新流水 和子任务
+                    JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
+                    BigDecimal num6 = new BigDecimal("1000000");
+                    BigDecimal gatherFee =BigDecimal.ZERO;
+                    if(json.containsKey("fee")) {
+                        String fee = json.getString("fee");
+                        gatherFee = new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
+                    }
+                    ChainFlow gatherFlow = new ChainFlow();
+                    gatherFlow.setNetName("TRON");
+                    gatherFlow.setWalletType(3);
+                    gatherFlow.setAddress(chainGatherTask.getAddress());
+                    gatherFlow.setTxId(txId);
+                    gatherFlow.setTransferType(1);
+                    gatherFlow.setFlowWay(4);
+                    gatherFlow.setAmount(jsonObject.getBigDecimal("balance"));
+                    gatherFlow.setTargetAddress(nowTask.getGatherAddress());
+                    gatherFlow.setCreateTime(System.currentTimeMillis());
+                    gatherFlow.setGroupId(chainGatherTask.getId().toString());
+                    gatherFlow.setCoinName(transCoin.getCoinName());
+                    nowTask.setGatherStatus(2);
+                    nowTask.setTxId(txId);
+                    nowTask.setFeeAmount(nowTask.getFeeAmount().add(gatherFee));
+                    nowTask.setFeeAddress(jsonObject.getString("feeAddress"));
+                    if("base".equals(transCoin.getCoinType())){
                         flowMapper.insert(gatherFlow);
                         nowTask.setGatherStatus(3);
                         nowTask.setGatherStage(3);
                         nowTask.setFinishTime(System.currentTimeMillis());
                         nowTask.setAmount(jsonObject.getBigDecimal("balance"));
+                    }else {
+                        String result = json.getJSONObject("receipt").getString("result");
+                        if("SUCCESS".equals(result)){
+                            flowMapper.insert(gatherFlow);
+                            nowTask.setGatherStatus(3);
+                            nowTask.setGatherStage(3);
+                            nowTask.setFinishTime(System.currentTimeMillis());
+                            nowTask.setAmount(jsonObject.getBigDecimal("balance"));
+                        }
                     }
-                }
 
-            }else {
-                nowTask.setGatherStatus(2);
+                }else {
+                    nowTask.setGatherStatus(2);
+                }
             }
+
         }catch (Exception e){
             e.printStackTrace();
             nowTask.setGatherStatus(2);

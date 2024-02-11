@@ -133,6 +133,9 @@ public class ChainOperateService {
         JSONObject jsonObject = new JSONObject();
         if("base".equals(coin.getCoinType())){
             BigDecimal balance = basicService.queryBalance(coin.getNetName(), nowtask.getGatherAddress());
+            if(balance.compareTo(BigDecimal.ZERO)==0){
+                return null;
+            }
             //转矿工费
             String feeAddress = transferFee(Constant.BaseUrl.trxfee, nowtask.getGatherAddress(), coin.getNetName(), coin.getCoinName(), nowtask.getTaskId());
             if(Objects.isNull(feeAddress)){
@@ -149,6 +152,9 @@ public class ChainOperateService {
         }else {
             //查合约币
             BigDecimal balance = basicService.queryContractBalance(coin.getNetName(), code, nowtask.getGatherAddress());
+            if(balance.compareTo(BigDecimal.ZERO)==0){
+                return null;
+            }
             //查询需要消耗的trx
             String estimateenergy = basicService.estimateenergy(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, coin.getCoinCode(), balance);
             //转矿工费

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -287,7 +288,7 @@ public class ChainWalletService {
             if(StringUtils.isNotEmpty(txId)){
                 address= chainHotWallet.getAddress();
                 try{
-                    Thread.sleep(1000);
+                    Thread.sleep(3000);
                 }catch (Exception e){
                 }
                 break;
@@ -319,6 +320,25 @@ public class ChainWalletService {
         chainFlow.setNetName(chainCoin.getNetName());
         chainFlow.setCreateTime(System.currentTimeMillis());
         flowMapper.insert(chainFlow);
+        JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
+        BigDecimal num6 = new BigDecimal("1000000");
+        BigDecimal gatherFee =BigDecimal.ZERO;
+        if(json.containsKey("fee")) {
+            String fee = json.getString("fee");
+            gatherFee = new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
+        }
+        ChainFlow gatherFlow = new ChainFlow();
+        gatherFlow.setNetName("TRON");
+        gatherFlow.setWalletType(3);
+        gatherFlow.setAddress(address);
+        gatherFlow.setTxId(txId);
+        gatherFlow.setTransferType(1);
+        gatherFlow.setFlowWay(4);
+        gatherFlow.setAmount(gatherFee);
+        gatherFlow.setCreateTime(System.currentTimeMillis());
+        gatherFlow.setGroupId(vo.getOrderId());
+        gatherFlow.setCoinName(NetEnum.TRON.getBaseCoin());
+        flowMapper.insert(gatherFlow);
         HotWalletExpensesDTO hotWalletExpensesDTO = new HotWalletExpensesDTO();
         hotWalletExpensesDTO.setTxId(txId);
         hotWalletExpensesDTO.setAddress(address);
