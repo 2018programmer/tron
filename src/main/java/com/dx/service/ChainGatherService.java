@@ -75,7 +75,7 @@ public class ChainGatherService {
         cwrapper.eq(ChainCoin::getCoinType,"base");
         ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
         //获取资产表
-        List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null);
+        List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null,null);
         if(CollectionUtils.isEmpty(assets)){
             result.error("没有达到归集要求的地址");
             return result;

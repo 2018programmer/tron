@@ -14,5 +14,5 @@ public interface ChainAssetsMapper extends BaseMapper<ChainAssets> {
      * @param netName
      * @return
      */
-    List<ChainAssets> getHaveAssets(String netName, String coinName);
+    List<ChainAssets> getHaveAssets(String netName, String coinName,Integer autoGather);
 }

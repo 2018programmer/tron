@@ -89,7 +89,7 @@ public class GatherJob {
             List<ChainCoin> chainCoins = coinMapper.selectList(cwrapper);
             ChainCoin base = chainCoins.stream().filter(o -> o.getCoinType().equals("base")).collect(Collectors.toList()).get(0);
             //获取资产表
-            List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null);
+            List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null,1);
             if(CollectionUtils.isEmpty(assets)){
                 continue;
             }
@@ -103,14 +103,6 @@ public class GatherJob {
             gatherTaskMapper.insert(task);
             //创建 对应明细
             for (ChainAssets asset : assets) {
-                ChainCoin nowCoin = chainCoins.stream().filter(o -> o.getCoinName().equals(asset.getCoinName())).collect(Collectors.toList()).get(0);
-
-                if(1!=nowCoin.getAutoGather()){
-                    continue;
-                }
-                if (nowCoin.getThreshold().compareTo(asset.getBalance())>0){
-                    continue;
-                }
                 ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
                 chainGatherDetail.setGatherAddress(asset.getAddress());
                 chainGatherDetail.setGatherStatus(0);

@@ -8,6 +8,9 @@
             where x.balance >=c.threshold
             and x.asset_type = 2
             <if test="netName != null">
+                and c.auto_gather = 1
+            </if>
+            <if test="netName != null">
                 and x.net_name = #{netName}
             </if>
             <if test="coinName != null">

@@ -182,7 +182,7 @@ public class ChainPoolAddressService {
     public Result<GetGatherNumDTO> getGatherNum(String netName) {
         Result<GetGatherNumDTO> result = new Result<>();
         GetGatherNumDTO getGatherNumDTO = new GetGatherNumDTO();
-        List<ChainAssets> haveAssets = assetsMapper.getHaveAssets(netName, null);
+        List<ChainAssets> haveAssets = assetsMapper.getHaveAssets(netName, null,null);
         Set<String> collect = haveAssets.stream().map(ChainAssets::getAddress).collect(Collectors.toSet());
         getGatherNumDTO.setNum(collect.size());
         getGatherNumDTO.setNetName(netName);
