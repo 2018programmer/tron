@@ -215,13 +215,12 @@ public class ChainOperateService {
         if(StringUtils.isEmpty(txId)){
             return null;
         }
-        if(!"base".equals(transCoin.getCoinType())){
-            try{
-                Thread.sleep(3000);
-            }catch (Exception e){
+        try{
+            Thread.sleep(3000);
+        }catch (Exception e){
 
-            }
         }
+
         JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
         BigDecimal num6 = new BigDecimal("1000000");
         BigDecimal coldFee =BigDecimal.ZERO;
@@ -237,7 +236,6 @@ public class ChainOperateService {
         feeFlow.setTransferType(0);
         feeFlow.setFlowWay(3);
         feeFlow.setAmount(coldFee);
-        feeFlow.setTargetAddress(hotWallet.getNetName());
         feeFlow.setCreateTime(System.currentTimeMillis());
         feeFlow.setCoinName(transCoin.getCoinName());
         flowMapper.insert(feeFlow);
