@@ -325,6 +325,7 @@ public class ChainWalletService {
         chainAddressExpenses.setTxId(txId);
         chainAddressExpenses.setExpensesStatus(4);
         chainAddressExpenses.setFee(gatherFee);
+        chainAddressExpenses.setFeeCoinName(NetEnum.TRON.getBaseCoin());
         addressExpensesMapper.insert(chainAddressExpenses);
 
         ChainFlow chainFlow = new ChainFlow();
