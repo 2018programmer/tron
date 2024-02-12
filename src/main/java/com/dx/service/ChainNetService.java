@@ -55,7 +55,6 @@ public class ChainNetService {
         for (ChainNet chainNet : chainNets) {
             NetDTO netDTO = new NetDTO();
             BeanUtils.copyProperties(chainNet,netDTO);
-            netDTO.setLogo("没有logo");
             LambdaQueryWrapper<ChainCoin> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(ChainCoin::getNetName,chainNet.getNetName());
             Long num = coinMapper.selectCount(wrapper);
