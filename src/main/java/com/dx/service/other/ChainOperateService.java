@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Constant;
+import com.dx.common.NetEnum;
 import com.dx.entity.*;
 import com.dx.mapper.ChainCoinMapper;
 import com.dx.mapper.ChainFeeWalletMapper;
@@ -137,7 +138,7 @@ public class ChainOperateService {
                 return null;
             }
             //转矿工费
-            String feeAddress = transferFee(Constant.BaseUrl.trxfee, nowtask.getGatherAddress(), coin.getNetName(), coin.getCoinName(), nowtask.getTaskId());
+            String feeAddress = transferFee(Constant.BaseUrl.trxfee, nowtask.getGatherAddress(), coin.getNetName(), NetEnum.TRON.getBaseCoin(), nowtask.getTaskId());
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
@@ -158,7 +159,7 @@ public class ChainOperateService {
             //查询需要消耗的trx
             String estimateenergy = basicService.estimateenergy(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, coin.getCoinCode(), balance);
             //转矿工费
-            String feeAddress = transferFee(new BigDecimal(estimateenergy), nowtask.getGatherAddress(), coin.getNetName(), coin.getCoinName(),nowtask.getTaskId());
+            String feeAddress = transferFee(new BigDecimal(estimateenergy), nowtask.getGatherAddress(), coin.getNetName(), NetEnum.TRON.getBaseCoin(),nowtask.getTaskId());
             if(Objects.isNull(feeAddress)){
                 return jsonObject;
             }
