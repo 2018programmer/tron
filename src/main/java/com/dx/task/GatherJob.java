@@ -24,6 +24,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -83,15 +84,17 @@ public class GatherJob {
             ChainHotWallet chainHotWallet = chainHotWallets.get(0);
             //创建归集明细
             LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
-            cwrapper.eq(ChainCoin::getCoinType,"base");
-            ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+            cwrapper.eq(ChainCoin::getNetName,chainNet.getNetName());
+//            cwrapper.eq(ChainCoin::getCoinType,"base");
+            List<ChainCoin> chainCoins = coinMapper.selectList(cwrapper);
+            ChainCoin base = chainCoins.stream().filter(o -> o.getCoinType().equals("base")).collect(Collectors.toList()).get(0);
             //获取资产表
             List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null);
             if(CollectionUtils.isEmpty(assets)){
                 continue;
             }
             ChainGatherTask task = new ChainGatherTask();
-            task.setGatherType(0);
+            task.setGatherType(1);
             task.setAddress(chainHotWallet.getAddress());
             task.setTaskStatus(1);
             task.setCreateTime(System.currentTimeMillis());
@@ -100,6 +103,14 @@ public class GatherJob {
             gatherTaskMapper.insert(task);
             //创建 对应明细
             for (ChainAssets asset : assets) {
+                ChainCoin nowCoin = chainCoins.stream().filter(o -> o.getCoinName().equals(asset.getCoinName())).collect(Collectors.toList()).get(0);
+
+                if(1!=nowCoin.getAutoGather()){
+                    continue;
+                }
+                if (nowCoin.getThreshold().compareTo(asset.getBalance())>0){
+                    continue;
+                }
                 ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
                 chainGatherDetail.setGatherAddress(asset.getAddress());
                 chainGatherDetail.setGatherStatus(0);
@@ -109,7 +120,7 @@ public class GatherJob {
                 chainGatherDetail.setTaskId(task.getId());
                 chainGatherDetail.setTryTime(0);
                 chainGatherDetail.setFeeAmount(BigDecimal.ZERO);
-                chainGatherDetail.setFeeCoinName(chainCoin.getCoinName());
+                chainGatherDetail.setFeeCoinName(base.getCoinName());
 
                 gatherDetailMapper.insert(chainGatherDetail);
             }

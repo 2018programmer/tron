@@ -108,7 +108,7 @@ public class MonitorJob {
                     ChainCoin chainCoin = coinMapper.selectOne(coinwrapper);
                     chainAddressIncome.setNetName(chainCoin.getNetName());
                     chainAddressIncome.setTxId(contactDTO.getTxId());
-                    if(chainCoin.getThreshold().compareTo(contactDTO.getAmount())>0){
+                    if(chainCoin.getMinNum().compareTo(contactDTO.getAmount())>0){
                         chainAddressIncome.setEffective(0);
                     }else {
                         chainAddressIncome.setEffective(1);
@@ -134,7 +134,7 @@ public class MonitorJob {
                     flowMapper.insert(chainFlow);
 
                     log.info("能否创建订单{},{}",StringUtils.isNotEmpty(chainPoolAddress.getAssignedId()),chainCoin.getThreshold().compareTo(contactDTO.getAmount())<=0);
-                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getThreshold().compareTo(contactDTO.getAmount())<=0){
+                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0){
                         //创建充值订单
                         CreateOrderVO createOrderVO = new CreateOrderVO();
                         createOrderVO.setExchangeCurrency(chainCoin.getCoinName());
