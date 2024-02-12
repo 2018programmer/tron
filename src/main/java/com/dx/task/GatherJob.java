@@ -85,7 +85,6 @@ public class GatherJob {
             //创建归集明细
             LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
             cwrapper.eq(ChainCoin::getNetName,chainNet.getNetName());
-//            cwrapper.eq(ChainCoin::getCoinType,"base");
             List<ChainCoin> chainCoins = coinMapper.selectList(cwrapper);
             ChainCoin base = chainCoins.stream().filter(o -> o.getCoinType().equals("base")).collect(Collectors.toList()).get(0);
             //获取资产表
@@ -184,7 +183,7 @@ public class GatherJob {
             ChainCoin transCoin = coinMapper.selectOne(cwrapper);
         try{
             JSONObject jsonObject = operateService.addressToGather(nowTask, chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode());
-            if(ObjectUtils.isNull(jsonObject)){
+            if(null==jsonObject){
                 nowTask.setGatherStatus(3);
                 nowTask.setGatherStage(3);
                 nowTask.setFinishTime(System.currentTimeMillis());
