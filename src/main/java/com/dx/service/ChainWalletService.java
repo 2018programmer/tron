@@ -121,7 +121,7 @@ public class ChainWalletService {
                 amount=amount.add(chainAsset.getBalance().multiply(new BigDecimal("7.12")));
             }
         }
-        return amount;
+        return amount.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     public Result updateHotWalletStatus(UpdateHotWalletStatusDTO dto) {
@@ -327,18 +327,18 @@ public class ChainWalletService {
             String fee = json.getString("fee");
             gatherFee = new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
         }
-        ChainFlow gatherFlow = new ChainFlow();
-        gatherFlow.setNetName("TRON");
-        gatherFlow.setWalletType(3);
-        gatherFlow.setAddress(address);
-        gatherFlow.setTxId(txId);
-        gatherFlow.setTransferType(1);
-        gatherFlow.setFlowWay(4);
-        gatherFlow.setAmount(gatherFee);
-        gatherFlow.setCreateTime(System.currentTimeMillis());
-        gatherFlow.setGroupId(vo.getOrderId());
-        gatherFlow.setCoinName(NetEnum.TRON.getBaseCoin());
-        flowMapper.insert(gatherFlow);
+        ChainFlow feeFlow = new ChainFlow();
+        feeFlow.setNetName("TRON");
+        feeFlow.setWalletType(3);
+        feeFlow.setAddress(address);
+        feeFlow.setTxId(txId);
+        feeFlow.setTransferType(0);
+        feeFlow.setFlowWay(3);
+        feeFlow.setAmount(gatherFee);
+        feeFlow.setCreateTime(System.currentTimeMillis());
+        feeFlow.setGroupId(vo.getOrderId());
+        feeFlow.setCoinName(NetEnum.TRON.getBaseCoin());
+        flowMapper.insert(feeFlow);
         HotWalletExpensesDTO hotWalletExpensesDTO = new HotWalletExpensesDTO();
         hotWalletExpensesDTO.setTxId(txId);
         hotWalletExpensesDTO.setAddress(address);
