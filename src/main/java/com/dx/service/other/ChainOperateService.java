@@ -191,23 +191,23 @@ public class ChainOperateService {
         BigDecimal transAmount ;
         String txId ="";
         if(transCoin.getCoinCode().equals(baseCoin.getCoinCode())){
-            transAmount =bigDecimal;
+            transAmount =bigDecimal.subtract(Constant.BaseUrl.trxfee);
             if(bigDecimal.compareTo(Constant.BaseUrl.trxfee)<=0){
                 return "任务终止请补充至少"+Constant.BaseUrl.trxfee+"矿工费";
             }
-              txId= basicService.transferBaseCoins(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), bigDecimal.subtract(Constant.BaseUrl.trxfee));
+              txId= basicService.transferBaseCoins(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transAmount);
         }else {
             //查合约币
             BigDecimal amount = basicService.queryContractBalance(hotWallet.getNetName(), transCoin.getCoinCode(), hotWallet.getAddress());
             transAmount =amount;
             //查询需要消耗的trx
-            String estimateenergy = basicService.estimateenergy(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), amount);
+            String estimateenergy = basicService.estimateenergy(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), transAmount);
             BigDecimal fee = new BigDecimal(estimateenergy);
             if (bigDecimal.compareTo(fee)<0){
                 return "任务终止请补充至少"+fee.subtract(bigDecimal)+"矿工费";
             }
             //开始归集 或者冷却
-            txId = basicService.transferContractCoins(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), amount);
+            txId = basicService.transferContractCoins(transCoin.getNetName(), hotWallet.getAddress(), wallet.getAddress(), hotWallet.getPrivateKey(), transCoin.getCoinCode(), transAmount);
 
         }
 

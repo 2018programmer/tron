@@ -166,8 +166,7 @@ public class ChainAssetsService {
         coldFlow.setTxId(txId);
         coldFlow.setTransferType(0);
         coldFlow.setFlowWay(5);
-        BigDecimal subtract = balance.subtract(Constant.BaseUrl.trxfee);
-        coldFlow.setAmount(subtract);
+        coldFlow.setAmount(balance);
         coldFlow.setTargetAddress(wallet.getAddress());
         coldFlow.setCreateTime(System.currentTimeMillis());
         coldFlow.setCoinName(feeWallet.getCoinName());
