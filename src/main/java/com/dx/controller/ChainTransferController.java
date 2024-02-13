@@ -9,10 +9,7 @@ import com.dx.pojo.vo.GetAddressExpensesVO;
 import com.dx.pojo.vo.GetAddressIncomeVO;
 import com.dx.service.ChainTranferService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 收入出款接口
@@ -54,7 +51,7 @@ public class ChainTransferController {
      * @return
      */
     @PostMapping("/income/confirm")
-    public Result  confirmOrder(ConfirmOrderVO vo){
+    public Result  confirmOrder(@RequestBody ConfirmOrderVO vo){
         return transferService.confirmOrder(vo);
     }
 }
