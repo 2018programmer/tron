@@ -14,6 +14,7 @@ import com.dx.entity.*;
 import com.dx.mapper.*;
 import com.dx.pojo.vo.GetUserAddressVO;
 import com.dx.pojo.vo.QueryPoolAddressVO;
+import com.dx.pojo.vo.UnbindAddressVO;
 import com.dx.pojo.vo.UpdatePoolManageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -283,5 +284,9 @@ public class ChainPoolAddressService {
         result.setResult(verifyAddressDTO);
         return result;
 
+    }
+
+    public Result unbindAddress(UnbindAddressVO vo) {
+        return null;
     }
 }

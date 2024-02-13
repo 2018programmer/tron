@@ -72,7 +72,7 @@ public class ChainOperateService {
      * 转矿工费
      * @return
      */
-    public String transferFee(BigDecimal amount, String toAddress,String netName,String coinName,Integer taskId){
+    public void transferFee(BigDecimal amount, String toAddress,String netName,String coinName,Integer taskId,JSONObject jsonObject){
 
         //转账矿工费
         BigDecimal add = amount.add(Constant.BaseUrl.trxfee);
@@ -80,7 +80,7 @@ public class ChainOperateService {
 
         if(Objects.isNull(feeWallet)){
             log.info("主网{},矿工费钱包余额不足",netName);
-            return null;
+            return ;
         }
         String txId = basicService.transferBaseCoins(netName, feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
         //查询交易结果
@@ -114,10 +114,9 @@ public class ChainOperateService {
         chainFlow.setCoinName(coinName);
         flowMapper.insert(chainFlow);
         transactionManager.commit(status);
+        jsonObject.put("fee",amount);
         if (StringUtils.isNotEmpty(feeWallet.getAddress())){
-            return feeWallet.getAddress();
-        }else {
-            return null;
+            jsonObject.put("feeAddress",feeWallet.getAddress());
         }
     }
 
@@ -138,8 +137,8 @@ public class ChainOperateService {
                 return null;
             }
             //转矿工费
-            String feeAddress = transferFee(Constant.BaseUrl.trxfee, nowtask.getGatherAddress(), coin.getNetName(), NetEnum.TRON.getBaseCoin(), nowtask.getTaskId());
-            if(Objects.isNull(feeAddress)){
+            transferFee(Constant.BaseUrl.trxfee, nowtask.getGatherAddress(), coin.getNetName(), NetEnum.TRON.getBaseCoin(), nowtask.getTaskId(),jsonObject);
+            if(Objects.isNull(jsonObject.getString("feeAddress"))){
                 return jsonObject;
             }
             nowtask.setGatherStage(2);
@@ -149,7 +148,6 @@ public class ChainOperateService {
             String txId = basicService.transferBaseCoins(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, balance);
             jsonObject.put("txId",txId);
             jsonObject.put("balance",balance);
-            jsonObject.put("feeAddress",feeAddress);
         }else {
             //查合约币
             BigDecimal balance = basicService.queryContractBalance(coin.getNetName(), code, nowtask.getGatherAddress());
@@ -159,8 +157,8 @@ public class ChainOperateService {
             //查询需要消耗的trx
             String estimateenergy = basicService.estimateenergy(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, coin.getCoinCode(), balance);
             //转矿工费
-            String feeAddress = transferFee(new BigDecimal(estimateenergy), nowtask.getGatherAddress(), coin.getNetName(), NetEnum.TRON.getBaseCoin(),nowtask.getTaskId());
-            if(Objects.isNull(feeAddress)){
+            transferFee(new BigDecimal(estimateenergy), nowtask.getGatherAddress(), coin.getNetName(), NetEnum.TRON.getBaseCoin(),nowtask.getTaskId(),jsonObject);
+            if(Objects.isNull(jsonObject.getString("feeAddress"))){
                 return jsonObject;
             }
             nowtask.setGatherStage(2);
@@ -168,7 +166,6 @@ public class ChainOperateService {
             String txId = basicService.transferContractCoins(coin.getNetName(), nowtask.getGatherAddress(), toAddress, privateKey, coin.getCoinCode(), balance);
             jsonObject.put("txId",txId);
             jsonObject.put("balance",balance);
-            jsonObject.put("feeAddress",feeAddress);
         }
         return jsonObject;
     }
@@ -250,10 +247,9 @@ public class ChainOperateService {
         coldFlow.setTargetAddress(wallet.getAddress());
         coldFlow.setCreateTime(System.currentTimeMillis());
         coldFlow.setCoinName(transCoin.getCoinName());
-        BigDecimal subtract = transAmount.subtract(coldFee);
         if("base".equals(transCoin.getCoinType())){
 
-            coldFlow.setAmount(subtract);
+            coldFlow.setAmount(transAmount);
             flowMapper.insert(coldFlow);
         }else {
             String result = json.getJSONObject("receipt").getString("result");

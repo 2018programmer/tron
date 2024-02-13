@@ -3,11 +3,8 @@ package com.dx.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.pojo.dto.*;
+import com.dx.pojo.vo.*;
 import com.dx.service.ChainPoolAddressService;
-import com.dx.pojo.vo.GetPoolManageVO;
-import com.dx.pojo.vo.GetUserAddressVO;
-import com.dx.pojo.vo.QueryPoolAddressVO;
-import com.dx.pojo.vo.UpdatePoolManageVO;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -78,5 +75,12 @@ public class ChainPoolAddressController {
     @GetMapping("/address/verify")
     public Result<VerifyAddressDTO> verifyAddress(@NotNull String address,@NotNull String netName, Integer type){
         return poolService.verifyAddress(address,netName,type);
+    }
+    /**
+     * 接触绑定地址
+     */
+    @PostMapping("/address/unbind")
+    public Result unbindAddress(@RequestBody UnbindAddressVO vo){
+        return poolService.unbindAddress(vo);
     }
 }

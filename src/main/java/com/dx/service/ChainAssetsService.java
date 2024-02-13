@@ -140,6 +140,10 @@ public class ChainAssetsService {
             result.error("冷却失败");
             return result;
         }
+        try {
+            Thread.sleep(3000);
+        }catch (Exception e){
+        }
         JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
         ChainFlow feeFlow = new ChainFlow();
         feeFlow.setNetName(feeWallet.getNetName());

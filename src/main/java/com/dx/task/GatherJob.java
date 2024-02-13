@@ -195,12 +195,12 @@ public class GatherJob {
 
                     //解析记录 更新流水 和子任务
                     JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
-                    BigDecimal num6 = new BigDecimal("1000000");
-                    BigDecimal gatherFee =BigDecimal.ZERO;
-                    if(json.containsKey("fee")) {
-                        String fee = json.getString("fee");
-                        gatherFee = new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
-                    }
+//                    BigDecimal num6 = new BigDecimal("1000000");
+//                    BigDecimal gatherFee =BigDecimal.ZERO;
+//                    if(json.containsKey("fee")) {
+//                        String fee = json.getString("fee");
+//                        gatherFee = new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
+//                    }
                     ChainFlow gatherFlow = new ChainFlow();
                     gatherFlow.setNetName("TRON");
                     gatherFlow.setWalletType(3);
@@ -215,7 +215,7 @@ public class GatherJob {
                     gatherFlow.setCoinName(transCoin.getCoinName());
                     nowTask.setGatherStatus(2);
                     nowTask.setTxId(txId);
-                    nowTask.setFeeAmount(nowTask.getFeeAmount().add(gatherFee));
+                    nowTask.setFeeAmount(nowTask.getFeeAmount().add(json.getBigDecimal("fee")));
                     nowTask.setFeeAddress(jsonObject.getString("feeAddress"));
                     if("base".equals(transCoin.getCoinType())){
                         flowMapper.insert(gatherFlow);
