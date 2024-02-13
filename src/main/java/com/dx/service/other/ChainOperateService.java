@@ -234,7 +234,7 @@ public class ChainOperateService {
         feeFlow.setFlowWay(3);
         feeFlow.setAmount(coldFee);
         feeFlow.setCreateTime(System.currentTimeMillis());
-        feeFlow.setCoinName(transCoin.getCoinName());
+        feeFlow.setCoinName(baseCoin.getCoinName());
         flowMapper.insert(feeFlow);
         //添加流水明细
         ChainFlow coldFlow = new ChainFlow();
