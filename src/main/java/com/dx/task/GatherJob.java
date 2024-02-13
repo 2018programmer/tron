@@ -215,7 +215,7 @@ public class GatherJob {
                     gatherFlow.setCoinName(transCoin.getCoinName());
                     nowTask.setGatherStatus(2);
                     nowTask.setTxId(txId);
-                    nowTask.setFeeAmount(nowTask.getFeeAmount().add(json.getBigDecimal("fee")));
+                    nowTask.setFeeAmount(nowTask.getFeeAmount().add(jsonObject.getBigDecimal("fee")));
                     nowTask.setFeeAddress(jsonObject.getString("feeAddress"));
                     if("base".equals(transCoin.getCoinType())){
                         flowMapper.insert(gatherFlow);
