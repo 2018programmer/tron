@@ -176,7 +176,7 @@ public class ChainPoolAddressService {
                 amount=amount.add(chainAsset.getBalance().multiply(new BigDecimal("7.12")));
             }
         }
-        return amount;
+        return amount.setScale(2,BigDecimal.ROUND_HALF_UP);
     }
 
     public Result<GetGatherNumDTO> getGatherNum(String netName) {
