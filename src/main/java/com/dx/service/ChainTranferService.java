@@ -16,10 +16,12 @@ import com.dx.pojo.vo.GetAddressExpensesVO;
 import com.dx.pojo.vo.GetAddressIncomeVO;
 import com.dx.entity.ChainAddressIncome;
 import com.dx.mapper.ChainAddressIncomeMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ChainTranferService {
 
     @Autowired
@@ -87,6 +89,8 @@ public class ChainTranferService {
     }
 
     public Result confirmOrder(ConfirmOrderVO vo) {
+        log.info("确认订单参数为{}",vo);
+
         Result<Object> result = new Result<>();
         LambdaUpdateWrapper<ChainAddressIncome> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(ChainAddressIncome::getTxId, vo.getTxId());
