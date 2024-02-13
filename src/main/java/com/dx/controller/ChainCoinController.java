@@ -43,6 +43,6 @@ public class ChainCoinController {
 
     @PostMapping("/getm")
     public void  getm(){
-        balanceJob.executeGather();
+        balanceJob.autoGather();
     }
 }
