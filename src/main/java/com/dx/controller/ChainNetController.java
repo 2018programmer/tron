@@ -21,7 +21,7 @@ public class ChainNetController {
     private ChainNetService chainNetService;
 
     /**
-     * 获取主网列表
+     * 获取主网列表 runningStatus:1运行中 不传或者其他值为全量
      */
     @GetMapping("/list/get")
     public Result<List<NetDTO>> getNets(Integer runningStatus){

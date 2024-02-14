@@ -43,15 +43,17 @@ public class ChainNetService {
 
     public Result<List<NetDTO>> getChainNet(Integer runningStatus){
         Result<List<NetDTO>> result = new Result<>();
-
+        LambdaQueryWrapper<ChainNet> netWrapper = Wrappers.lambdaQuery();
+        if(1 == runningStatus){
+            netWrapper.eq(ChainNet::getRunningStatus,1);
+        }
+        List<NetDTO> list = new ArrayList<>();
         //获取所有主网名称
-        List<ChainNet> chainNets = netMapper.selectList(null);
+        List<ChainNet> chainNets = netMapper.selectList(netWrapper);
         if(CollectionUtils.isEmpty(chainNets)){
-            result.error("没有数据");
+            result.setResult(list);
             return result;
         }
-
-        List<NetDTO> list = new ArrayList<>();
         for (ChainNet chainNet : chainNets) {
             NetDTO netDTO = new NetDTO();
             BeanUtils.copyProperties(chainNet,netDTO);
