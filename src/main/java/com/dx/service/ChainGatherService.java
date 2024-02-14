@@ -199,7 +199,9 @@ public class ChainGatherService {
         //归集子任务取消
         LambdaUpdateWrapper<ChainGatherDetail> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(ChainGatherDetail::getTaskId,vo.getId());
-        wrapper.eq(ChainGatherDetail::getGatherStatus,0).or().eq(ChainGatherDetail::getGatherStatus,2);
+        wrapper.and((w)->{
+            w.eq(ChainGatherDetail::getGatherStatus,0).or().eq(ChainGatherDetail::getGatherStatus,2);
+        });
         wrapper.set(ChainGatherDetail::getGatherStatus,4);
         gatherDetailMapper.update(wrapper);
 

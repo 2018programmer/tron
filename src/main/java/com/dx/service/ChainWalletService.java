@@ -86,7 +86,9 @@ public class ChainWalletService {
 
             fwrapper.clear();
             fwrapper.eq(ChainFlow::getAddress,chainHotWallet.getAddress());
-            fwrapper.eq(ChainFlow::getFlowWay,2).or().eq(ChainFlow::getFlowWay,5);
+            fwrapper.and((w)->{
+                w.eq(ChainFlow::getFlowWay,2).or().eq(ChainFlow::getFlowWay,5);
+            });
             Long outNum = flowMapper.selectCount(fwrapper);
             hotWalletDTO.setOutCount(outNum.intValue());
 
