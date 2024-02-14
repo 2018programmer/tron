@@ -77,17 +77,25 @@ public class ChainWalletService {
             result.error("没有数据");
             return result;
         }
-        LambdaQueryWrapper<ChainAddressExpenses> ewrapper = Wrappers.lambdaQuery();
+        LambdaQueryWrapper<ChainFlow> fwrapper = Wrappers.lambdaQuery();
         LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
         List<HotWalletDTO> list = new ArrayList<>();
         for (ChainHotWallet chainHotWallet : chainHotWallets) {
             HotWalletDTO hotWalletDTO = new HotWalletDTO();
             BeanUtils.copyProperties(chainHotWallet,hotWalletDTO);
-            ewrapper.clear();
-            ewrapper.eq(ChainAddressExpenses::getAddress,chainHotWallet.getAddress());
-            ewrapper.eq(ChainAddressExpenses::getExpensesStatus,4);
-            Long num = addressExpensesMapper.selectCount(ewrapper);
-            hotWalletDTO.setOutCount(num.intValue());
+
+            fwrapper.clear();
+            fwrapper.eq(ChainFlow::getAddress,chainHotWallet.getAddress());
+            fwrapper.eq(ChainFlow::getFlowWay,2).or().eq(ChainFlow::getFlowWay,5);
+            Long outNum = flowMapper.selectCount(fwrapper);
+            hotWalletDTO.setOutCount(outNum.intValue());
+
+            fwrapper.clear();
+            fwrapper.eq(ChainFlow::getAddress,chainHotWallet.getAddress());
+            fwrapper.eq(ChainFlow::getFlowWay,4);
+            Long inNum = flowMapper.selectCount(fwrapper);
+            hotWalletDTO.setInCount(inNum.intValue());
+
             awrapper.clear();
             awrapper.eq(ChainAssets::getAddress,chainHotWallet.getAddress());
             awrapper.eq(ChainAssets::getCoinName, NetEnum.TRON.getBaseCoin());
@@ -97,7 +105,6 @@ public class ChainWalletService {
             }else {
                 hotWalletDTO.setBalance(chainAssets.getBalance());
             }
-            hotWalletDTO.setInCount(0);
             hotWalletDTO.setConvertBalance(getContractBalance(chainHotWallet.getAddress()));
             list.add(hotWalletDTO);
         }
