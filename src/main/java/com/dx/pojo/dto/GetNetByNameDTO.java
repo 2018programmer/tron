@@ -24,5 +24,9 @@ public class GetNetByNameDTO implements Serializable {
      * 最小收款数
      */
     private BigDecimal minNum;
+    /**
+     * 运行状态 0关闭 1开启
+     */
+    private Integer runningStatus;
 
 }

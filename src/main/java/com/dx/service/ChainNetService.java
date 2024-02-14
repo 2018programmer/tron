@@ -86,6 +86,7 @@ public class ChainNetService {
         getNetByNameDTO.setMinNum(chainCoin.getMinNum());
         getNetByNameDTO.setNetName(chainNet.getNetName());
         getNetByNameDTO.setDisplayName(chainNet.getDisplayName());
+        getNetByNameDTO.setRunningStatus(chainNet.getRunningStatus());
         result.setResult(getNetByNameDTO);
         return result;
     }
@@ -105,6 +106,7 @@ public class ChainNetService {
             ChainNet chainNet = netMapper.selectOne(wrapper);
             getNetByNameDTO.setRechargeNetConfirmNum(chainNet.getRechargeNetConfirmNum());
             getNetByNameDTO.setDisplayName(chainNet.getDisplayName());
+            getNetByNameDTO.setRunningStatus(chainNet.getRunningStatus());
             if(1==chainNet.getRunningStatus()){
                 dtos.add(getNetByNameDTO);
             }
