@@ -157,7 +157,6 @@ public class ChainAssetsService {
         }else {
             feeFlow.setAmount(BigDecimal.ZERO);
         }
-        feeFlow.setTargetAddress(feeWallet.getNetName());
         feeFlow.setCreateTime(System.currentTimeMillis());
         feeFlow.setCoinName(feeWallet.getCoinName());
         flowMapper.insert(feeFlow);
