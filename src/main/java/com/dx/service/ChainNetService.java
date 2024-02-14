@@ -44,7 +44,7 @@ public class ChainNetService {
     public Result<List<NetDTO>> getChainNet(Integer runningStatus){
         Result<List<NetDTO>> result = new Result<>();
         LambdaQueryWrapper<ChainNet> netWrapper = Wrappers.lambdaQuery();
-        if(1 == runningStatus){
+        if(runningStatus!=null&&runningStatus==1){
             netWrapper.eq(ChainNet::getRunningStatus,1);
         }
         List<NetDTO> list = new ArrayList<>();
