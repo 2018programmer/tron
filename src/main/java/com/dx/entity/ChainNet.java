@@ -6,9 +6,17 @@ import lombok.Data;
 public class ChainNet {
     private Integer id;
     /**
+     * 展示名称
+     */
+    private String displayName;
+    /**
      * 主网名称
      */
     private String netName;
+    /**
+     * logo
+     */
+    private String logo;
     /**
      * 充值网络确认
      */

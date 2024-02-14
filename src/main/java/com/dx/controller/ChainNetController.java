@@ -24,8 +24,8 @@ public class ChainNetController {
      * 获取主网列表
      */
     @GetMapping("/list/get")
-    public Result<List<NetDTO>> getNets(){
-        return chainNetService.getChainNet();
+    public Result<List<NetDTO>> getNets(Integer runningStatus){
+        return chainNetService.getChainNet(runningStatus);
     }
 
     /**

@@ -41,7 +41,7 @@ public class ChainNetService {
         return result;
     }
 
-    public Result<List<NetDTO>> getChainNet(){
+    public Result<List<NetDTO>> getChainNet(Integer runningStatus){
         Result<List<NetDTO>> result = new Result<>();
 
         //获取所有主网名称
@@ -82,6 +82,8 @@ public class ChainNetService {
         GetNetByNameDTO getNetByNameDTO = new GetNetByNameDTO();
         getNetByNameDTO.setRechargeNetConfirmNum(chainNet.getRechargeNetConfirmNum());
         getNetByNameDTO.setMinNum(chainCoin.getMinNum());
+        getNetByNameDTO.setNetName(chainNet.getNetName());
+        getNetByNameDTO.setDisplayName(chainNet.getDisplayName());
         result.setResult(getNetByNameDTO);
         return result;
     }
@@ -100,6 +102,7 @@ public class ChainNetService {
             wrapper.eq(ChainNet::getNetName,chainCoin.getNetName());
             ChainNet chainNet = netMapper.selectOne(wrapper);
             getNetByNameDTO.setRechargeNetConfirmNum(chainNet.getRechargeNetConfirmNum());
+            getNetByNameDTO.setDisplayName(chainNet.getDisplayName());
             dtos.add(getNetByNameDTO);
         }
 

@@ -14,7 +14,10 @@ public class NetDTO implements Serializable {
      * logo
      */
     private String logo;
-
+    /**
+     * 展示名称
+     */
+    private String displayName;
     /**
      * 支持币总数
      */

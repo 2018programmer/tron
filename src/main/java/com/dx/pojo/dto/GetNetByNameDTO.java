@@ -12,6 +12,10 @@ public class GetNetByNameDTO implements Serializable {
      */
     private String netName;
     /**
+     * 展示名称
+     */
+    private String displayName;
+    /**
      * 充值网络确认数
      */
     private Integer rechargeNetConfirmNum;
