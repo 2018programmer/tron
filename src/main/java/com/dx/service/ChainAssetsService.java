@@ -144,6 +144,7 @@ public class ChainAssetsService {
             Thread.sleep(3000);
         }catch (Exception e){
         }
+        long current = System.currentTimeMillis();
         JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
         ChainFlow feeFlow = new ChainFlow();
         feeFlow.setNetName(feeWallet.getNetName());
@@ -157,7 +158,8 @@ public class ChainAssetsService {
         }else {
             feeFlow.setAmount(BigDecimal.ZERO);
         }
-        feeFlow.setCreateTime(System.currentTimeMillis());
+        feeFlow.setCreateTime(current);
+        feeFlow.setGroupId(String.valueOf(current));
         feeFlow.setCoinName(feeWallet.getCoinName());
         flowMapper.insert(feeFlow);
 
@@ -171,7 +173,8 @@ public class ChainAssetsService {
         coldFlow.setFlowWay(5);
         coldFlow.setAmount(balance);
         coldFlow.setTargetAddress(wallet.getAddress());
-        coldFlow.setCreateTime(System.currentTimeMillis());
+        coldFlow.setCreateTime(current);
+        coldFlow.setGroupId(String.valueOf(current));
         coldFlow.setCoinName(feeWallet.getCoinName());
         flowMapper.insert(coldFlow);
         result.setMessage("操作成功");

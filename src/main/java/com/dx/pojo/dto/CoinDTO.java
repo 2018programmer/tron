@@ -28,4 +28,8 @@ public class CoinDTO implements Serializable {
      * 主网名称
      */
     private String netName;
+    /**
+     * 主网展示名称
+     */
+    private String displayName;
 }

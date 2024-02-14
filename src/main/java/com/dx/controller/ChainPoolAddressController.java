@@ -62,7 +62,6 @@ public class ChainPoolAddressController {
 
     /**
      * 获取用户对应地址
-     * @param userId
      * @return
      */
     @PostMapping("/user-address/get")

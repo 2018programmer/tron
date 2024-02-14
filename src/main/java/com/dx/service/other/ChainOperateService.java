@@ -217,7 +217,7 @@ public class ChainOperateService {
         }catch (Exception e){
 
         }
-
+        long gourpId = System.currentTimeMillis();
         JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
         BigDecimal num6 = new BigDecimal("1000000");
         BigDecimal coldFee =BigDecimal.ZERO;
@@ -233,6 +233,7 @@ public class ChainOperateService {
         feeFlow.setTransferType(0);
         feeFlow.setFlowWay(3);
         feeFlow.setAmount(coldFee);
+        feeFlow.setGroupId(String.valueOf(gourpId));
         feeFlow.setCreateTime(System.currentTimeMillis());
         feeFlow.setCoinName(baseCoin.getCoinName());
         flowMapper.insert(feeFlow);
@@ -242,6 +243,7 @@ public class ChainOperateService {
         coldFlow.setWalletType(3);
         coldFlow.setAddress(hotWallet.getAddress());
         coldFlow.setTxId(txId);
+        coldFlow.setGroupId(String.valueOf(gourpId));
         coldFlow.setTransferType(0);
         coldFlow.setFlowWay(5);
         coldFlow.setTargetAddress(wallet.getAddress());

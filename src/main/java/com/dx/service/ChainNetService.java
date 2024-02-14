@@ -105,7 +105,9 @@ public class ChainNetService {
             ChainNet chainNet = netMapper.selectOne(wrapper);
             getNetByNameDTO.setRechargeNetConfirmNum(chainNet.getRechargeNetConfirmNum());
             getNetByNameDTO.setDisplayName(chainNet.getDisplayName());
-            dtos.add(getNetByNameDTO);
+            if(1==chainNet.getRunningStatus()){
+                dtos.add(getNetByNameDTO);
+            }
         }
 
         result.setResult(dtos);
