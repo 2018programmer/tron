@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.pojo.dto.ContactDTO;
 import com.dx.entity.*;
 import com.dx.mapper.*;
+import com.dx.pojo.dto.GetCurrencyListDTO;
 import com.dx.service.ApiService;
 import com.dx.service.ChainBasicService;
 import com.dx.pojo.vo.CreateOrderVO;
@@ -133,8 +134,10 @@ public class MonitorJob {
                     chainFlow.setCreateTime(System.currentTimeMillis());
                     flowMapper.insert(chainFlow);
 
-                    log.info("能否创建订单{},{}",StringUtils.isNotEmpty(chainPoolAddress.getAssignedId()),chainCoin.getThreshold().compareTo(contactDTO.getAmount())<=0);
-                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0){
+                    List<GetCurrencyListDTO> currencyList = apiService.getCurrencyList();
+                    long count = currencyList.stream().filter(o -> o.getCurrency().equals(chainCoin.getCoinName())).count();
+
+                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0&&count>0){
                         //创建充值订单
                         CreateOrderVO createOrderVO = new CreateOrderVO();
                         createOrderVO.setExchangeCurrency(chainCoin.getCoinName());

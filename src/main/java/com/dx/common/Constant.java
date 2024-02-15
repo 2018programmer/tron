@@ -37,4 +37,8 @@ public interface Constant {
     interface OrderUrl{
         String createOrder ="/merchant/back/recharge/create";
     }
+
+    interface TradeUrl{
+        String GETCURRENCYLIST="/open/list";
+    }
 }
