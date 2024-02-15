@@ -109,7 +109,9 @@ public class MonitorJob {
                     ChainCoin chainCoin = coinMapper.selectOne(coinwrapper);
                     chainAddressIncome.setNetName(chainCoin.getNetName());
                     chainAddressIncome.setTxId(contactDTO.getTxId());
-                    if(chainCoin.getMinNum().compareTo(contactDTO.getAmount())>0){
+                    List<GetCurrencyListDTO> currencyList = apiService.getCurrencyList();
+                    long count = currencyList.stream().filter(o -> o.getCurrency().equals(chainCoin.getCoinName())).count();
+                    if(chainCoin.getMinNum().compareTo(contactDTO.getAmount())>0|| count==0){
                         chainAddressIncome.setEffective(0);
                     }else {
                         chainAddressIncome.setEffective(1);
@@ -134,8 +136,7 @@ public class MonitorJob {
                     chainFlow.setCreateTime(System.currentTimeMillis());
                     flowMapper.insert(chainFlow);
 
-                    List<GetCurrencyListDTO> currencyList = apiService.getCurrencyList();
-                    long count = currencyList.stream().filter(o -> o.getCurrency().equals(chainCoin.getCoinName())).count();
+
 
                     if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0&&count>0){
                         //创建充值订单
