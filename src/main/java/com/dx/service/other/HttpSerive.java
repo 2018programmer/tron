@@ -182,7 +182,7 @@ public class HttpSerive {
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
-            throw new RuntimeException("获取区块信息失败");
+            return false;
         }
         return jsonObject.getBoolean("result");
     }
