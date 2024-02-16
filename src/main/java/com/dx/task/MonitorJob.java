@@ -2,6 +2,7 @@ package com.dx.task;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -77,9 +78,7 @@ public class MonitorJob {
         }
         for (int i = numRedis; i <= numOnline; i++) {
             //获取区块信息
-            DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
-//            defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-            TransactionStatus status = transactionManager.getTransaction(defaultTransactionDefinition);
+
             String tron = chainBasicService.getblockbynum("TRON", i);
             if(ObjectUtils.isNull(tron)){
                 redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
@@ -88,6 +87,9 @@ public class MonitorJob {
             List<ContactDTO> list = JSONUtil.toList(tron, ContactDTO.class);
             LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
             List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(wrapper);
+            DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
+//            defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(defaultTransactionDefinition);
             try {
 
                 for (ContactDTO contactDTO : list) {
@@ -137,9 +139,6 @@ public class MonitorJob {
                     chainFlow.setTargetAddress(contactDTO.getFromAddress());
                     chainFlow.setNetName(chainCoin.getNetName());
                     chainFlow.setCreateTime(System.currentTimeMillis());
-                    flowMapper.insert(chainFlow);
-
-
 
                     if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0&&count>0){
                         //创建充值订单
@@ -154,19 +153,24 @@ public class MonitorJob {
                         createOrderVO.setMainNet(1);
                         log.info("充值订单请求参数:{}",createOrderVO);
                         //新建进程调用创建订单
-//                        Thread thread = new Thread(() -> {
+                        Thread thread = new Thread(() -> {
                         String order = apiService.createOrder(createOrderVO);
-                        chainAddressIncome.setSerial(order);
-//                        });
-//                        thread.run();
+                        LambdaUpdateWrapper<ChainAddressIncome> wrapper1 = Wrappers.lambdaUpdate();
+                        wrapper1.eq(ChainAddressIncome::getTxId,contactDTO.getTxId());
+                        wrapper1.set(ChainAddressIncome::getSerial, order);
+                        });
+                        thread.run();
                     }
+
+                    flowMapper.insert(chainFlow);
                     incomeMapper.insert(chainAddressIncome);
                 }
                 // 提交事务
-                transactionManager.commit(status);
                 redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
+                transactionManager.commit(status);
             } catch (Exception e) {
                 e.printStackTrace();
+                transactionManager.rollback(status);
             }
         }
     }
