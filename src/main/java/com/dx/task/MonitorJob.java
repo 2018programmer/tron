@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
@@ -61,7 +62,6 @@ public class MonitorJob {
             //延迟5块 方便监听区分哪些是归集打的钱
             numOnline =tronNum-5;
         }
-
         if(0==numOnline){
             return;
         }
@@ -77,7 +77,9 @@ public class MonitorJob {
         }
         for (int i = numRedis; i <= numOnline; i++) {
             //获取区块信息
-            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+            DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
+            defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(defaultTransactionDefinition);
             String tron = chainBasicService.getblockbynum("TRON", i);
             if(ObjectUtils.isNull(tron)){
                 redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
@@ -160,10 +162,9 @@ public class MonitorJob {
                     }
                     incomeMapper.insert(chainAddressIncome);
                 }
-
-                redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
                 // 提交事务
                 transactionManager.commit(status);
+                redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
             } catch (Exception e) {
                 e.printStackTrace();
             }
