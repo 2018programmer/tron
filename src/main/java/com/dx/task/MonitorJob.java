@@ -16,6 +16,7 @@ import com.dx.pojo.dto.GetCurrencyListDTO;
 import com.dx.service.ApiService;
 import com.dx.service.ChainBasicService;
 import com.dx.pojo.vo.CreateOrderVO;
+import com.dx.service.ChainPoolAddressService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class MonitorJob {
     
     @Autowired
     private ChainBasicService chainBasicService;
+
+    @Autowired
+    private ChainPoolAddressService poolAddressService;
 
     @Autowired
     private ChainPoolAddressMapper poolAddressMapper;
@@ -155,10 +159,8 @@ public class MonitorJob {
                         //新建进程调用创建订单
                         Thread thread = new Thread(() -> {
                         String order = apiService.createOrder(createOrderVO);
-                        LambdaUpdateWrapper<ChainAddressIncome> wrapper1 = Wrappers.lambdaUpdate();
-                        wrapper1.eq(ChainAddressIncome::getTxId,contactDTO.getTxId());
-                        wrapper1.set(ChainAddressIncome::getSerial, order);
-                        });
+                        poolAddressService.confirmOrder(createOrderVO.getTranId(),order);
+                        })
                         thread.run();
                     }
 

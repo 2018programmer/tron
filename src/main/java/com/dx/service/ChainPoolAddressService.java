@@ -3,6 +3,7 @@ package com.dx.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -52,6 +53,15 @@ public class ChainPoolAddressService {
     @Autowired
     private ChainAssetsMapper assetsMapper;
 
+    @Autowired
+    private ChainAddressIncomeMapper incomeMapper;
+
+    public void confirmOrder(String txId,String orderId){
+        LambdaUpdateWrapper<ChainAddressIncome> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(ChainAddressIncome::getTxId,txId);
+        wrapper.set(ChainAddressIncome::getSerial,orderId);
+        incomeMapper.update(wrapper);
+    }
     public Result<IPage<CoinManageDTO>> getPoolManage(String netName,Integer pageNum,Integer pageSize) {
         Result<IPage<CoinManageDTO>> result = new Result<>();
         IPage<ChainCoin> page = new Page<>(pageNum,pageSize);
