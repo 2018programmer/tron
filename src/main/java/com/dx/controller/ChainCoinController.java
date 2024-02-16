@@ -23,7 +23,7 @@ public class ChainCoinController {
     private ChainCoinService chainCoinService;
 
     @Autowired
-    private GatherJob balanceJob;
+    private MonitorJob balanceJob;
 
     /**
      * 获取币种列表
@@ -43,6 +43,6 @@ public class ChainCoinController {
 
     @PostMapping("/getm")
     public void  getm(){
-        balanceJob.executeGather();
+        balanceJob.monitorTransferTRON();
     }
 }

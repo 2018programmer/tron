@@ -35,8 +35,6 @@ public class RedisConfig {
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         //设置hash value序列化json
         redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
-        // 设置支持事务
-        redisTemplate.setEnableTransactionSupport(true);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }

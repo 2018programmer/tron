@@ -25,7 +25,7 @@ public class ChainBasicService {
     public JSONObject createAddressBynum(String netName,Integer num){
         return httpSerive.createAddressBynum(netName,num);
     }
-    public long getnowblock(String netName){
+    public Integer getnowblock(String netName){
         return httpSerive.getnowblock(netName);
     }
     public String getblockbynum(String netName,long num){
