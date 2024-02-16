@@ -56,11 +56,11 @@ public class MonitorJob {
     private ChainFlowMapper flowMapper;
     @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
-        var numRedis =0;
+        long numRedis =0;
         Boolean has = redisUtil.hasKey(Constant.RedisKey.HITCOUNTER);
-        var numOnline = 0;
+        long numOnline = 0;
         // 查询区块计数表 获取当前区块 没有则设值
-        Integer tronNum = chainBasicService.getnowblock("TRON");
+        long tronNum = chainBasicService.getnowblock("TRON");
         if(ObjectUtils.isNotNull(tronNum)){
             //延迟5块 方便监听区分哪些是归集打的钱
             numOnline =tronNum-5;
@@ -73,12 +73,13 @@ public class MonitorJob {
             numRedis=numOnline;
             redisUtil.setCacheObject(Constant.RedisKey.HITCOUNTER, numOnline);
         }else {
-            numRedis = (Integer) redisUtil.getCacheObject(Constant.RedisKey.HITCOUNTER);
+            numRedis = redisUtil.getCacheObject(Constant.RedisKey.HITCOUNTER);
+            log.info("当前redis记录块高为{}",numRedis);
         }
         if (numRedis>numOnline){
             return;
         }
-        for (int i = numRedis; i <= numOnline; i++) {
+        for (long i = numRedis; i <= numOnline; i++) {
             //获取区块信息
             TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
             String tron = chainBasicService.getblockbynum("TRON", i);

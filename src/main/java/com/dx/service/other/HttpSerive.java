@@ -47,7 +47,7 @@ public class HttpSerive {
 
         return result;
     }
-    public Integer getnowblock(String netName) {
+    public long getnowblock(String netName) {
 
         String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETNOWBLOCK).execute().body();
         log.info("查询最新区块，查询结果:{}",body);
@@ -56,12 +56,12 @@ public class HttpSerive {
         if(Objects.isNull(success)||false==success){
             throw new RuntimeException("获取区块失败");
         }
-        Integer result = jsonObject.getInteger("result");
+        long result = jsonObject.getLong("result");
 
         return result;
     }
 
-    public String getblockbynum(String netName,Integer num) {
+    public String getblockbynum(String netName,long num) {
         Map<String, Object> map = new HashMap<>();
         map.put("num",num);
         String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETBLOCKBYNUM).form(map).execute().body();
