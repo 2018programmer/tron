@@ -41,4 +41,8 @@ public interface Constant {
     interface TradeUrl{
         String GETCURRENCYLIST="/open/list";
     }
+
+    interface RedisKey{
+        String HITCOUNTER = "HitCounter";
+    }
 }

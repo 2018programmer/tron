@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.dx.common.Constant;
+import com.dx.common.RedisUtil;
 import com.dx.pojo.dto.ContactDTO;
 import com.dx.entity.*;
 import com.dx.mapper.*;
@@ -27,6 +29,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class MonitorJob {
+
+    @Autowired
+    private RedisUtil redisUtil;
     
     @Autowired
     private ChainBasicService chainBasicService;
@@ -51,9 +56,8 @@ public class MonitorJob {
     private ChainFlowMapper flowMapper;
     @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
-        var numsql =0;
-        HitCounter hit = hitCounterMapper.selectById(1);
-        numsql = hit.getCnt();
+        var numRedis =0;
+        Boolean has = redisUtil.hasKey(Constant.RedisKey.HITCOUNTER);
         var numOnline = 0;
         // 查询区块计数表 获取当前区块 没有则设值
         Integer tronNum = chainBasicService.getnowblock("TRON");
@@ -65,21 +69,19 @@ public class MonitorJob {
         if(0==numOnline){
             return;
         }
-        if(numsql==0){
-            numsql=numOnline;
+        if(!has){
+            numRedis=numOnline;
+            redisUtil.setCacheObject(Constant.RedisKey.HITCOUNTER, numOnline);
         }
-        if (numsql>numOnline){
+        if (numRedis>numOnline){
             return;
         }
-        for (int i = numsql; i <= numOnline; i++) {
+        for (int i = numRedis; i <= numOnline; i++) {
             //获取区块信息
             TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
             String tron = chainBasicService.getblockbynum("TRON", i);
             if(ObjectUtils.isNull(tron)){
-                hit.setCnt(i+1);
-                hitCounterMapper.updateById(hit);
-                // 提交事务
-                transactionManager.commit(status);
+                redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
                 continue;
             }
             List<ContactDTO> list = JSONUtil.toList(tron, ContactDTO.class);
@@ -120,7 +122,7 @@ public class MonitorJob {
                     chainAddressIncome.setChainConfirm(1);
                     chainAddressIncome.setCoinName(chainCoin.getCoinName());
                     chainAddressIncome.setAmount(contactDTO.getAmount());
-                    incomeMapper.insert(chainAddressIncome);
+
                     //记录流水
                     ChainFlow chainFlow = new ChainFlow();
                     chainFlow.setGroupId(String.valueOf(System.currentTimeMillis()));
@@ -151,19 +153,19 @@ public class MonitorJob {
                         createOrderVO.setMainNet(1);
                         log.info("充值订单请求参数:{}",createOrderVO);
                         //新建进程调用创建订单
-                        Thread thread = new Thread(() -> {
-                            apiService.createOrder(createOrderVO);
-                        });
-                        thread.run();
+//                        Thread thread = new Thread(() -> {
+                        String order = apiService.createOrder(createOrderVO);
+                        chainAddressIncome.setSerial(order);
+//                        });
+//                        thread.run();
                     }
-
+                    incomeMapper.insert(chainAddressIncome);
                 }
-                hit.setCnt(i+1);
-                hitCounterMapper.updateById(hit);
+
+                redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
                 // 提交事务
                 transactionManager.commit(status);
             } catch (Exception e) {
-                transactionManager.rollback(status);
                 e.printStackTrace();
             }
         }

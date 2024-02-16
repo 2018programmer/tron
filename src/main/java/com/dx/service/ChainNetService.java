@@ -2,6 +2,7 @@ package com.dx.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Result;
 import com.dx.pojo.dto.GetNetByNameDTO;
@@ -18,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ChainNetService {
@@ -76,12 +78,17 @@ public class ChainNetService {
         wrapper.eq(ChainNet::getNetName,netName);
         wrapper.eq(ChainNet::getRunningStatus,1);
         ChainNet chainNet = netMapper.selectOne(wrapper);
-
+        GetNetByNameDTO getNetByNameDTO = new GetNetByNameDTO();
+        if(ObjectUtils.isEmpty(chainNet)){
+            return result.error("对应的主网不存在");
+        }
         LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
         cwrapper.eq(ChainCoin::getCoinName,coinName);
         cwrapper.eq(ChainCoin::getNetName,netName);
         ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
-        GetNetByNameDTO getNetByNameDTO = new GetNetByNameDTO();
+        if(ObjectUtils.isEmpty(chainNet)){
+            return result.error("对应的主网不存在");
+        }
         getNetByNameDTO.setRechargeNetConfirmNum(chainNet.getRechargeNetConfirmNum());
         getNetByNameDTO.setMinNum(chainCoin.getMinNum());
         getNetByNameDTO.setNetName(chainNet.getNetName());
