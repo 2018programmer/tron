@@ -72,6 +72,8 @@ public class MonitorJob {
         if(!has){
             numRedis=numOnline;
             redisUtil.setCacheObject(Constant.RedisKey.HITCOUNTER, numOnline);
+        }else {
+            numRedis = (Integer) redisUtil.getCacheObject(Constant.RedisKey.HITCOUNTER);
         }
         if (numRedis>numOnline){
             return;
