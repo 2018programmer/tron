@@ -78,7 +78,7 @@ public class MonitorJob {
         for (int i = numRedis; i <= numOnline; i++) {
             //获取区块信息
             DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
-            defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+//            defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             TransactionStatus status = transactionManager.getTransaction(defaultTransactionDefinition);
             String tron = chainBasicService.getblockbynum("TRON", i);
             if(ObjectUtils.isNull(tron)){
