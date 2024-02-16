@@ -160,7 +160,7 @@ public class MonitorJob {
                         Thread thread = new Thread(() -> {
                         String order = apiService.createOrder(createOrderVO);
                         poolAddressService.confirmOrder(createOrderVO.getTranId(),order);
-                        })
+                        });
                         thread.run();
                     }
 
