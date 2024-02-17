@@ -157,11 +157,12 @@ public class MonitorJob {
                         createOrderVO.setMainNet(1);
                         log.info("充值订单请求参数:{}",createOrderVO);
                         //新建进程调用创建订单
-                        Thread thread = new Thread(() -> {
+//                        Thread thread = new Thread(() -> {
                         String order = apiService.createOrder(createOrderVO);
-                        poolAddressService.confirmOrder(createOrderVO.getTranId(),order);
-                        });
-                        thread.run();
+                        chainAddressIncome.setSerial(order);
+//                        poolAddressService.confirmOrder(createOrderVO.getTranId(),order);
+//                        });
+//                        thread.run();
                     }
 
                     flowMapper.insert(chainFlow);
