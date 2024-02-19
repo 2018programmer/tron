@@ -8,6 +8,7 @@ import com.dx.pojo.vo.HotWalletExpensesVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -93,6 +94,14 @@ public class ChainWalletController {
     @PostMapping("/hot-wallet/expenses")
     public Result<HotWalletExpensesDTO> hotWalletExpenses(@RequestBody HotWalletExpensesVO vo){
         return walletService.hotWalletExpenses(vo);
+    }
+
+    /**
+     * 检查热钱包余额
+     */
+    @GetMapping("/hot-wallet/balance/vaild")
+    public Result vaildHotWalletBalance(BigDecimal amount,String netName,String coinName){
+        return walletService.vaildHotWalletBalance(amount,netName,coinName);
     }
 
 }

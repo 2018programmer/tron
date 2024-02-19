@@ -359,4 +359,34 @@ public class ChainWalletService {
         result.setResult(hotWalletExpensesDTO);
         return result;
     }
+
+    public Result vaildHotWalletBalance(BigDecimal amount,String netName,String coinName) {
+        Result<Object> result = new Result<>();
+
+        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
+        cwrapper.eq(ChainCoin::getCoinName,coinName);
+        cwrapper.eq(ChainCoin::getNetName,netName);
+        ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+
+
+        LambdaQueryWrapper<ChainHotWallet> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChainHotWallet::getNetName,netName);
+        wrapper.eq(ChainHotWallet::getRunningStatus,1);
+
+        List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(wrapper);
+
+        for (ChainHotWallet chainHotWallet : chainHotWallets) {
+
+            BigDecimal balance = basicService.queryContractBalance(netName, chainCoin.getCoinCode(), chainHotWallet.getAddress());
+            if(amount.compareTo(balance)<=0){
+                return result.ok("热钱包余额充足");
+            }
+
+//            BigDecimal trx = basicService.queryBalance(netName, chainHotWallet.getAddress());
+//            if (trx.compareTo(new BigDecimal(14))<0){
+//                continue;
+//            }
+        }
+        return result.error("热钱包余额不足");
+    }
 }
