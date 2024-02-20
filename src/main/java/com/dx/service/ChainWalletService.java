@@ -286,7 +286,7 @@ public class ChainWalletService {
                 if((vo.getAmount().add(Constant.BaseUrl.trxfee)).compareTo(trx)>0){
                     continue;
                 }
-                txId = basicService.transferBaseCoins(chainCoin.getNetName(), chainHotWallet.getAddress(), vo.getAddress(), chainHotWallet.getPrivateKey(), trx);
+                txId = basicService.transferBaseCoins(chainCoin.getNetName(), chainHotWallet.getAddress(), vo.getAddress(), chainHotWallet.getPrivateKey(), vo.getAmount());
             }else {
                 BigDecimal balance = basicService.queryContractBalance(chainCoin.getNetName(), chainCoin.getCoinCode(), chainHotWallet.getAddress());
 
