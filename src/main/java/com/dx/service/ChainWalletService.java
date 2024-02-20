@@ -310,10 +310,6 @@ public class ChainWalletService {
 
             if(StringUtils.isNotEmpty(txId)){
                 address= chainHotWallet.getAddress();
-                try{
-                    Thread.sleep(3000);
-                }catch (Exception e){
-                }
                 break;
             }
         }
@@ -323,6 +319,12 @@ public class ChainWalletService {
             result.error("出款失败,检查热钱包余额");
             return result;
         }
+
+        try{
+            Thread.sleep(3500);
+        }catch (Exception e){
+        }
+
         JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
         BigDecimal num6 = new BigDecimal("1000000");
         BigDecimal gatherFee =BigDecimal.ZERO;
