@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.dx.common.Constant;
 import com.dx.common.NetEnum;
 import com.dx.common.Result;
 import com.dx.pojo.dto.*;
@@ -280,19 +281,32 @@ public class ChainWalletService {
         chainAddressExpenses.setTryTime(1);
 
         for (ChainHotWallet chainHotWallet : chainHotWallets) {
+            if(chainCoin.getCoinType().equals("base")){
+                BigDecimal trx = basicService.queryBalance(chainCoin.getNetName(), chainHotWallet.getAddress());
+                if((vo.getAmount().add(Constant.BaseUrl.trxfee)).compareTo(trx)>0){
+                    continue;
+                }
+                txId = basicService.transferBaseCoins(chainCoin.getNetName(), chainHotWallet.getAddress(), vo.getAddress(), chainHotWallet.getPrivateKey(), trx);
+            }else {
+                BigDecimal balance = basicService.queryContractBalance(chainCoin.getNetName(), chainCoin.getCoinCode(), chainHotWallet.getAddress());
 
-            BigDecimal balance = basicService.queryContractBalance(chainCoin.getNetName(), chainCoin.getCoinCode(), chainHotWallet.getAddress());
-            if(vo.getAmount().compareTo(balance)>0){
-                continue;
+                if(vo.getAmount().compareTo(balance)>0){
+                    continue;
+                }
+                String estimateenergy = basicService.estimateenergy(chainCoin.getNetName(), chainHotWallet.getAddress()
+                        , vo.getAddress(), chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
+
+                BigDecimal trx = basicService.queryBalance(chainCoin.getNetName(), chainHotWallet.getAddress());
+
+                if (trx.compareTo(new BigDecimal(estimateenergy))<0){
+                    continue;
+                }
+                txId= basicService.transferContractCoins(chainCoin.getNetName(), chainHotWallet.getAddress(), vo.getAddress()
+                        , chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
             }
-            String estimateenergy = basicService.estimateenergy(chainCoin.getNetName(), chainHotWallet.getAddress()
-                    , vo.getAddress(), chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
-            BigDecimal trx = basicService.queryBalance(chainCoin.getNetName(), chainHotWallet.getAddress());
-            if (trx.compareTo(new BigDecimal(estimateenergy))<0){
-                continue;
-            }
-             txId= basicService.transferContractCoins(chainCoin.getNetName(), chainHotWallet.getAddress(), vo.getAddress()
-                    , chainHotWallet.getPrivateKey(), chainCoin.getCoinCode(), vo.getAmount());
+
+
+
 
             if(StringUtils.isNotEmpty(txId)){
                 address= chainHotWallet.getAddress();
