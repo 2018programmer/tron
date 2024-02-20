@@ -376,13 +376,16 @@ public class ChainWalletService {
         List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(wrapper);
 
         for (ChainHotWallet chainHotWallet : chainHotWallets) {
-
-            BigDecimal balance = basicService.queryContractBalance(netName, chainCoin.getCoinCode(), chainHotWallet.getAddress());
+            BigDecimal balance ;
+            if(chainCoin.getCoinType().equals("base")){
+                balance=basicService.queryBalance(netName, chainHotWallet.getAddress());
+            }else {
+                balance= basicService.queryContractBalance(netName, chainCoin.getCoinCode(), chainHotWallet.getAddress());
+            }
             if(amount.compareTo(balance)<=0){
                 return result.ok("热钱包余额充足");
             }
-
-//            BigDecimal trx = basicService.queryBalance(netName, chainHotWallet.getAddress());
+//            BigDecimal trx =
 //            if (trx.compareTo(new BigDecimal(14))<0){
 //                continue;
 //            }
