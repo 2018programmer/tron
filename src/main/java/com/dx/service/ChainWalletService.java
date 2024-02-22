@@ -391,20 +391,22 @@ public class ChainWalletService {
 
         List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(wrapper);
 
+
+
         for (ChainHotWallet chainHotWallet : chainHotWallets) {
             BigDecimal balance ;
+            BigDecimal trx=basicService.queryBalance(netName, chainHotWallet.getAddress());
             if(chainCoin.getCoinType().equals("base")){
-                balance=basicService.queryBalance(netName, chainHotWallet.getAddress());
+                balance=trx;
             }else {
                 balance= basicService.queryContractBalance(netName, chainCoin.getCoinCode(), chainHotWallet.getAddress());
+            }
+            if (trx.compareTo(new BigDecimal(15))<0){
+                return result.error("trx少于15,矿工费不足请补充");
             }
             if(amount.compareTo(balance)<=0){
                 return result.ok("热钱包余额充足");
             }
-//            BigDecimal trx =
-//            if (trx.compareTo(new BigDecimal(14))<0){
-//                continue;
-//            }
         }
         return result.error("热钱包余额不足");
     }
