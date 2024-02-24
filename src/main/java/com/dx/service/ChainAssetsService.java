@@ -113,7 +113,7 @@ public class ChainAssetsService {
             }
         }
         if(StringUtils.isEmpty(msg)){
-            result.error("操作成功");
+            result.setMessage("操作成功");
         }else {
             result.error(msg);
         }
@@ -133,7 +133,7 @@ public class ChainAssetsService {
             result.error("必须余额大于"+Constant.BaseUrl.trxfee+"才可冷却");
             return result;
         }
-        balance=balance.subtract(Constant.BaseUrl.trxfee);
+        balance=balance.subtract(new BigDecimal("0.269"));
         String txId = operateService.feeWalletCold(feeWallet, wallet.getAddress(), balance);
 
         if(StringUtils.isEmpty(txId)){

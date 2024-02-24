@@ -125,7 +125,7 @@ public class HttpSerive {
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
-            throw new RuntimeException("请求交易失败");
+            return null;
         }
         String result = jsonObject.getJSONObject("result").getString("txId");
         return result;
