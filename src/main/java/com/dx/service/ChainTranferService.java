@@ -79,12 +79,22 @@ public class ChainTranferService {
     public Result getResultByTxId(String netName,String txId) {
         Result<Object> result = new Result<>();
         JSONObject json = basicService.gettransactioninfo(netName, txId);
-        String success = json.getJSONObject("receipt").getString("result");
-        if("SUCCESS".equals(success)){
-            result.setMessage("成功");
+        JSONObject receipt = json.getJSONObject("receipt");
+
+        if(receipt.containsKey("result")){
+            if("SUCCESS".equals(receipt.getString("result"))){
+                result.setMessage("成功");
+            }else {
+                result.error("失败");
+            }
         }else {
-            result.error("失败");
+            if(receipt.containsKey("net_usage")||receipt.containsKey("net_fee")){
+                result.setMessage("成功");
+            }else {
+                result.error("失败");
+            }
         }
+
         return result;
     }
 
