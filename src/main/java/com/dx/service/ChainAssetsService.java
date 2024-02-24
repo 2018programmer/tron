@@ -133,7 +133,7 @@ public class ChainAssetsService {
             result.error("必须余额大于"+Constant.BaseUrl.trxfee+"才可冷却");
             return result;
         }
-        balance=balance.subtract(new BigDecimal("0.269"));
+        balance=balance.subtract(Constant.BaseUrl.trxfee);
         String txId = operateService.feeWalletCold(feeWallet, wallet.getAddress(), balance);
 
         if(StringUtils.isEmpty(txId)){
