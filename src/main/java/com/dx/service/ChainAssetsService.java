@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,11 +154,14 @@ public class ChainAssetsService {
         feeFlow.setTxId(txId);
         feeFlow.setTransferType(0);
         feeFlow.setFlowWay(3);
+
+        BigDecimal coldFee =BigDecimal.ZERO;
+        BigDecimal num6 = new BigDecimal("1000000");
         if(json.containsKey("fee")){
-            feeFlow.setAmount(Constant.BaseUrl.trxfee);
-        }else {
-            feeFlow.setAmount(BigDecimal.ZERO);
+            String fee = json.getString("fee");
+            coldFee= new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
         }
+        feeFlow.setAmount(coldFee);
         feeFlow.setCreateTime(current);
         feeFlow.setGroupId(String.valueOf(current));
         feeFlow.setCoinName(feeWallet.getCoinName());
