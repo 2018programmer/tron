@@ -141,6 +141,7 @@ public class ChainPoolAddressService {
         Result<IPage<PoolAddressDTO>> result = new Result<>();
 
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainPoolAddress::getIsDelete,0);
         wrapper.eq(ChainPoolAddress::getNetName,vo.getNetName());
         if(ObjectUtils.isNotNull(vo.getAssignId())){
             wrapper.eq(ChainPoolAddress::getAssignedId,vo.getAssignId());
@@ -239,6 +240,7 @@ public class ChainPoolAddressService {
         wrapper.eq(ChainPoolAddress::getAssignedId,vo.getAssignedId());
         wrapper.eq(ChainPoolAddress::getAssignType,vo.getAssignType());
         wrapper.eq(ChainPoolAddress::getNetName,vo.getNetName());
+        wrapper.eq(ChainPoolAddress::getIsDelete,0);
 
         List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(wrapper);
         if(!CollectionUtils.isEmpty(chainPoolAddresses)){
@@ -276,6 +278,7 @@ public class ChainPoolAddressService {
         wrapper.eq(ChainPoolAddress::getAddress,address);
         wrapper.eq(ChainPoolAddress::getNetName,netName);
         wrapper.eq(ChainPoolAddress::getIsAssigned,1);
+        wrapper.eq(ChainPoolAddress::getIsDelete,0);
         ChainPoolAddress chainPoolAddress = poolAddressMapper.selectOne(wrapper);
         if(ObjectUtils.isNotNull(chainPoolAddress)){
             verifyAddressDTO.setIsAssigned(1);
@@ -291,6 +294,10 @@ public class ChainPoolAddressService {
     }
 
     public Result unbindAddress(UnbindAddressVO vo) {
-        return null;
+        LambdaUpdateWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(ChainPoolAddress::getAddress,vo.getAddress());
+        wrapper.eq(ChainPoolAddress::getIsDelete,1);
+        poolAddressMapper.update(wrapper);
+        return Result.ok();
     }
 }

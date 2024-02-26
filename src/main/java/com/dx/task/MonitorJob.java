@@ -122,7 +122,7 @@ public class MonitorJob {
                     chainAddressIncome.setTxId(contactDTO.getTxId());
                     List<GetCurrencyListDTO> currencyList = apiService.getCurrencyList();
                     long count = currencyList.stream().filter(o -> o.getCurrency().equals(chainCoin.getCoinName())).count();
-                    if(chainCoin.getMinNum().compareTo(contactDTO.getAmount())>0|| count==0){
+                    if(chainCoin.getMinNum().compareTo(contactDTO.getAmount())>0|| count==0||chainPoolAddress.getIsDelete()==1){
                         chainAddressIncome.setEffective(0);
                     }else {
                         chainAddressIncome.setEffective(1);
@@ -146,7 +146,7 @@ public class MonitorJob {
                     chainFlow.setNetName(chainCoin.getNetName());
                     chainFlow.setCreateTime(System.currentTimeMillis());
 
-                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0&&count>0){
+                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0&&count>0&&chainPoolAddress.getIsDelete()==0){
                         //创建充值订单
                         CreateOrderVO createOrderVO = new CreateOrderVO();
                         createOrderVO.setExchangeCurrency(chainCoin.getCoinName());
