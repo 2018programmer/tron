@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <!--1，这里修改为你应用的名称-->
+    <property name="appName" value="blockchain-service"/>
+
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <param name="Encoding" value="UTF-8" />
+
+        <!--2，这里修改为当前环境的logstash地址-->
+        <destination>${LOGSTASH_ADDRESS:-192.168.222.10}:4560</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder" >
+            <customFields>{"appname":"${appName}"}</customFields>
+        </encoder>
+        <keepAliveDuration>5 minutes</keepAliveDuration>
+    </appender>
+
+    <!--3，这里修改为你应用的命名空间-->
+    <logger name="com.dx" level="INFO">
+        <appender-ref ref="logstash"/>
+    </logger>
+</configuration>
