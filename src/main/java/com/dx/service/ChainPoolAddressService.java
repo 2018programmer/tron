@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +52,8 @@ public class ChainPoolAddressService {
 
     @Autowired
     private ChainAddressIncomeMapper incomeMapper;
+    @Autowired
+    private ApiService apiService;
 
     public void confirmOrder(String txId,String orderId){
         LambdaUpdateWrapper<ChainAddressIncome> wrapper = Wrappers.lambdaUpdate();
@@ -157,12 +156,12 @@ public class ChainPoolAddressService {
         }
         IPage<ChainPoolAddress> page = new Page<>(vo.getPageNum(), vo.getPageSize());
         page=poolAddressMapper.selectPage(page,wrapper);
-
+        Map<String, String> priceList = apiService.getPriceList();
         IPage<PoolAddressDTO> convert = page.convert(u -> {
             PoolAddressDTO poolAddressDTO = new PoolAddressDTO();
             BeanUtils.copyProperties(u, poolAddressDTO);
             poolAddressDTO.setAssignId(u.getAssignedId());
-            poolAddressDTO.setEstimateBalance(getContractBalance(u.getAddress()));
+            poolAddressDTO.setEstimateBalance(getContractBalance(u.getAddress(),priceList));
             return poolAddressDTO;
         });
 
@@ -171,7 +170,7 @@ public class ChainPoolAddressService {
         return result;
     }
 
-    private BigDecimal getContractBalance(String address) {
+    private BigDecimal getContractBalance(String address,Map<String,String> map) {
         LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
         awrapper.eq(ChainAssets::getAddress,address);
         List<ChainAssets> chainAssets = assetsMapper.selectList(awrapper);
@@ -180,12 +179,7 @@ public class ChainPoolAddressService {
             return amount;
         }
         for (ChainAssets chainAsset : chainAssets) {
-            if(Objects.equals(chainAsset.getCoinName(), NetEnum.TRON.getBaseCoin())){
-                amount=amount.add(chainAsset.getBalance().multiply(new BigDecimal("0.81")));
-            }
-            if(Objects.equals(chainAsset.getCoinName(),"USDT")){
-                amount=amount.add(chainAsset.getBalance().multiply(new BigDecimal("7.12")));
-            }
+            amount=amount.add(chainAsset.getBalance().multiply(new BigDecimal(map.get(chainAsset.getCoinName()))));
         }
         return amount.setScale(2,BigDecimal.ROUND_HALF_UP);
     }

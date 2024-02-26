@@ -35,7 +35,9 @@ public interface Constant {
         String VERIFYADDRESS="/verifyAddress";
     }
     interface OrderUrl{
-        String createOrder ="/merchant/back/recharge/create";
+        String CREATEORDER ="/merchant/back/recharge/create";
+
+        String GETPRICELIST="/wallet-config/price/list";
     }
 
     interface TradeUrl{
