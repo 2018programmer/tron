@@ -24,16 +24,12 @@ public class ApiService {
     @Value("${trade.url}")
     private String tradeUrl;
 
-    public String createOrder(CreateOrderVO vo){
+    public JSONObject createOrder(CreateOrderVO vo){
 
         String body = HttpRequest.post(orderUrl + Constant.OrderUrl.CREATEORDER).body(JSON.toJSONString(vo)).execute().body();
         log.info("创建充值订单返回参数:{}",body);
         JSONObject jsonObject = JSON.parseObject(body);
-        Boolean success = jsonObject.getBoolean("success");
-        if (Objects.isNull(success) || false == success) {
-            return null;
-        }
-        return jsonObject.getJSONObject("result").getString("orderId");
+        return jsonObject;
     }
 
     public Map<String, String> getPriceList(){

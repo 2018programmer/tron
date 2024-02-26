@@ -1,6 +1,7 @@
 package com.dx.task;
 
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -27,6 +28,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -159,9 +161,17 @@ public class MonitorJob {
                         //新建进程调用创建订单
                         String orderId="";
                         try{
-                            orderId = apiService.createOrder(createOrderVO);
+                            JSONObject jsonObject = apiService.createOrder(createOrderVO);
+                            chainAddressIncome.setOrderLog(jsonObject.toJSONString());
+                            Boolean success = jsonObject.getBoolean("success");
+                            if (!Objects.isNull(success) && true == success) {
+                                orderId=jsonObject.getJSONObject("result").getString("orderId");
+                            }
                         }catch (Exception e){
                             e.printStackTrace();
+                            if(ObjectUtils.isEmpty(chainAddressIncome.getOrderLog())){
+                                chainAddressIncome.setOrderLog("调用结果解析报错");
+                            }
                         }
                         chainAddressIncome.setSerial(orderId);
                     }

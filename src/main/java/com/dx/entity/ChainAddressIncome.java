@@ -54,5 +54,9 @@ public class ChainAddressIncome {
      * 监听时间
      */
     private Long createTime;
+    /**
+     * 发起订单调用日志
+     */
+    private String orderLog;
 
 }
