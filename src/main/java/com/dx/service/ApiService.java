@@ -49,7 +49,7 @@ public class ApiService {
         Map<String, String> map = new HashMap<>();
         for (int i = 0; i <jsonArray.size(); i++) {
             JSONObject res = jsonArray.getJSONObject(i);
-            map.put(res.getString("targetCurrency"),res.getString("buyOne").replace("CNY",""));
+            map.put(res.getString("targetCurrency"),res.getString("sellOne").replace("CNY",""));
         }
         return map;
     }
