@@ -142,7 +142,7 @@ public class ChainAssetsService {
             return result;
         }
         try {
-            Thread.sleep(3500);
+            Thread.sleep(4000);
         }catch (Exception e){
         }
         long current = System.currentTimeMillis();

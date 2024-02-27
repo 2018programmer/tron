@@ -191,7 +191,7 @@ public class GatherJob {
                 String txId = jsonObject.getString("txId");
                 if(ObjectUtils.isNotEmpty(txId)){
 
-                    Thread.sleep(3500);
+                    Thread.sleep(4000);
 
                     //解析记录 更新流水 和子任务
                     JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);

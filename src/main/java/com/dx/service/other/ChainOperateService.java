@@ -85,7 +85,7 @@ public class ChainOperateService {
         String txId = basicService.transferBaseCoins(netName, feeWallet.getAddress(), toAddress, feeWallet.getPrivateKey(), amount);
         //查询交易结果
         try{
-            Thread.sleep(3500);
+            Thread.sleep(4000);
         }catch (Exception e){
 
         }
@@ -213,7 +213,7 @@ public class ChainOperateService {
             return null;
         }
         try{
-            Thread.sleep(3500);
+            Thread.sleep(4000);
         }catch (Exception e){
 
         }
