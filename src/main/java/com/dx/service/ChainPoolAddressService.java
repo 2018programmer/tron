@@ -296,7 +296,7 @@ public class ChainPoolAddressService {
     public Result unbindAddress(UnbindAddressVO vo) {
         LambdaUpdateWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(ChainPoolAddress::getAddress,vo.getAddress());
-        wrapper.eq(ChainPoolAddress::getIsDelete,1);
+        wrapper.set(ChainPoolAddress::getIsDelete,1);
         poolAddressMapper.update(wrapper);
         return Result.ok();
     }
