@@ -24,7 +24,7 @@ public interface Constant {
 
         String ESTIMATEENERGY ="/estimateenergy";
 
-        BigDecimal trxfee =new BigDecimal("0.270");
+        BigDecimal trxfee =new BigDecimal("0.300");
         String GETTRANSACTIONINFO ="/gettransactioninfo";
         String TRANSFERCONTRACTCOINS ="/transferContractCoins";
         String TRANSFERBASECOINS ="/transferBaseCoins";
