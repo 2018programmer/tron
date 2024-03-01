@@ -123,6 +123,9 @@ public class ChainWalletService {
     }
 
     private BigDecimal getContractBalance(String address,Map<String,String> map) {
+        if(CollectionUtils.isEmpty(map)){
+            return BigDecimal.ZERO;
+        }
         LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
         awrapper.eq(ChainAssets::getAddress,address);
         List<ChainAssets> chainAssets = assetsMapper.selectList(awrapper);
@@ -131,7 +134,11 @@ public class ChainWalletService {
             return amount;
         }
         for (ChainAssets chainAsset : chainAssets) {
-            amount=amount.add(chainAsset.getBalance().multiply(new BigDecimal(map.get(chainAsset.getCoinName()))));
+            BigDecimal num = BigDecimal.ZERO;
+            if (!StringUtils.isEmpty(map.get(chainAsset.getCoinName()))){
+                num =new BigDecimal(map.get(chainAsset.getCoinName()));
+            }
+            amount=amount.add(chainAsset.getBalance().multiply(num));
         }
         return amount.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
