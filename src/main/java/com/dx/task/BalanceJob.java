@@ -50,6 +50,12 @@ public class BalanceJob {
             for (ChainFeeWallet chainFeeWallet : chainFeeWallets) {
                 chainFeeWallet.setBalance(basicService.queryBalance(NetEnum.TRON.getNetName(), chainFeeWallet.getAddress()));
                 feeWalletMapper.updateById(chainFeeWallet);
+                try {
+
+                    Thread.sleep(200);
+                }catch (Exception e){
+
+                }
             }
         }
         //热钱包
@@ -80,6 +86,12 @@ public class BalanceJob {
                 } else {
                     chainAssets.setBalance(amount);
                     assetsMapper.updateById(chainAssets);
+                }
+                try {
+
+                    Thread.sleep(200);
+                }catch (Exception e){
+
                 }
             }
         }
@@ -112,6 +124,12 @@ public class BalanceJob {
                     chainAssets.setBalance(amount);
                     assetsMapper.updateById(chainAssets);
                 }
+            }
+            try {
+
+                Thread.sleep(200);
+            }catch (Exception e){
+
             }
         }
         long end = System.currentTimeMillis();
@@ -164,6 +182,12 @@ public class BalanceJob {
                         assetsMapper.updateById(chainAssets);
                     }
                 }
+                try {
+
+                    Thread.sleep(200);
+                }catch (Exception e){
+
+                }
             }
 
             //地址池
@@ -194,6 +218,12 @@ public class BalanceJob {
                         chainAssets.setBalance(amount);
                         assetsMapper.updateById(chainAssets);
                     }
+                }
+                try {
+
+                    Thread.sleep(200);
+                }catch (Exception e){
+
                 }
             }
 
