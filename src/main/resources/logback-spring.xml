@@ -25,7 +25,4 @@
     <logger name="com.dx" level="ERROR">
         <appender-ref ref="logstash"/>
     </logger>
-    <logger name="com.dx" level="TRACE">
-        <appender-ref ref="logstash"/>
-    </logger>
 </configuration>
