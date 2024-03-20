@@ -184,17 +184,17 @@ public class GatherJob {
         try{
             JSONObject jsonObject = operateService.addressToGather(nowTask, chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode());
             if(null==jsonObject){
-                nowTask.setGatherStatus(3);
-                nowTask.setGatherStage(3);
+                nowTask.setGatherStatus(2);
+                nowTask.setGatherStage(1);
                 nowTask.setFinishTime(System.currentTimeMillis());
             }else {
                 String txId = jsonObject.getString("txId");
                 if(ObjectUtils.isNotEmpty(txId)){
 
                     Thread.sleep(4000);
-
                     //解析记录 更新流水 和子任务
                     JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
+
 //                    BigDecimal num6 = new BigDecimal("1000000");
 //                    BigDecimal gatherFee =BigDecimal.ZERO;
 //                    if(json.containsKey("fee")) {

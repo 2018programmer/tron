@@ -135,9 +135,11 @@ public class HttpSerive {
         Map<String, Object> map = new HashMap<>();
         map.put("txId",txId);
         String body = HttpRequest.get(chainbaseUrl + Constant.BaseUrl.V1_CHAIN + netName + Constant.BaseUrl.GETTRANSACTIONINFO).form(map).execute().body();
+        log.info("查询交易信息txid:{}，查询结果:{}",txId,body);
         JSONObject jsonObject = JSON.parseObject(body);
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
+            log.info("获取区块信息失败");
             throw new RuntimeException("获取区块信息失败");
         }
         JSONObject result = jsonObject.getJSONObject("result");
