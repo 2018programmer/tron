@@ -163,7 +163,7 @@ public class GatherJob {
             return;
         }
         long start = System.currentTimeMillis();
-        log.info("开始归集任务id{},子任务id{},当前常识次数{},归集地址{}",nowTask.getTaskId(),nowTask.getId(),nowTask.getTryTime()+1,nowTask.getGatherAddress());
+        log.info("开始归集任务id{},子任务id{},当前尝试次数{},归集地址{}",nowTask.getTaskId(),nowTask.getId(),nowTask.getTryTime()+1,nowTask.getGatherAddress());
         //开始执行该子任务,并且更改阶段
         nowTask.setGatherStage(1);
         nowTask.setGatherStatus(1);
@@ -240,7 +240,7 @@ public class GatherJob {
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("归集发生异常{},{}",e.getMessage(),e.getStackTrace());
             nowTask.setGatherStatus(2);
         }
         gatherDetailMapper.updateById(nowTask);
