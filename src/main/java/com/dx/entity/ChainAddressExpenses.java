@@ -63,4 +63,8 @@ public class ChainAddressExpenses implements Serializable {
      * 矿工费币种名称
      */
     private String feeCoinName;
+    /**
+     * 最后一次调用日志
+     */
+    private String orderLog;
 }
