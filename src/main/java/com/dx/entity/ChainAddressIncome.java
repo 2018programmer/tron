@@ -58,5 +58,9 @@ public class ChainAddressIncome {
      * 发起订单调用日志
      */
     private String orderLog;
+    /**
+     * 发起地址
+     */
+    private String fromAddress;
 
 }

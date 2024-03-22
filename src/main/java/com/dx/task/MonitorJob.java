@@ -113,6 +113,7 @@ public class MonitorJob {
                     ChainPoolAddress chainPoolAddress = collect.get(0);
                     //添加收款监听记录
                     ChainAddressIncome chainAddressIncome = new ChainAddressIncome();
+                    chainAddressIncome.setFromAddress(contactDTO.getFromAddress());
                     chainAddressIncome.setAddress(chainPoolAddress.getAddress());
                     chainAddressIncome.setCreateTime(System.currentTimeMillis());
                     LambdaQueryWrapper<ChainCoin> coinwrapper = Wrappers.lambdaQuery();
@@ -159,7 +160,7 @@ public class MonitorJob {
                         createOrderVO.setMainNet(1);
                         log.info("充值订单请求参数:{}",createOrderVO);
                         //新建进程调用创建订单
-                        String orderId="";
+                        String orderId=null;
                         try{
                             JSONObject jsonObject = apiService.createOrder(createOrderVO);
                             chainAddressIncome.setOrderLog(jsonObject.toJSONString());
@@ -170,7 +171,9 @@ public class MonitorJob {
                         }catch (Exception e){
                             e.printStackTrace();
                             if(ObjectUtils.isEmpty(chainAddressIncome.getOrderLog())){
-                                chainAddressIncome.setOrderLog("调用结果解析报错");
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("result","订单服务错误,请排查,并且等待重试");
+                                chainAddressIncome.setOrderLog(jsonObject.toJSONString());
                             }
                         }
                         chainAddressIncome.setSerial(orderId);
