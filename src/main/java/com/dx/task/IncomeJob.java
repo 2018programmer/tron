@@ -3,6 +3,7 @@ package com.dx.task;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.entity.ChainAddressIncome;
@@ -45,7 +46,10 @@ public class IncomeJob {
         wrapper.eq(ChainAddressIncome::getEffective,1);
         wrapper.last("limit 10");
         List<ChainAddressIncome> chainAddressIncomes = incomeMapper.selectList(wrapper);
-
+        log.info("重试调用充值订单:{}",chainAddressIncomes.size());
+        if (CollectionUtils.isEmpty(chainAddressIncomes)){
+            return;
+        }
         for (ChainAddressIncome chainAddressIncome : chainAddressIncomes) {
             log.info("重试调用充值订单:{}",chainAddressIncome.toString());
             CreateOrderVO createOrderVO = new CreateOrderVO();

@@ -110,6 +110,7 @@ public class MonitorJob {
                     if(CollectionUtils.isEmpty(collect)){
                         continue;
                     }
+                    log.info("正在处理的充值信息{}",contactDTO);
                     ChainPoolAddress chainPoolAddress = collect.get(0);
                     //添加收款监听记录
                     ChainAddressIncome chainAddressIncome = new ChainAddressIncome();
