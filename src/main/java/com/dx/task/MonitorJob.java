@@ -124,12 +124,6 @@ public class MonitorJob {
                     chainAddressIncome.setTxId(contactDTO.getTxId());
                     List<GetCurrencyListDTO> currencyList = apiService.getCurrencyList();
                     long count = currencyList.stream().filter(o -> o.getCurrency().equals(chainCoin.getCoinName())).count();
-                    if(chainCoin.getMinNum().compareTo(contactDTO.getAmount())>0|| count==0||chainPoolAddress.getIsDelete()==1){
-                        chainAddressIncome.setEffective(0);
-                    }else {
-                        chainAddressIncome.setEffective(1);
-                    }
-
                     chainAddressIncome.setChainConfirm(1);
                     chainAddressIncome.setCoinName(chainCoin.getCoinName());
                     chainAddressIncome.setAmount(contactDTO.getAmount());
@@ -149,6 +143,7 @@ public class MonitorJob {
                     chainFlow.setCreateTime(System.currentTimeMillis());
 
                     if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0&&count>0&&chainPoolAddress.getIsDelete()==0){
+                        chainAddressIncome.setEffective(1);
                         //创建充值订单
                         CreateOrderVO createOrderVO = new CreateOrderVO();
                         createOrderVO.setExchangeCurrency(chainCoin.getCoinName());
@@ -170,7 +165,7 @@ public class MonitorJob {
                                 orderId=jsonObject.getJSONObject("result").getString("orderId");
                             }
                         }catch (Exception e){
-                            e.printStackTrace();
+                            log.info("链充值调用订单服务失败{}",e.getMessage());
                             if(ObjectUtils.isEmpty(chainAddressIncome.getOrderLog())){
                                 JSONObject jsonObject = new JSONObject();
                                 jsonObject.put("result","订单服务错误,请排查,并且等待重试");
@@ -178,6 +173,8 @@ public class MonitorJob {
                             }
                         }
                         chainAddressIncome.setSerial(orderId);
+                    }else {
+                        chainAddressIncome.setEffective(0);
                     }
 
                     flowMapper.insert(chainFlow);
@@ -187,8 +184,8 @@ public class MonitorJob {
                 redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
                 transactionManager.commit(status);
             } catch (Exception e) {
-                log.info("监听发生异常{}",e.getMessage());
-                log.info("监听发生异常栈信息{}",e.getStackTrace());
+                log.info("监听发生逻辑异常{}",e.getMessage());
+                log.info("监听发生逻辑异常栈信息{}",e.getStackTrace());
             }
         }
     }
