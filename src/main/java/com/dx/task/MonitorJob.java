@@ -106,7 +106,7 @@ public class MonitorJob {
                         continue;
                     }
                     //匹配信息 更新表数据 更新区块
-                    List<ChainPoolAddress> collect = chainPoolAddresses.stream().filter(o -> (o.getAddress().equals(contactDTO.getToAddress())&&0==o.getIsDelete())).collect(Collectors.toList());
+                    List<ChainPoolAddress> collect = chainPoolAddresses.stream().filter(o -> (o.getAddress().equals(contactDTO.getToAddress()))).collect(Collectors.toList());
                     if(CollectionUtils.isEmpty(collect)){
                         continue;
                     }
