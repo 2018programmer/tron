@@ -42,7 +42,7 @@ public class IncomeJob {
         wrapper.isNull(ChainAddressIncome::getSerial);
         wrapper.isNotNull(ChainAddressIncome::getFromAddress);
         wrapper.orderByDesc(ChainAddressIncome::getId);
-        wrapper.lt(ChainAddressIncome::getCreateTime,System.currentTimeMillis()-24*60*60*1000);
+        wrapper.gt(ChainAddressIncome::getCreateTime,System.currentTimeMillis()-24*60*60*1000);
         wrapper.eq(ChainAddressIncome::getEffective,1);
         wrapper.last("limit 10");
         List<ChainAddressIncome> chainAddressIncomes = incomeMapper.selectList(wrapper);
