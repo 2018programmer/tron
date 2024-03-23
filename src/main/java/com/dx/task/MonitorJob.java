@@ -187,8 +187,8 @@ public class MonitorJob {
                 redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
                 transactionManager.commit(status);
             } catch (Exception e) {
-                e.printStackTrace();
-                transactionManager.rollback(status);
+                log.info("监听发生异常{}",e.getMessage());
+                log.info("监听发生异常栈信息{}",e.getStackTrace());
             }
         }
     }
