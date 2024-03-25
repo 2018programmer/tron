@@ -141,8 +141,27 @@ public class MonitorJob {
                     chainFlow.setTargetAddress(contactDTO.getFromAddress());
                     chainFlow.setNetName(chainCoin.getNetName());
                     chainFlow.setCreateTime(System.currentTimeMillis());
+                    JSONObject reason = new JSONObject();
+                    reason.put("success",true);
 
-                    if(StringUtils.isNotEmpty(chainPoolAddress.getAssignedId())&&chainCoin.getMinNum().compareTo(contactDTO.getAmount())<=0&&count>0&&chainPoolAddress.getIsDelete()==0){
+                    if (Objects.isNull(chainPoolAddress.getAssignedId())){
+                        reason.put("success",false);
+                        reason.put("reason","地址未分配");
+                    }
+                    if (chainCoin.getMinNum().compareTo(contactDTO.getAmount())>0){
+                        reason.put("success",false);
+                        reason.put("reason","不满足最小收款数");
+                    }
+
+                    if(count<=0){
+                        reason.put("success",false);
+                        reason.put("reason","未配置相关交易对");
+                    }
+                    if (chainPoolAddress.getIsDelete()==1){
+                        reason.put("success",false);
+                        reason.put("reason","地址已删除");
+                    }
+                    if(reason.getBoolean("success")){
                         chainAddressIncome.setEffective(1);
                         //创建充值订单
                         CreateOrderVO createOrderVO = new CreateOrderVO();
@@ -159,24 +178,24 @@ public class MonitorJob {
                         String orderId=null;
                         try{
                             JSONObject jsonObject = apiService.createOrder(createOrderVO);
-                            chainAddressIncome.setOrderLog(jsonObject.toJSONString());
                             Boolean success = jsonObject.getBoolean("success");
                             if (!Objects.isNull(success) && true == success) {
                                 orderId=jsonObject.getJSONObject("result").getString("orderId");
+                                reason.put("log",jsonObject);
+                            }else {
+                                reason.put("reason","订单服务返回false");
                             }
                         }catch (Exception e){
                             log.info("链充值调用订单服务失败{}",e.getMessage());
-                            if(ObjectUtils.isEmpty(chainAddressIncome.getOrderLog())){
-                                JSONObject jsonObject = new JSONObject();
-                                jsonObject.put("result","订单服务错误,请排查,并且等待重试");
-                                chainAddressIncome.setOrderLog(jsonObject.toJSONString());
-                            }
+                            reason.put("reason","订单服务调用报错");
+                            reason.put("log",e.getMessage());
+                            reason.put("logstack",e.getStackTrace());
                         }
                         chainAddressIncome.setSerial(orderId);
                     }else {
                         chainAddressIncome.setEffective(0);
                     }
-
+                    chainAddressIncome.setOrderLog(reason.toJSONString());
                     flowMapper.insert(chainFlow);
                     incomeMapper.insert(chainAddressIncome);
                 }
