@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dx.entity.ChainHotWallet;
 import com.dx.mapper.ChainHotWalletMapper;
 import com.dx.service.iservice.IChainHotWalletService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ChainHotWalletServiceImpl extends ServiceImpl<ChainHotWalletMapper, ChainHotWallet> implements IChainHotWalletService {
     @Override
     public Long getOnHotWalletCount() {
