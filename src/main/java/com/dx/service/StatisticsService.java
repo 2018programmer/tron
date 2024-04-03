@@ -38,6 +38,7 @@ public class StatisticsService {
         getStatisticsDTO.setExpensesQueueCount(0);
         getStatisticsDTO.setExpensesingCount(0);
         getStatisticsDTO.setExpensesWrongCount(chainAddressExpensesService.getExpensesWrongCount().intValue());
+        result.setResult(getStatisticsDTO);
         return result;
     }
 }
