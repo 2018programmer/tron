@@ -1,32 +1,32 @@
 nacos:
-#  discovery:
-#    namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
-#    group: ${NACOS_GROUP:DEFAULT_GROUP}
-#    server-addr: ${NACOS_SERVER_ADDR:nacos-headless.wallet:8848}
-#    username: ${NACOS_USERNAME:nacos}
-#    password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
-#    autoRegister: true
- config:
-   username: ${NACOS_USERNAME:nacos}
-   password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
-   # 配置所属命名空间的id，我们配置名称为dev的id，在命名空间列表查看id的值
-   namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
-   type: yaml
-   # 文件名，如果没有配置则默认为 ${spring.application.name}
-   # 配置所属分组
-   group: ${NACOS_GROUP:DEFAULT_GROUP}
-   auto-refresh: true
-   # 后缀名，只支持 properties 和 yaml 类型
-   dataId: dx-blockchain-service
-   bootstrap:
-     enable: true
-     logEnable: true
-   # nacos服务器地址
-   server-addr: ${NACOS_SERVER_ADDR:nacos-headless.wallet:8848}
-   # 配置自动刷新
-   refresh-enabled: true
-   # 启用远程同步配置
-   enable-remote-sync-config: true
+  discovery:
+    namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
+    group: ${NACOS_GROUP:DEFAULT_GROUP}
+    server-addr: ${NACOS_SERVER_ADDR:nacos-headless.wallet:8848}
+    username: ${NACOS_USERNAME:nacos}
+    password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
+    autoRegister: true
+  config:
+    username: ${NACOS_USERNAME:nacos}
+    password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
+    # 配置所属命名空间的id，我们配置名称为dev的id，在命名空间列表查看id的值
+    namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
+    type: yaml
+    # 文件名，如果没有配置则默认为 ${spring.application.name}
+    # 配置所属分组
+    group: ${NACOS_GROUP:DEFAULT_GROUP}
+    auto-refresh: true
+    # 后缀名，只支持 properties 和 yaml 类型
+    dataId: dx-blockchain-service
+    bootstrap:
+      enable: true
+      logEnable: true
+    # nacos服务器地址
+    server-addr: ${NACOS_SERVER_ADDR:nacos-headless.wallet:8848}
+    # 配置自动刷新
+    refresh-enabled: true
+    # 启用远程同步配置
+    enable-remote-sync-config: true
 
 spring:
  application:
