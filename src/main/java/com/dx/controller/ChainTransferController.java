@@ -7,7 +7,7 @@ import com.dx.entity.ChainAddressIncome;
 import com.dx.pojo.vo.ConfirmOrderVO;
 import com.dx.pojo.vo.GetAddressExpensesVO;
 import com.dx.pojo.vo.GetAddressIncomeVO;
-import com.dx.service.ChainTranferService;
+import com.dx.service.TranferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChainTransferController {
 
     @Autowired
-    private ChainTranferService transferService;
+    private TranferService transferService;
     /**
      * 获取收款监听列表
      */

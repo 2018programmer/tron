@@ -5,7 +5,7 @@ import com.dx.common.IdVO;
 import com.dx.common.Result;
 import com.dx.pojo.dto.GetGatherDetailsDTO;
 import com.dx.pojo.dto.GetGatherTasksDTO;
-import com.dx.service.ChainGatherService;
+import com.dx.service.GatherService;
 import com.dx.pojo.vo.GetGatherDetailsVO;
 import com.dx.pojo.vo.GetGatherTasksVO;
 import com.dx.pojo.vo.ManualGatherVO;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChainGatherController {
 
     @Autowired
-    private ChainGatherService gatherService;
+    private GatherService gatherService;
 
     /**
      * 主动归集

@@ -3,7 +3,7 @@ package com.dx.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.entity.ChainFlow;
-import com.dx.service.ChainFlowService;
+import com.dx.service.FlowService;
 import com.dx.pojo.vo.GetChainFlowsVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +19,7 @@ public class ChainFlowController {
 
 
     @Autowired
-    private ChainFlowService flowService;
+    private FlowService flowService;
     /**
      * 获取流水
      * @param vo

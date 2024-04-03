@@ -4,7 +4,7 @@ import com.dx.common.Result;
 import com.dx.pojo.dto.GetNetByNameDTO;
 import com.dx.pojo.dto.NetDTO;
 import com.dx.pojo.vo.UpdateNetStatusVO;
-import com.dx.service.ChainNetService;
+import com.dx.service.NetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +18,14 @@ import java.util.List;
 public class ChainNetController {
 
     @Autowired
-    private ChainNetService chainNetService;
+    private NetService netService;
 
     /**
      * 获取主网列表 runningStatus:1运行中 不传或者其他值为全量
      */
     @GetMapping("/list/get")
     public Result<List<NetDTO>> getNets(Integer runningStatus){
-        return chainNetService.getChainNet(runningStatus);
+        return netService.getChainNet(runningStatus);
     }
 
     /**
@@ -34,7 +34,7 @@ public class ChainNetController {
      */
     @GetMapping("/get-by-name")
     public Result<GetNetByNameDTO> getNetByName(String netName, String coinName){
-        return chainNetService.getNetByName(netName,coinName);
+        return netService.getNetByName(netName,coinName);
     }
 
     /**
@@ -43,7 +43,7 @@ public class ChainNetController {
      */
     @GetMapping("/get-by-coin")
     public Result<List<GetNetByNameDTO>> getNetByCoin(String coinName){
-        return chainNetService.getNetByCoin(coinName);
+        return netService.getNetByCoin(coinName);
     }
 
     /**
@@ -52,7 +52,7 @@ public class ChainNetController {
     @PostMapping("/status/update")
     @ResponseBody
     public Result updateNetStatus(@RequestBody UpdateNetStatusVO vo){
-        return chainNetService.updateNetStatus(vo);
+        return netService.updateNetStatus(vo);
     }
 
 

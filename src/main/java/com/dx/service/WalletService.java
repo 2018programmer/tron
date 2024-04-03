@@ -27,7 +27,7 @@ import java.util.Objects;
 
 @Service
 @Slf4j
-public class ChainWalletService {
+public class WalletService {
 
     @Autowired
     private ChainHotWalletMapper hotWalletMapper;
@@ -38,7 +38,7 @@ public class ChainWalletService {
     private ChainFeeWalletMapper feeWalletMapper;
 
     @Autowired
-    private ChainBasicService basicService;
+    private BasicService basicService;
 
     @Autowired
     private ChainCoinMapper coinMapper;

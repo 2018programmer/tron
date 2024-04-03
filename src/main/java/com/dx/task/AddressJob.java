@@ -1,7 +1,7 @@
 package com.dx.task;
 
 
-import com.dx.service.ChainPoolAddressService;
+import com.dx.service.PoolAddressService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class AddressJob {
 
     @Autowired
-    private ChainPoolAddressService poolAddressService;
+    private PoolAddressService poolAddressService;
 
 
     @Value("${base.address-num}")

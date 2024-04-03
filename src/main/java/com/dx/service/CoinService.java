@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 @Service
-public class ChainCoinService {
+public class CoinService {
     
     @Autowired
     private ChainCoinMapper coinMapper;

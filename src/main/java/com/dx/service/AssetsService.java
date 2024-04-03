@@ -10,7 +10,7 @@ import com.dx.common.Result;
 import com.dx.pojo.dto.AssetHotDTO;
 import com.dx.entity.*;
 import com.dx.mapper.*;
-import com.dx.service.other.ChainOperateService;
+import com.dx.service.other.OperateService;
 import com.dx.pojo.vo.FreezeBalanceVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,13 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ChainAssetsService {
+public class AssetsService {
 
     @Autowired
-    private ChainAssetsMapper assetsMapper;
-
-    @Autowired
-    private ChainOperateService operateService;
+    private OperateService operateService;
 
     @Autowired
     private ChainFeeWalletMapper feeWalletMapper;
@@ -39,7 +36,7 @@ public class ChainAssetsService {
     private ChainHotWalletMapper hotWalletMapper;
 
     @Autowired
-    private ChainBasicService basicService;
+    private BasicService basicService;
     
     @Autowired
     private ChainFlowMapper flowMapper;

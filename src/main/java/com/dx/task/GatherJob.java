@@ -8,9 +8,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.NetEnum;
 import com.dx.entity.*;
 import com.dx.mapper.*;
-import com.dx.service.ChainBasicService;
-import com.dx.service.ChainPoolAddressService;
-import com.dx.service.other.ChainOperateService;
+import com.dx.service.BasicService;
+import com.dx.service.PoolAddressService;
+import com.dx.service.other.OperateService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +18,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,16 +33,16 @@ public class GatherJob {
     private ChainGatherDetailMapper gatherDetailMapper;
 
     @Autowired
-    private ChainOperateService operateService;
+    private OperateService operateService;
 
     @Autowired
     private ChainGatherTaskMapper gatherTaskMapper;
 
     @Autowired
-    private ChainPoolAddressService poolAddressService;
+    private PoolAddressService poolAddressService;
 
     @Autowired
-    private ChainBasicService basicService;
+    private BasicService basicService;
     @Autowired
     private ChainCoinMapper coinMapper;
     @Autowired

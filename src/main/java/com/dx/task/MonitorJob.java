@@ -3,10 +3,8 @@ package com.dx.task;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Constant;
 import com.dx.common.RedisUtil;
@@ -15,15 +13,14 @@ import com.dx.entity.*;
 import com.dx.mapper.*;
 import com.dx.pojo.dto.GetCurrencyListDTO;
 import com.dx.service.ApiService;
-import com.dx.service.ChainBasicService;
+import com.dx.service.BasicService;
 import com.dx.pojo.vo.CreateOrderVO;
-import com.dx.service.ChainPoolAddressService;
+import com.dx.service.PoolAddressService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
@@ -39,10 +36,10 @@ public class MonitorJob {
     private RedisUtil redisUtil;
     
     @Autowired
-    private ChainBasicService chainBasicService;
+    private BasicService basicService;
 
     @Autowired
-    private ChainPoolAddressService poolAddressService;
+    private PoolAddressService poolAddressService;
 
     @Autowired
     private ChainPoolAddressMapper poolAddressMapper;
@@ -64,7 +61,7 @@ public class MonitorJob {
         Boolean has = redisUtil.hasKey(Constant.RedisKey.HITCOUNTER);
         var numOnline = 0;
         // 查询区块计数表 获取当前区块 没有则设值
-        var tronNum = chainBasicService.getnowblock("TRON");
+        var tronNum = basicService.getnowblock("TRON");
         if(ObjectUtils.isNotNull(tronNum)){
             //延迟5块 方便监听区分哪些是归集打的钱
             numOnline =tronNum-5;
@@ -85,7 +82,7 @@ public class MonitorJob {
         for (int i = numRedis; i <= numOnline; i++) {
             //获取区块信息
 
-            String tron = chainBasicService.getblockbynum("TRON", i);
+            String tron = basicService.getblockbynum("TRON", i);
             if(ObjectUtils.isNull(tron)){
                 redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);
                 continue;

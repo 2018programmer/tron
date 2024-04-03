@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.NetEnum;
 import com.dx.entity.*;
 import com.dx.mapper.*;
-import com.dx.service.ChainBasicService;
+import com.dx.service.BasicService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class BalanceJob {
     private ChainFeeWalletMapper feeWalletMapper;
 
     @Autowired
-    private ChainBasicService basicService;
+    private BasicService basicService;
     @Autowired
     private ChainPoolAddressMapper poolAddressMapper;
 

@@ -4,11 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.PageVO;
 import com.dx.common.Result;
 import com.dx.pojo.dto.CoinDTO;
-import com.dx.task.BalanceJob;
-import com.dx.task.GatherJob;
-import com.dx.task.MonitorJob;
 import com.dx.pojo.vo.UpdateMinNumVO;
-import com.dx.service.ChainCoinService;
+import com.dx.service.CoinService;
+import com.dx.task.GatherJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,17 +18,17 @@ import org.springframework.web.bind.annotation.*;
 public class ChainCoinController {
 
     @Autowired
-    private ChainCoinService chainCoinService;
+    private CoinService coinService;
 
     @Autowired
-    private MonitorJob balanceJob;
+    private GatherJob balanceJob;
 
     /**
      * 获取币种列表
      */
     @GetMapping("/list/get")
     public Result<IPage<CoinDTO>> getCoins(PageVO vo){
-        return chainCoinService.getCoins(vo.getPageNum(),vo.getPageSize());
+        return coinService.getCoins(vo.getPageNum(),vo.getPageSize());
     }
 
     /**
@@ -38,11 +36,11 @@ public class ChainCoinController {
      */
     @PostMapping("/min-num/update")
     public Result updateMinNum(@RequestBody UpdateMinNumVO vo){
-        return chainCoinService.updateMinNum(vo);
+        return coinService.updateMinNum(vo);
     }
 
     @PostMapping("/getm")
     public void  getm(){
-        balanceJob.monitorTransferTRON();
+        balanceJob.executeGather();
     }
 }

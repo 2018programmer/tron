@@ -3,7 +3,7 @@ package com.dx.controller;
 import com.dx.common.Result;
 import com.dx.pojo.dto.*;
 import com.dx.entity.ChainColdWallet;
-import com.dx.service.ChainWalletService;
+import com.dx.service.WalletService;
 import com.dx.pojo.vo.HotWalletExpensesVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/wallet")
 public class ChainWalletController {
     @Autowired
-    private ChainWalletService walletService;
+    private WalletService walletService;
     /**
      * 获取热钱包列表
      */

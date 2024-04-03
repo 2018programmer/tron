@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class ChainGatherService {
+public class GatherService {
 
     @Autowired
     private ChainGatherTaskMapper gatherTaskMapper;

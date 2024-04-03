@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ChainFlowService {
+public class FlowService {
 
     @Autowired
     private ChainFlowMapper flowMapper;

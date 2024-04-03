@@ -11,7 +11,7 @@ import com.dx.mapper.ChainCoinMapper;
 import com.dx.mapper.ChainFeeWalletMapper;
 import com.dx.mapper.ChainFlowMapper;
 import com.dx.mapper.ChainGatherDetailMapper;
-import com.dx.service.ChainBasicService;
+import com.dx.service.BasicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,10 +28,10 @@ import java.util.Objects;
 
 @Service
 @Slf4j
-public class ChainOperateService {
+public class OperateService {
 
     @Autowired
-    private ChainBasicService basicService;
+    private BasicService basicService;
     @Autowired
     private ChainFeeWalletMapper feeWalletMapper;
     @Autowired

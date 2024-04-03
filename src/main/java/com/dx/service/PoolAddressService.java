@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dx.common.NetEnum;
 import com.dx.common.Result;
 import com.dx.pojo.dto.*;
 import com.dx.entity.*;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class ChainPoolAddressService {
+public class PoolAddressService {
 
 
     @Autowired
@@ -43,7 +42,7 @@ public class ChainPoolAddressService {
     private ChainPoolAddressMapper poolAddressMapper;
 
     @Autowired
-    private ChainBasicService basicService;
+    private BasicService basicService;
 
     @Autowired
     private ChainGatherTaskMapper gatherTaskMapper;

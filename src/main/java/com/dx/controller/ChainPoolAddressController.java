@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.pojo.dto.*;
 import com.dx.pojo.vo.*;
-import com.dx.service.ChainPoolAddressService;
+import com.dx.service.PoolAddressService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ChainPoolAddressController {
 
     @Autowired
-    private ChainPoolAddressService poolService;
+    private PoolAddressService poolService;
 
     /**
      * 获取地址池的地址明细

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class ChainTranferService {
+public class TranferService {
 
     @Autowired
     private ChainAddressIncomeMapper addressIncomeMapper;
@@ -30,7 +30,7 @@ public class ChainTranferService {
     @Autowired
     private ChainAddressExpensesMapper addressExpensesMapper;
     @Autowired
-    private ChainBasicService basicService;
+    private BasicService basicService;
 
 
     public Result<IPage<ChainAddressIncome>> getAddressIncome(GetAddressIncomeVO vo) {

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
  * 调用
  */
 @Service
-public class ChainBasicService {
+public class BasicService {
 
     @Autowired
     private HttpSerive httpSerive;

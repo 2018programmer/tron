@@ -1,7 +1,6 @@
 package com.dx.task;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -12,7 +11,6 @@ import com.dx.mapper.ChainAddressIncomeMapper;
 import com.dx.mapper.ChainPoolAddressMapper;
 import com.dx.pojo.vo.CreateOrderVO;
 import com.dx.service.ApiService;
-import com.dx.service.ChainPoolAddressService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
