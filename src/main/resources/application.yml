@@ -1,4 +1,4 @@
-#nacos:
+nacos:
 #  discovery:
 #    namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
 #    group: ${NACOS_GROUP:DEFAULT_GROUP}
@@ -6,84 +6,84 @@
 #    username: ${NACOS_USERNAME:nacos}
 #    password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
 #    autoRegister: true
-#  config:
-#    username: ${NACOS_USERNAME:nacos}
-#    password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
-#    # 配置所属命名空间的id，我们配置名称为dev的id，在命名空间列表查看id的值
-#    namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
-#    type: yaml
-#    # 文件名，如果没有配置则默认为 ${spring.application.name}
-#    # 配置所属分组
-#    group: ${NACOS_GROUP:DEFAULT_GROUP}
-#    auto-refresh: true
-#    # 后缀名，只支持 properties 和 yaml 类型
-#    dataId: dx-blockchain-service
-#    bootstrap:
-#      enable: true
-#      logEnable: true
-#    # nacos服务器地址
-#    server-addr: ${NACOS_SERVER_ADDR:nacos-headless.wallet:8848}
-#    # 配置自动刷新
-#    refresh-enabled: true
-#    # 启用远程同步配置
-#    enable-remote-sync-config: true
-#
-#spring:
-#  application:
-#    name: dx-blockchain-service
-
+ config:
+   username: ${NACOS_USERNAME:nacos}
+   password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
+   # 配置所属命名空间的id，我们配置名称为dev的id，在命名空间列表查看id的值
+   namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
+   type: yaml
+   # 文件名，如果没有配置则默认为 ${spring.application.name}
+   # 配置所属分组
+   group: ${NACOS_GROUP:DEFAULT_GROUP}
+   auto-refresh: true
+   # 后缀名，只支持 properties 和 yaml 类型
+   dataId: dx-blockchain-service
+   bootstrap:
+     enable: true
+     logEnable: true
+   # nacos服务器地址
+   server-addr: ${NACOS_SERVER_ADDR:nacos-headless.wallet:8848}
+   # 配置自动刷新
+   refresh-enabled: true
+   # 启用远程同步配置
+   enable-remote-sync-config: true
 
 spring:
-  application:
-    name: blockchain-service
-  datasource:
-    url: jdbc:mysql://192.168.222.120:3306/blockchain_service?useSSL=false&useUnicode=true&characterEncoding=UTF-8
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 3AdUUfqmtWq3zXryBdWmvCW6K28R67AC
-#  jackson:
-#    # json 序列化排除值为 null 的属性
-#    default-property-inclusion: non_null
-  data:
-    redis:
-      host: 192.168.222.111
-      port: 31708
-      password: dxopt123#$%
-      database: 2
-      timeout: 6000ms
-      open: true
-
-mybatis-plus:
-  mapper-locations: classpath:mapper/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true
-  type-aliases-package: com.dx.entity
-
-xxl:
-  job:
-    admin:
-      addresses: http://xxl-job-admin.wallet:8080/xxl-job-admin
-    accessToken: abcdefg
-    executor:
-      appname: blockchain-service
-      address:
-      ip:
-      port: 9888
-      logpath: log
-      logretentiondays: 3
+ application:
+   name: dx-blockchain-service
 
 
-server:
-  port: 8080
-  servlet:
-    context-path: /blockchain-service
+# spring:
+#   application:
+#     name: blockchain-service
+#   datasource:
+#     url: jdbc:mysql://192.168.222.120:3306/blockchain_service?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+#     username: root
+#     password: 3AdUUfqmtWq3zXryBdWmvCW6K28R67AC
+# #  jackson:
+# #    # json 序列化排除值为 null 的属性
+# #    default-property-inclusion: non_null
+#   data:
+#     redis:
+#       host: 192.168.222.111
+#       port: 31708
+#       password: dxopt123#$%
+#       database: 2
+#       timeout: 6000ms
+#       open: true
+
+# mybatis-plus:
+#   mapper-locations: classpath:mapper/*.xml
+#   configuration:
+#     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#     map-underscore-to-camel-case: true
+#   type-aliases-package: com.dx.entity
+
+# xxl:
+#   job:
+#     admin:
+#       addresses: http://xxl-job-admin.wallet:8080/xxl-job-admin
+#     accessToken: abcdefg
+#     executor:
+#       appname: blockchain-service
+#       address:
+#       ip:
+#       port: 9888
+#       logpath: log
+#       logretentiondays: 3
 
 
-base:
-  url: http://192.168.222.111:30024/blockchain-basic
-  address-num: 300
-order:
-  url: http://dx-wallet-trade-center.wallet:8080/trade-center
-trade:
-  url: http://dx-wallet-trade-process.wallet:8080/trade-process
+# server:
+#   port: 8080
+#   servlet:
+#     context-path: /blockchain-service
+
+
+# base:
+#   url: http://192.168.222.111:30024/blockchain-basic
+#   address-num: 300
+# order:
+#   url: http://dx-wallet-trade-center.wallet:8080/trade-center
+# trade:
+#   url: http://dx-wallet-trade-process.wallet:8080/trade-process
