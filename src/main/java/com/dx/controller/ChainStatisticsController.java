@@ -22,7 +22,7 @@ public class ChainStatisticsController {
     /**
      * 获取链服务统计
      */
-    @GetMapping("/statistics/get")
+    @GetMapping("/info/get")
     public Result<GetStatisticsDTO> getStatistics(){
         return statisticsService.getStatistics();
     }
