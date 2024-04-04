@@ -10,4 +10,6 @@ public interface IChainCoinService extends IService<ChainCoin> {
     ChainCoin getBaseCoin(String netName);
 
     ChainCoin getCoinByCode(String code);
+
+    ChainCoin getCoinByName(String coinName, String netName);
 }

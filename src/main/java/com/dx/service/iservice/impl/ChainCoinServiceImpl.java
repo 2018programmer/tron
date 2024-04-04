@@ -30,4 +30,12 @@ public class ChainCoinServiceImpl extends ServiceImpl<ChainCoinMapper, ChainCoin
         wrapper.eq(ChainCoin::getCoinCode,code);
         return getOne(wrapper);
     }
+
+    @Override
+    public ChainCoin getCoinByName(String coinName, String netName) {
+        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainCoin::getCoinName,coinName);
+        wrapper.eq(ChainCoin::getNetName,netName);
+        return getOne(wrapper);
+    }
 }

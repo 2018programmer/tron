@@ -3,20 +3,19 @@ package com.dx.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
-import com.dx.pojo.dto.*;
 import com.dx.entity.*;
-import com.dx.mapper.*;
+import com.dx.pojo.dto.*;
 import com.dx.pojo.vo.GetUserAddressVO;
 import com.dx.pojo.vo.QueryPoolAddressVO;
 import com.dx.pojo.vo.UnbindAddressVO;
 import com.dx.pojo.vo.UpdatePoolManageVO;
+import com.dx.service.iservice.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,50 +30,30 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PoolAddressService {
 
-
     @Autowired
-    private ChainCoinMapper coinMapper;
-
+    private IChainCoinService chainCoinService;
     @Autowired
-    private ChainNetMapper netMapper;
-
+    private IChainNetService chainNetService;
     @Autowired
-    private ChainPoolAddressMapper poolAddressMapper;
-
+    private IChainPoolAddressService chainPoolAddressService;
     @Autowired
     private BasicService basicService;
-
     @Autowired
-    private ChainGatherTaskMapper gatherTaskMapper;
-
+    private IChainGatherTaskService chainGatherTaskService;
     @Autowired
-    private ChainAssetsMapper assetsMapper;
-
-    @Autowired
-    private ChainAddressIncomeMapper incomeMapper;
+    private IChainAssetsService chainAssetsService;
     @Autowired
     private ApiService apiService;
-
-    public void confirmOrder(String txId,String orderId){
-        LambdaUpdateWrapper<ChainAddressIncome> wrapper = Wrappers.lambdaUpdate();
-        wrapper.eq(ChainAddressIncome::getTxId,txId);
-        wrapper.set(ChainAddressIncome::getSerial,orderId);
-        incomeMapper.update(wrapper);
-    }
     public Result<IPage<CoinManageDTO>> getPoolManage(String netName,Integer pageNum,Integer pageSize) {
         Result<IPage<CoinManageDTO>> result = new Result<>();
         IPage<ChainCoin> page = new Page<>(pageNum,pageSize);
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainCoin::getNetName,netName);
-        page=coinMapper.selectPage(page,wrapper);
+        page=chainCoinService.page(page,wrapper);
         IPage<CoinManageDTO> convert = page.convert(u -> {
             CoinManageDTO coinManageDTO = new CoinManageDTO();
             BeanUtils.copyProperties(u, coinManageDTO);
-            LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
-            awrapper.eq(ChainAssets::getNetName,u.getNetName());
-            awrapper.eq(ChainAssets::getCoinName,u.getCoinName());
-            awrapper.eq(ChainAssets::getAssetType,2);
-            List<ChainAssets> chainAssets = assetsMapper.selectList(awrapper);
+            List<ChainAssets> chainAssets = chainAssetsService.getAssetsBytype(u.getNetName(),u.getCoinName(),2);
             BigDecimal reduce = chainAssets.stream()
                     .map(ChainAssets::getBalance)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -87,9 +66,9 @@ public class PoolAddressService {
 
     public Result updatePoolManage(UpdatePoolManageVO vo) {
         Result<Object> result = new Result<>();
+        ChainCoin chainCoin = chainCoinService.getCoinByCode(vo.getCoinCode());
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainCoin::getCoinCode,vo.getCoinCode());
-        ChainCoin chainCoin = coinMapper.selectOne(wrapper);
         if(Objects.isNull(chainCoin)){
             result.error("币种编码有误");
             return result;
@@ -100,31 +79,23 @@ public class PoolAddressService {
         if(ObjectUtils.isNotNull(vo.getAutoGather())){
             chainCoin.setAutoGather(vo.getAutoGather());
         }
-
-
-        coinMapper.updateById(chainCoin);
+        chainCoinService.updateById(chainCoin);
         result.setMessage("操作成功");
         return result;
     }
 
     public Result<List<PoolManageDTO>> getNets() {
         Result<List<PoolManageDTO>> result = new Result<>();
-        List<ChainNet> chainNets = netMapper.selectList(null);
+        List<ChainNet> chainNets = chainNetService.list();
         List<PoolManageDTO> poollist = new ArrayList<>();
         for (ChainNet chainNet : chainNets) {
             PoolManageDTO poolManageDTO = new PoolManageDTO();
             poolManageDTO.setNetName(chainNet.getNetName());
-            LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
-            wrapper.eq(ChainPoolAddress::getNetName,chainNet.getNetName());
-            Long total = poolAddressMapper.selectCount(wrapper);
-            wrapper.eq(ChainPoolAddress::getIsAssigned,0);
-            Long noNum = poolAddressMapper.selectCount(wrapper);
-            LambdaQueryWrapper<ChainGatherTask> twrapper = Wrappers.lambdaQuery();
-            twrapper.eq(ChainGatherTask::getNetName,chainNet.getNetName());
-            twrapper.eq(ChainGatherTask::getTaskStatus,1);
-            Long status = gatherTaskMapper.selectCount(twrapper);
+            Long total = chainPoolAddressService.getCount(chainNet.getNetName());
+            Long noNum = chainPoolAddressService.getNoAssignedNum(chainNet.getNetName());
+            List<ChainGatherTask> runningTask = chainGatherTaskService.getRunningTask(chainNet.getNetName());
             poolManageDTO.setTotalNum(total.intValue());
-            if(status>=1){
+            if(runningTask.size()>=1){
                 poolManageDTO.setGatherStatus(1);
             }else {
                 poolManageDTO.setGatherStatus(0);
@@ -156,7 +127,7 @@ public class PoolAddressService {
             wrapper.eq(ChainPoolAddress::getAssignType,vo.getAssignType());
         }
         IPage<ChainPoolAddress> page = new Page<>(vo.getPageNum(), vo.getPageSize());
-        page=poolAddressMapper.selectPage(page,wrapper);
+        page=chainPoolAddressService.page(page,wrapper);
         Map<String, String> priceList = apiService.getPriceList();
         IPage<PoolAddressDTO> convert = page.convert(u -> {
             PoolAddressDTO poolAddressDTO = new PoolAddressDTO();
@@ -175,9 +146,8 @@ public class PoolAddressService {
         if(CollectionUtils.isEmpty(map)){
             return BigDecimal.ZERO;
         }
-        LambdaQueryWrapper<ChainAssets> awrapper = Wrappers.lambdaQuery();
-        awrapper.eq(ChainAssets::getAddress,address);
-        List<ChainAssets> chainAssets = assetsMapper.selectList(awrapper);
+
+        List<ChainAssets> chainAssets = chainAssetsService.getAddressAssets(address);
         BigDecimal amount =BigDecimal.ZERO;
         if(CollectionUtils.isEmpty(chainAssets)){
             return amount;
@@ -195,7 +165,7 @@ public class PoolAddressService {
     public Result<GetGatherNumDTO> getGatherNum(String netName) {
         Result<GetGatherNumDTO> result = new Result<>();
         GetGatherNumDTO getGatherNumDTO = new GetGatherNumDTO();
-        List<ChainAssets> haveAssets = assetsMapper.getHaveAssets(netName, null,null);
+        List<ChainAssets> haveAssets = chainAssetsService.getHaveAssets(netName, null,null);
         Set<String> collect = haveAssets.stream().map(ChainAssets::getAddress).collect(Collectors.toSet());
         getGatherNumDTO.setNum(collect.size());
         getGatherNumDTO.setNetName(netName);
@@ -205,17 +175,13 @@ public class PoolAddressService {
 
     public Result  autoCreateAddress(Integer num){
         Result<Object> result = new Result<>();
-        LambdaQueryWrapper<ChainNet> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainNet::getRunningStatus,1);
-        List<ChainNet> chainNets = netMapper.selectList(wrapper);
+        List<ChainNet> chainNets = chainNetService.getRunningNets();
         if(CollectionUtils.isEmpty(chainNets)){
             return result;
         }
         for (ChainNet chainNet : chainNets) {
-            LambdaQueryWrapper<ChainPoolAddress> awrapper = Wrappers.lambdaQuery();
-            awrapper.eq(ChainPoolAddress::getNetName,chainNet.getNetName());
-            awrapper.eq(ChainPoolAddress::getIsAssigned,0);
-            int aNum = poolAddressMapper.selectCount(awrapper).intValue();
+
+            int aNum = chainPoolAddressService.getNoAssignedNum(chainNet.getNetName()).intValue();
             if(aNum>=num){
                 continue;
             }
@@ -228,43 +194,29 @@ public class PoolAddressService {
                 chainPoolAddress.setNetName(chainNet.getNetName());
                 chainPoolAddress.setIsActivated(0);
                 chainPoolAddress.setIsAssigned(0);
-                poolAddressMapper.insert(chainPoolAddress);
+                chainPoolAddressService.save(chainPoolAddress);
             }
         }
         return result;
     }
 
-    public ChainPoolAddress getAddress(String address){
-        LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainPoolAddress::getAddress,address);
-        return poolAddressMapper.selectOne(wrapper);
-
-    }
 
     public Result matchUserAddress(GetUserAddressVO vo) {
         Result<Object> result = new Result<>();
-        LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainPoolAddress::getAssignedId,vo.getAssignedId());
-        wrapper.eq(ChainPoolAddress::getAssignType,vo.getAssignType());
-        wrapper.eq(ChainPoolAddress::getNetName,vo.getNetName());
-        wrapper.eq(ChainPoolAddress::getIsDelete,0);
 
-        List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(wrapper);
+        List<ChainPoolAddress> chainPoolAddresses = chainPoolAddressService.getByAssigned(vo.getAssignedId(),vo.getAssignType(),vo.getNetName());
         if(!CollectionUtils.isEmpty(chainPoolAddresses)){
             ChainPoolAddress chainPoolAddress = chainPoolAddresses.get(0);
             result.setResult(chainPoolAddress.getAddress());
             return result;
         }
-        wrapper.clear();
-        wrapper.eq(ChainPoolAddress::getIsAssigned,0);
-        wrapper.orderByAsc(ChainPoolAddress::getId);
-        wrapper.last("limit 8");
-        List<ChainPoolAddress> address = poolAddressMapper.selectList(wrapper);
+
+        List<ChainPoolAddress> address = chainPoolAddressService.getMatchAddress();
         ChainPoolAddress chainPoolAddress = address.get(0);
         chainPoolAddress.setIsAssigned(1);
         chainPoolAddress.setAssignedId(vo.getAssignedId());
         chainPoolAddress.setAssignType(vo.getAssignType());
-        poolAddressMapper.updateById(chainPoolAddress);
+        chainPoolAddressService.updateById(chainPoolAddress);
         result.setResult(chainPoolAddress.getAddress());
         return result;
     }
@@ -281,12 +233,8 @@ public class PoolAddressService {
             result.setResult(verifyAddressDTO);
             return result;
         }
-        LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainPoolAddress::getAddress,address);
-        wrapper.eq(ChainPoolAddress::getNetName,netName);
-        wrapper.eq(ChainPoolAddress::getIsAssigned,1);
-        wrapper.eq(ChainPoolAddress::getIsDelete,0);
-        ChainPoolAddress chainPoolAddress = poolAddressMapper.selectOne(wrapper);
+
+        ChainPoolAddress chainPoolAddress = chainPoolAddressService.getValidAddress(address,netName);
         if(ObjectUtils.isNotNull(chainPoolAddress)){
             verifyAddressDTO.setIsAssigned(1);
             verifyAddressDTO.setAssignedType(chainPoolAddress.getAssignType());
@@ -301,10 +249,7 @@ public class PoolAddressService {
     }
 
     public Result unbindAddress(UnbindAddressVO vo) {
-        LambdaUpdateWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaUpdate();
-        wrapper.eq(ChainPoolAddress::getAddress,vo.getAddress());
-        wrapper.set(ChainPoolAddress::getIsDelete,1);
-        poolAddressMapper.update(wrapper);
+        chainPoolAddressService.unbindAddress(vo.getAddress());
         return Result.ok();
     }
 }

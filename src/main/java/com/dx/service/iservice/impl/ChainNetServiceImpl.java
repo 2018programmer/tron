@@ -8,13 +8,22 @@ import com.dx.mapper.ChainNetMapper;
 import com.dx.service.iservice.IChainNetService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ChainNetServiceImpl extends ServiceImpl<ChainNetMapper, ChainNet> implements IChainNetService {
     @Override
     public Long getOnNetCount() {
         LambdaQueryWrapper<ChainNet> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainNet::getRunningStatus,1);
-        return this.count(wrapper);
+        return count(wrapper);
 
+    }
+
+    @Override
+    public List<ChainNet> getRunningNets() {
+        LambdaQueryWrapper<ChainNet> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainNet::getRunningStatus,1);
+        return list(wrapper);
     }
 }

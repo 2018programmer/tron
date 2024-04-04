@@ -8,6 +8,8 @@ import com.dx.mapper.ChainAddressExpensesMapper;
 import com.dx.service.iservice.IChainAddressExpensesService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ChainAddressExpensesServiceImpl extends ServiceImpl<ChainAddressExpensesMapper, ChainAddressExpenses> implements IChainAddressExpensesService {
     @Override
@@ -15,5 +17,13 @@ public class ChainAddressExpensesServiceImpl extends ServiceImpl<ChainAddressExp
         LambdaQueryWrapper<ChainAddressExpenses> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainAddressExpenses::getExpensesStatus,3);
         return count(wrapper);
+    }
+
+    @Override
+    public List<ChainAddressExpenses> getFinsishExpenses(String orderId) {
+        LambdaQueryWrapper<ChainAddressExpenses> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainAddressExpenses::getExpensesStatus,4);
+        wrapper.eq(ChainAddressExpenses::getSerial,orderId);
+        return list(wrapper);
     }
 }

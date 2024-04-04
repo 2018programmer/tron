@@ -2,7 +2,6 @@ package com.dx.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -10,12 +9,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.entity.ChainAddressExpenses;
-import com.dx.mapper.ChainAddressExpensesMapper;
+import com.dx.entity.ChainAddressIncome;
 import com.dx.pojo.vo.ConfirmOrderVO;
 import com.dx.pojo.vo.GetAddressExpensesVO;
 import com.dx.pojo.vo.GetAddressIncomeVO;
-import com.dx.entity.ChainAddressIncome;
-import com.dx.mapper.ChainAddressIncomeMapper;
+import com.dx.service.iservice.IChainAddressExpensesService;
+import com.dx.service.iservice.IChainAddressIncomeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,10 +24,9 @@ import org.springframework.stereotype.Service;
 public class TranferService {
 
     @Autowired
-    private ChainAddressIncomeMapper addressIncomeMapper;
-
+    private IChainAddressIncomeService chainAddressIncomeService;
     @Autowired
-    private ChainAddressExpensesMapper addressExpensesMapper;
+    private IChainAddressExpensesService chainAddressExpensesService;
     @Autowired
     private BasicService basicService;
 
@@ -51,7 +49,7 @@ public class TranferService {
         }
         wrapper.orderByDesc(ChainAddressIncome::getId);
         IPage<ChainAddressIncome> page = new Page<>(vo.getPageNum(), vo.getPageSize());
-        page = addressIncomeMapper.selectPage(page, wrapper);
+        page = chainAddressIncomeService.page(page, wrapper);
 
         result.setResult(page);
         return result;
@@ -69,7 +67,7 @@ public class TranferService {
         }
         wrapper.orderByDesc(ChainAddressExpenses::getId);
         IPage<ChainAddressExpenses> page = new Page<>(vo.getPageNum(), vo.getPageSize());
-        page = addressExpensesMapper.selectPage(page, wrapper);
+        page = chainAddressExpensesService.page(page, wrapper);
 
         result.setResult(page);
         return  result;
@@ -99,13 +97,7 @@ public class TranferService {
     }
 
     public Result confirmOrder(ConfirmOrderVO vo) {
-        log.info("确认订单参数为{}",vo);
-
         Result<Object> result = new Result<>();
-        LambdaUpdateWrapper<ChainAddressIncome> wrapper = Wrappers.lambdaUpdate();
-        wrapper.eq(ChainAddressIncome::getTxId, vo.getTxId());
-        wrapper.set(ChainAddressIncome::getSerial, vo.getSerial());
-        addressIncomeMapper.update(wrapper);
         return result;
     }
 }

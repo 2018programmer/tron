@@ -6,13 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.dx.common.Constant;
 import com.dx.common.Result;
 import com.dx.entity.*;
-import com.dx.mapper.ChainFeeWalletMapper;
 import com.dx.pojo.dto.AssetHotDTO;
 import com.dx.pojo.vo.FreezeBalanceVO;
-import com.dx.service.iservice.IChainCoinService;
-import com.dx.service.iservice.IChainColdWalletService;
-import com.dx.service.iservice.IChainFlowService;
-import com.dx.service.iservice.IChainHotWalletService;
+import com.dx.service.iservice.*;
 import com.dx.service.other.OperateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,9 +24,8 @@ public class AssetsService {
 
     @Autowired
     private OperateService operateService;
-
     @Autowired
-    private ChainFeeWalletMapper feeWalletMapper;
+    private IChainFeeWalletService chainFeeWalletService;
     @Autowired
     private BasicService basicService;
 
@@ -112,7 +107,7 @@ public class AssetsService {
 
     public Result freezeFeeBalance(FreezeBalanceVO vo) {
         Result<Object> result = new Result<>();
-        ChainFeeWallet feeWallet = feeWalletMapper.selectById(vo.getId());
+        ChainFeeWallet feeWallet = chainFeeWalletService.getById(vo.getId());
         ChainColdWallet coldWallet = chainColdWalletService.getByNet(feeWallet.getNetName());
 
         BigDecimal balance = basicService.queryBalance(feeWallet.getNetName(), feeWallet.getAddress());

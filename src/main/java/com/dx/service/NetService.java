@@ -5,13 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Result;
+import com.dx.entity.ChainCoin;
+import com.dx.entity.ChainNet;
 import com.dx.pojo.dto.GetNetByNameDTO;
 import com.dx.pojo.dto.NetDTO;
 import com.dx.pojo.vo.UpdateNetStatusVO;
-import com.dx.entity.ChainCoin;
-import com.dx.entity.ChainNet;
-import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainNetMapper;
+import com.dx.service.iservice.IChainCoinService;
+import com.dx.service.iservice.IChainNetService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +22,11 @@ import java.util.List;
 
 @Service
 public class NetService {
-    
+
     @Autowired
-    private ChainNetMapper netMapper;
-    
+    private IChainNetService chainNetService;
     @Autowired
-    private ChainCoinMapper coinMapper;
+    private IChainCoinService chainCoinService;
 
     /**
      * 修改运行状态
@@ -37,7 +36,7 @@ public class NetService {
         LambdaUpdateWrapper<ChainNet> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(ChainNet::getNetName,vo.getNetName());
         wrapper.set(ChainNet::getRunningStatus,vo.getStatus());
-        netMapper.update(wrapper);
+        chainNetService.update(wrapper);
         result.setMessage("操作成功");
         return result;
     }
@@ -50,7 +49,7 @@ public class NetService {
         }
         List<NetDTO> list = new ArrayList<>();
         //获取所有主网名称
-        List<ChainNet> chainNets = netMapper.selectList(netWrapper);
+        List<ChainNet> chainNets = chainNetService.list(netWrapper);
         if(CollectionUtils.isEmpty(chainNets)){
             result.setResult(list);
             return result;
@@ -60,7 +59,7 @@ public class NetService {
             BeanUtils.copyProperties(chainNet,netDTO);
             LambdaQueryWrapper<ChainCoin> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(ChainCoin::getNetName,chainNet.getNetName());
-            Long num = coinMapper.selectCount(wrapper);
+            Long num = chainCoinService.count(wrapper);
             netDTO.setCoinNum(num.intValue());
             list.add(netDTO);
         }
@@ -76,15 +75,12 @@ public class NetService {
         LambdaQueryWrapper<ChainNet> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainNet::getNetName,netName);
         wrapper.eq(ChainNet::getRunningStatus,1);
-        ChainNet chainNet = netMapper.selectOne(wrapper);
+        ChainNet chainNet = chainNetService.getOne(wrapper);
         GetNetByNameDTO getNetByNameDTO = new GetNetByNameDTO();
         if(ObjectUtils.isEmpty(chainNet)){
             return result.error("对应的主网不存在");
         }
-        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
-        cwrapper.eq(ChainCoin::getCoinName,coinName);
-        cwrapper.eq(ChainCoin::getNetName,netName);
-        ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+        ChainCoin chainCoin = chainCoinService.getCoinByName(coinName,netName);
         if(ObjectUtils.isEmpty(chainNet)){
             return result.error("对应的主网不存在");
         }
@@ -101,7 +97,7 @@ public class NetService {
         Result<List<GetNetByNameDTO>> result = new Result<>();
         LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
         cwrapper.eq(ChainCoin::getCoinName,coinName);
-        List<ChainCoin> chainCoins = coinMapper.selectList(cwrapper);
+        List<ChainCoin> chainCoins = chainCoinService.list(cwrapper);
         List<GetNetByNameDTO> dtos = new ArrayList<>();
         for (ChainCoin chainCoin : chainCoins) {
             GetNetByNameDTO getNetByNameDTO = new GetNetByNameDTO();
@@ -109,7 +105,7 @@ public class NetService {
             getNetByNameDTO.setMinNum(chainCoin.getMinNum());
             LambdaQueryWrapper<ChainNet> wrapper = Wrappers.lambdaQuery();
             wrapper.eq(ChainNet::getNetName,chainCoin.getNetName());
-            ChainNet chainNet = netMapper.selectOne(wrapper);
+            ChainNet chainNet = chainNetService.getOne(wrapper);
             getNetByNameDTO.setRechargeNetConfirmNum(chainNet.getRechargeNetConfirmNum());
             getNetByNameDTO.setDisplayName(chainNet.getDisplayName());
             getNetByNameDTO.setRunningStatus(chainNet.getRunningStatus());

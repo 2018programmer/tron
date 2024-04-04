@@ -9,7 +9,7 @@ import com.dx.common.NetEnum;
 import com.dx.entity.*;
 import com.dx.mapper.*;
 import com.dx.service.BasicService;
-import com.dx.service.PoolAddressService;
+import com.dx.service.iservice.IChainPoolAddressService;
 import com.dx.service.other.OperateService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +39,7 @@ public class GatherJob {
     private ChainGatherTaskMapper gatherTaskMapper;
 
     @Autowired
-    private PoolAddressService poolAddressService;
-
+    private IChainPoolAddressService chainPoolAddressService;
     @Autowired
     private BasicService basicService;
     @Autowired
@@ -174,7 +173,7 @@ public class GatherJob {
 
     public void execute(ChainGatherDetail nowTask, ChainGatherTask chainGatherTask,Long start) {
 
-            ChainPoolAddress address = poolAddressService.getAddress(nowTask.getGatherAddress());
+            ChainPoolAddress address = chainPoolAddressService.getByAddress(nowTask.getGatherAddress());
             LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
             cwrapper.eq(ChainCoin::getCoinName,nowTask.getCoinName());
             cwrapper.eq(ChainCoin::getNetName, NetEnum.TRON.getNetName());
