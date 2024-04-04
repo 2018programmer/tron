@@ -3,7 +3,6 @@ package com.dx.service;
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -11,15 +10,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.IdVO;
 import com.dx.common.Result;
+import com.dx.entity.*;
 import com.dx.pojo.dto.GatherTotalDTO;
 import com.dx.pojo.dto.GetGatherDetailDTO;
 import com.dx.pojo.dto.GetGatherDetailsDTO;
 import com.dx.pojo.dto.GetGatherTasksDTO;
-import com.dx.entity.*;
-import com.dx.mapper.*;
 import com.dx.pojo.vo.GetGatherDetailsVO;
 import com.dx.pojo.vo.GetGatherTasksVO;
 import com.dx.pojo.vo.ManualGatherVO;
+import com.dx.service.iservice.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,43 +26,42 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class GatherService {
 
-    @Autowired
-    private ChainGatherTaskMapper gatherTaskMapper;
 
     @Autowired
-    private ChainCoinMapper coinMapper;
+    private IChainGatherTaskService chainGatherTaskService;
 
     @Autowired
-    private ChainGatherDetailMapper gatherDetailMapper;
+    private IChainCoinService chainCoinService;
 
     @Autowired
-    private ChainHotWalletMapper hotWalletMapper;
+    private IChainGatherDetailService chainGatherDetailService;
+
     @Autowired
-    private ChainAssetsMapper assetsMapper;
+    private IChainHotWalletService chainHotWalletService;
+
+    @Autowired
+    private IChainAssetsService chainAssetsService;
 
 
     public Result manualGather(ManualGatherVO vo) {
         Result<Object> result = new Result<>();
-        LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainGatherTask::getNetName,vo.getNetName());
-        wrapper.eq(ChainGatherTask::getTaskStatus,1);
-        List<ChainGatherTask> chainGatherTasks = gatherTaskMapper.selectList(wrapper);
-        
+
+        List<ChainGatherTask> chainGatherTasks = chainGatherTaskService.getRunningTask(vo.getNetName());
         if(CollectionUtils.isNotEmpty(chainGatherTasks)){
             result.error("正在归集中,请勿使用手动归集");
             return result;
         }
-        LambdaQueryWrapper<ChainHotWallet> hotwrapper = Wrappers.lambdaQuery();
-        hotwrapper.eq(ChainHotWallet::getNetName,vo.getNetName());
-        hotwrapper.eq(ChainHotWallet::getRunningStatus,1);
-        List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
+        List<ChainHotWallet> chainHotWallets = chainHotWalletService.getOnHotWalletList(vo.getNetName());
 
         if(CollectionUtils.isEmpty(chainHotWallets)){
             result.error("没有可用热钱包！请先新增");
@@ -71,11 +69,9 @@ public class GatherService {
         }
         ChainHotWallet chainHotWallet = chainHotWallets.get(0);
         //创建归集明细
-        LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
-        cwrapper.eq(ChainCoin::getCoinType,"base");
-        ChainCoin chainCoin = coinMapper.selectOne(cwrapper);
+        ChainCoin chainCoin = chainCoinService.getBaseCoin(chainHotWallet.getNetName());
         //获取资产表
-        List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null,null);
+        List<ChainAssets> assets = chainAssetsService.getHaveAssets(chainHotWallet.getNetName(), null,null);
         if(CollectionUtils.isEmpty(assets)){
             result.error("没有达到归集要求的地址");
             return result;
@@ -87,7 +83,7 @@ public class GatherService {
         task.setCreateTime(System.currentTimeMillis());
         task.setNetName(chainHotWallet.getNetName());
         task.setTotalNum(assets.size());
-        gatherTaskMapper.insert(task);
+        chainGatherTaskService.save(task);
         //创建 对应明细
         for (ChainAssets asset : assets) {
             ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
@@ -100,8 +96,7 @@ public class GatherService {
             chainGatherDetail.setTryTime(0);
             chainGatherDetail.setFeeAmount(BigDecimal.ZERO);
             chainGatherDetail.setFeeCoinName(chainCoin.getCoinName());
-
-            gatherDetailMapper.insert(chainGatherDetail);
+            chainGatherDetailService.save(chainGatherDetail);
         }
 
         result.setMessage("操作成功！");
@@ -120,20 +115,18 @@ public class GatherService {
         }
         wrapper.orderByDesc(ChainGatherTask::getId);
         IPage<ChainGatherTask> page = new Page<>(vo.getPageNum(), vo.getPageSize());
-        page = gatherTaskMapper.selectPage(page, wrapper);
+        page = chainGatherTaskService.page(page, wrapper);
 
-        LambdaQueryWrapper<ChainGatherDetail> dwrapper = Wrappers.lambdaQuery();
+
         IPage<GetGatherTasksDTO> convert = page.convert(u -> {
             GetGatherTasksDTO getGatherTasksDTO = new GetGatherTasksDTO();
             BeanUtils.copyProperties(u, getGatherTasksDTO);
-            dwrapper.clear();
-            dwrapper.eq(ChainGatherDetail::getTaskId,u.getId()).eq(ChainGatherDetail::getGatherStatus,3);
-            Long aLong = gatherDetailMapper.selectCount(dwrapper);
+            Long num = chainGatherDetailService.getFinishCount(u.getId());
             if(ObjectUtils.isNotNull(u.getEndTime())){
                 getGatherTasksDTO.setTotalTime(DateUtil.formatBetween(new Date(u.getCreateTime()), new Date(u.getEndTime()), BetweenFormatter.Level.SECOND));
 
             }
-            getGatherTasksDTO.setFinishNum(aLong.intValue());
+            getGatherTasksDTO.setFinishNum(num.intValue());
             return getGatherTasksDTO;
         });
 
@@ -144,10 +137,8 @@ public class GatherService {
     public Result<GetGatherDetailsDTO> getGatherDetails(GetGatherDetailsVO vo) {
         Result<GetGatherDetailsDTO> result = new Result<>();
         GetGatherDetailsDTO getGatherDetailsDTO = new GetGatherDetailsDTO();
-        ChainGatherTask chainGatherTask = gatherTaskMapper.selectById(vo.getId());
-        LambdaQueryWrapper<ChainGatherDetail> dwrapper = Wrappers.lambdaQuery();
-        dwrapper.eq(ChainGatherDetail::getTaskId,vo.getId());
-        List<ChainGatherDetail> chainGatherDetails = gatherDetailMapper.selectList(dwrapper);
+        ChainGatherTask chainGatherTask = chainGatherTaskService.getById(vo.getId());
+        List<ChainGatherDetail> chainGatherDetails=chainGatherDetailService.getTaskDetails(vo.getId());
         getGatherDetailsDTO.setFeeName(chainGatherDetails.get(0).getFeeCoinName());
         BigDecimal totalBalance = chainGatherDetails.stream()
                 .map(ChainGatherDetail::getFeeAmount)
@@ -169,7 +160,7 @@ public class GatherService {
 
 
         IPage<ChainGatherDetail> page = new Page<>(vo.getPageNum(), vo.getPageSize());
-        page=gatherDetailMapper.selectPage(page,dwrapper);
+        page=chainGatherDetailService.getTaskDetailsPage(page,vo.getId());
         IPage<GetGatherDetailDTO> convert = page.convert(u -> {
             GetGatherDetailDTO getGatherDetailDTO = new GetGatherDetailDTO();
             BeanUtils.copyProperties(u, getGatherDetailDTO);
@@ -189,21 +180,15 @@ public class GatherService {
     @Transactional
     public Result cancelGatherTask(IdVO vo) {
         Result<Object> result = new Result<>();
-        ChainGatherTask chainGatherTask = gatherTaskMapper.selectById(vo.getId());
+        ChainGatherTask chainGatherTask = chainGatherTaskService.getById(vo.getId());
         if(chainGatherTask.getTaskStatus() == 3 || chainGatherTask.getTaskStatus() == 5){
             result.error("任务已完成或已取消，无法取消！");
             return result;
         }
         chainGatherTask.setTaskStatus(3);
-        gatherTaskMapper.updateById(chainGatherTask);
-        //归集子任务取消
-        LambdaUpdateWrapper<ChainGatherDetail> wrapper = Wrappers.lambdaUpdate();
-        wrapper.eq(ChainGatherDetail::getTaskId,vo.getId());
-        wrapper.and((w)->{
-            w.eq(ChainGatherDetail::getGatherStatus,0).or().eq(ChainGatherDetail::getGatherStatus,2);
-        });
-        wrapper.set(ChainGatherDetail::getGatherStatus,4);
-        gatherDetailMapper.update(wrapper);
+        chainGatherTaskService.updateById(chainGatherTask);
+
+        chainGatherDetailService.cancelGatherDetail(vo.getId());
 
         result.setMessage("操作成功！");
         return  result;

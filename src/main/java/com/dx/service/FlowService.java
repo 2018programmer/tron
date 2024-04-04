@@ -7,16 +7,17 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.entity.ChainFlow;
-import com.dx.mapper.ChainFlowMapper;
 import com.dx.pojo.vo.GetChainFlowsVO;
+import com.dx.service.iservice.IChainFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FlowService {
 
+
     @Autowired
-    private ChainFlowMapper flowMapper;
+    private IChainFlowService chainFlowService;
     public Result<IPage<ChainFlow>> getChainFlows(GetChainFlowsVO vo) {
         Result<IPage<ChainFlow>> result = new Result<>();
         LambdaQueryWrapper<ChainFlow> wrapper = Wrappers.lambdaQuery();
@@ -37,7 +38,7 @@ public class FlowService {
         }
         wrapper.orderByDesc(ChainFlow::getId);
         IPage<ChainFlow> page = new Page<>(vo.getPageNum(), vo.getPageSize());
-        page =flowMapper.selectPage(page,wrapper);
+        page =chainFlowService.page(page,wrapper);
 
         result.setResult(page);
         return result;

@@ -6,4 +6,8 @@ import com.dx.entity.ChainCoin;
 
 public interface IChainCoinService extends IService<ChainCoin> {
     Long getCoinCount();
+
+    ChainCoin getBaseCoin(String netName);
+
+    ChainCoin getCoinByCode(String code);
 }

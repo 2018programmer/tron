@@ -8,6 +8,8 @@ import com.dx.mapper.ChainGatherTaskMapper;
 import com.dx.service.iservice.IChainGatherTaskService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ChainGatherTaskServiceImpl extends ServiceImpl<ChainGatherTaskMapper, ChainGatherTask> implements IChainGatherTaskService {
     @Override
@@ -15,5 +17,13 @@ public class ChainGatherTaskServiceImpl extends ServiceImpl<ChainGatherTaskMappe
         LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainGatherTask::getTaskStatus,1);
         return this.count(wrapper);
+    }
+
+    @Override
+    public List<ChainGatherTask> getRunningTask(String netName) {
+        LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainGatherTask::getNetName,netName);
+        wrapper.eq(ChainGatherTask::getTaskStatus,1);
+        return list(wrapper);
     }
 }

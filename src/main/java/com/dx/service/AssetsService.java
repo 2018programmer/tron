@@ -1,17 +1,19 @@
 package com.dx.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Constant;
 import com.dx.common.Result;
-import com.dx.pojo.dto.AssetHotDTO;
 import com.dx.entity.*;
-import com.dx.mapper.*;
-import com.dx.service.other.OperateService;
+import com.dx.mapper.ChainFeeWalletMapper;
+import com.dx.pojo.dto.AssetHotDTO;
 import com.dx.pojo.vo.FreezeBalanceVO;
+import com.dx.service.iservice.IChainCoinService;
+import com.dx.service.iservice.IChainColdWalletService;
+import com.dx.service.iservice.IChainFlowService;
+import com.dx.service.iservice.IChainHotWalletService;
+import com.dx.service.other.OperateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -30,30 +32,27 @@ public class AssetsService {
     @Autowired
     private ChainFeeWalletMapper feeWalletMapper;
     @Autowired
-    private ChainColdWalletMapper coldWalletMapper;
-    
-    @Autowired
-    private ChainHotWalletMapper hotWalletMapper;
+    private BasicService basicService;
 
     @Autowired
-    private BasicService basicService;
-    
+    private IChainHotWalletService chainHotWalletService;
+
     @Autowired
-    private ChainFlowMapper flowMapper;
+    private IChainCoinService chainCoinService;
+
     @Autowired
-    private ChainCoinMapper coinMapper;
+    private IChainColdWalletService chainColdWalletService;
+
+    @Autowired
+    private IChainFlowService chainFlowService;
+
 
 
 
     public Result<List<AssetHotDTO>> getHotwalletBalance(Integer type,Integer id) {
         Result<List<AssetHotDTO>> result = new Result<>();
-        List<ChainCoin> chainCoins = coinMapper.selectList(null);
-
-
-
-        ChainHotWallet chainHotWallet = hotWalletMapper.selectById(id);
-        LambdaQueryWrapper<ChainAssets> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainAssets::getAddress,chainHotWallet.getAddress());
+        List<ChainCoin> chainCoins = chainCoinService.list();
+        ChainHotWallet chainHotWallet = chainHotWalletService.getById(id);
         List<AssetHotDTO> list = new ArrayList<>();
         for (ChainCoin chainCoin : chainCoins) {
             if(ObjectUtils.isNotNull(type)){
@@ -91,20 +90,12 @@ public class AssetsService {
             result.error("未选择币种");
             return result;
         }
-        ChainHotWallet hotWallet = hotWalletMapper.selectById(vo.getId());
-        LambdaQueryWrapper<ChainColdWallet> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainColdWallet::getNetName,hotWallet.getNetName());
-        ChainColdWallet wallet = coldWalletMapper.selectOne(wrapper);
-        LambdaQueryWrapper<ChainCoin> bwrapper = Wrappers.lambdaQuery();
-        bwrapper.eq(ChainCoin::getNetName,hotWallet.getNetName());
-        bwrapper.eq(ChainCoin::getCoinType,"base");
-        ChainCoin baseCoin = coinMapper.selectOne(bwrapper);
+        ChainHotWallet hotWallet = chainHotWalletService.getById(vo.getId());
+        ChainColdWallet wallet = chainColdWalletService.getByNet(hotWallet.getNetName());
+        ChainCoin baseCoin =chainCoinService.getBaseCoin(hotWallet.getNetName());
         String msg="";
         for (String code : vo.getCoinCodeList()) {
-            bwrapper.clear();
-            bwrapper.eq(ChainCoin::getNetName,hotWallet.getNetName());
-            bwrapper.eq(ChainCoin::getCoinCode,code);
-            ChainCoin transCoin = coinMapper.selectOne(bwrapper);
+            ChainCoin transCoin =chainCoinService.getCoinByCode(code);
             msg =operateService.hotWalletCold(wallet, hotWallet,transCoin,baseCoin);
             if (!StringUtils.isEmpty(msg)){
                 break;
@@ -122,9 +113,7 @@ public class AssetsService {
     public Result freezeFeeBalance(FreezeBalanceVO vo) {
         Result<Object> result = new Result<>();
         ChainFeeWallet feeWallet = feeWalletMapper.selectById(vo.getId());
-        LambdaQueryWrapper<ChainColdWallet> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainColdWallet::getNetName,feeWallet.getNetName());
-        ChainColdWallet wallet = coldWalletMapper.selectOne(wrapper);
+        ChainColdWallet coldWallet = chainColdWalletService.getByNet(feeWallet.getNetName());
 
         BigDecimal balance = basicService.queryBalance(feeWallet.getNetName(), feeWallet.getAddress());
         if(balance.compareTo(Constant.BaseUrl.trxfee)<=0){
@@ -132,7 +121,7 @@ public class AssetsService {
             return result;
         }
         balance=balance.subtract(Constant.BaseUrl.trxfee);
-        String txId = operateService.feeWalletCold(feeWallet, wallet.getAddress(), balance);
+        String txId = operateService.feeWalletCold(feeWallet, coldWallet.getAddress(), balance);
 
         if(StringUtils.isEmpty(txId)){
             result.error("冷却失败");
@@ -143,7 +132,7 @@ public class AssetsService {
         }catch (Exception e){
         }
         long current = System.currentTimeMillis();
-        JSONObject json = basicService.gettransactioninfo(wallet.getNetName(), txId);
+        JSONObject json = basicService.gettransactioninfo(coldWallet.getNetName(), txId);
         ChainFlow feeFlow = new ChainFlow();
         feeFlow.setNetName(feeWallet.getNetName());
         feeFlow.setWalletType(2);
@@ -162,7 +151,7 @@ public class AssetsService {
         feeFlow.setCreateTime(current);
         feeFlow.setGroupId(String.valueOf(current));
         feeFlow.setCoinName(feeWallet.getCoinName());
-        flowMapper.insert(feeFlow);
+        chainFlowService.save(feeFlow);
 
         //添加流水明细
         ChainFlow coldFlow = new ChainFlow();
@@ -173,11 +162,11 @@ public class AssetsService {
         coldFlow.setTransferType(0);
         coldFlow.setFlowWay(5);
         coldFlow.setAmount(balance);
-        coldFlow.setTargetAddress(wallet.getAddress());
+        coldFlow.setTargetAddress(coldWallet.getAddress());
         coldFlow.setCreateTime(current);
         coldFlow.setGroupId(String.valueOf(current));
         coldFlow.setCoinName(feeWallet.getCoinName());
-        flowMapper.insert(coldFlow);
+        chainFlowService.save(coldFlow);
         result.setMessage("操作成功");
         return result;
     }

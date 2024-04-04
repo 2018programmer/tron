@@ -25,7 +25,7 @@ public class StatisticsService {
     private IChainGatherTaskService chainGatherTaskService;
 
     @Autowired
-    private IChainAddressExpensesService chainAddressExpensesService;
+    private IChainAddressIncomeService chainAddressIncomeService;
 
     public Result<GetStatisticsDTO> getStatistics() {
         Result<GetStatisticsDTO> result = new Result<>();
@@ -37,7 +37,7 @@ public class StatisticsService {
         getStatisticsDTO.setGatherCount(chainGatherTaskService.getGatheringCount().intValue());
         getStatisticsDTO.setExpensesQueueCount(0);
         getStatisticsDTO.setExpensesingCount(0);
-        getStatisticsDTO.setExpensesWrongCount(chainAddressExpensesService.getExpensesWrongCount().intValue());
+        getStatisticsDTO.setExpensesWrongCount(chainAddressIncomeService.getIncomeWrongCount().intValue());
         result.setResult(getStatisticsDTO);
         return result;
     }

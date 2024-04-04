@@ -27,7 +27,7 @@ public class GetStatisticsDTO implements Serializable {
      */
     private Integer expensesingCount;
     /**
-     * 出款异常数量
+     * 收款异常数量
      */
     private Integer expensesWrongCount;
     /**
