@@ -8,6 +8,8 @@ import com.dx.mapper.ChainCoinMapper;
 import com.dx.service.iservice.IChainCoinService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class ChainCoinServiceImpl extends ServiceImpl<ChainCoinMapper, ChainCoin> implements IChainCoinService {
@@ -37,5 +39,20 @@ public class ChainCoinServiceImpl extends ServiceImpl<ChainCoinMapper, ChainCoin
         wrapper.eq(ChainCoin::getCoinName,coinName);
         wrapper.eq(ChainCoin::getNetName,netName);
         return getOne(wrapper);
+    }
+
+    @Override
+    public List<ChainCoin> getContractCoin(String netName) {
+        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainCoin::getNetName,netName);
+        wrapper.eq(ChainCoin::getCoinType,"contract");
+        return list(wrapper);
+    }
+
+    @Override
+    public List<ChainCoin> getByNet(String netName) {
+        LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainCoin::getNetName,netName);
+        return list(wrapper);
     }
 }

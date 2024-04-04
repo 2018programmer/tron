@@ -8,14 +8,19 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Constant;
 import com.dx.common.RedisUtil;
+import com.dx.entity.ChainAddressIncome;
+import com.dx.entity.ChainCoin;
+import com.dx.entity.ChainFlow;
+import com.dx.entity.ChainPoolAddress;
+import com.dx.mapper.ChainAddressIncomeMapper;
+import com.dx.mapper.ChainCoinMapper;
+import com.dx.mapper.ChainFlowMapper;
+import com.dx.mapper.ChainPoolAddressMapper;
 import com.dx.pojo.dto.ContactDTO;
-import com.dx.entity.*;
-import com.dx.mapper.*;
 import com.dx.pojo.dto.GetCurrencyListDTO;
+import com.dx.pojo.vo.CreateOrderVO;
 import com.dx.service.ApiService;
 import com.dx.service.BasicService;
-import com.dx.pojo.vo.CreateOrderVO;
-import com.dx.service.PoolAddressService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +39,8 @@ public class MonitorJob {
 
     @Autowired
     private RedisUtil redisUtil;
-    
     @Autowired
     private BasicService basicService;
-
-    @Autowired
-    private PoolAddressService poolAddressService;
-
     @Autowired
     private ChainPoolAddressMapper poolAddressMapper;
 

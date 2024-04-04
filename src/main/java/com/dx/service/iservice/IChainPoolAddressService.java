@@ -21,4 +21,6 @@ public interface IChainPoolAddressService extends IService<ChainPoolAddress> {
     void unbindAddress(String address);
 
     ChainPoolAddress getByAddress(String address);
+
+    List<ChainPoolAddress> getAssignedByNet(String netName);
 }

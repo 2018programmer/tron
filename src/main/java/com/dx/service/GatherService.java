@@ -56,8 +56,8 @@ public class GatherService {
     public Result manualGather(ManualGatherVO vo) {
         Result<Object> result = new Result<>();
 
-        List<ChainGatherTask> chainGatherTasks = chainGatherTaskService.getRunningTask(vo.getNetName());
-        if(CollectionUtils.isNotEmpty(chainGatherTasks)){
+        ChainGatherTask chainGatherTask = chainGatherTaskService.getRunningTask(vo.getNetName());
+        if(!ObjectUtils.isNull(chainGatherTask)){
             result.error("正在归集中,请勿使用手动归集");
             return result;
         }

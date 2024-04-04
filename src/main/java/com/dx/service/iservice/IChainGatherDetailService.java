@@ -14,4 +14,8 @@ public interface IChainGatherDetailService extends IService<ChainGatherDetail> {
     IPage<ChainGatherDetail> getTaskDetailsPage(IPage<ChainGatherDetail> page,Integer id);
 
     void cancelGatherDetail(Integer id);
+
+    List<ChainGatherDetail> getNotStartDetail(Integer id);
+
+    List<ChainGatherDetail> getGoingDetail(Integer id);
 }

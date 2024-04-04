@@ -79,5 +79,13 @@ public class ChainPoolAddressServiceImpl extends ServiceImpl<ChainPoolAddressMap
         return getOne(wrapper);
     }
 
+    @Override
+    public List<ChainPoolAddress> getAssignedByNet(String netName) {
+        LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainPoolAddress::getNetName, netName);
+        wrapper.eq(ChainPoolAddress::getIsAssigned,1);
+        return list(wrapper);
+    }
+
 
 }

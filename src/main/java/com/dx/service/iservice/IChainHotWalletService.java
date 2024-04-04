@@ -10,4 +10,6 @@ public interface IChainHotWalletService extends IService<ChainHotWallet> {
     Long getOnHotWalletCount();
 
     List<ChainHotWallet> getOnHotWalletList(String netName);
+
+    List<ChainHotWallet> getHotWalletsByNet(String netName);
 }

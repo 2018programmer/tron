@@ -9,6 +9,9 @@ import com.dx.common.NetEnum;
 import com.dx.entity.*;
 import com.dx.mapper.*;
 import com.dx.service.BasicService;
+import com.dx.service.iservice.IChainCoinService;
+import com.dx.service.iservice.IChainGatherDetailService;
+import com.dx.service.iservice.IChainGatherTaskService;
 import com.dx.service.iservice.IChainPoolAddressService;
 import com.dx.service.other.OperateService;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -28,22 +31,20 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GatherJob {
 
-
     @Autowired
-    private ChainGatherDetailMapper gatherDetailMapper;
+    private IChainGatherDetailService chainGatherDetailService;
 
     @Autowired
     private OperateService operateService;
-
     @Autowired
-    private ChainGatherTaskMapper gatherTaskMapper;
+    private IChainGatherTaskService chainGatherTaskService;
 
     @Autowired
     private IChainPoolAddressService chainPoolAddressService;
     @Autowired
     private BasicService basicService;
     @Autowired
-    private ChainCoinMapper coinMapper;
+    private IChainCoinService chainCoinService;
     @Autowired
     private ChainFlowMapper flowMapper;
 
@@ -62,12 +63,8 @@ public class GatherJob {
         nwrapper.eq(ChainNet::getRunningStatus,1);
         List<ChainNet> chainNets = netMapper.selectList(nwrapper);
         for (ChainNet chainNet : chainNets) {
-            LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
-            wrapper.eq(ChainGatherTask::getNetName,chainNet.getNetName());
-            wrapper.eq(ChainGatherTask::getTaskStatus,1);
-            List<ChainGatherTask> chainGatherTasks = gatherTaskMapper.selectList(wrapper);
-
-            if(CollectionUtils.isNotEmpty(chainGatherTasks)){
+            ChainGatherTask chainGatherTask = chainGatherTaskService.getRunningTask(NetEnum.TRON.getNetName());
+            if(ObjectUtils.isNull(chainGatherTask)){
                 continue;
             }
             LambdaQueryWrapper<ChainHotWallet> hotwrapper = Wrappers.lambdaQuery();
@@ -80,9 +77,8 @@ public class GatherJob {
             }
             ChainHotWallet chainHotWallet = chainHotWallets.get(0);
             //创建归集明细
-            LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
-            cwrapper.eq(ChainCoin::getNetName,chainNet.getNetName());
-            List<ChainCoin> chainCoins = coinMapper.selectList(cwrapper);
+
+            List<ChainCoin> chainCoins = chainCoinService.getByNet(chainNet.getNetName());
             ChainCoin base = chainCoins.stream().filter(o -> o.getCoinType().equals("base")).collect(Collectors.toList()).get(0);
             //获取资产表
             List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null,1);
@@ -96,7 +92,7 @@ public class GatherJob {
             task.setCreateTime(System.currentTimeMillis());
             task.setNetName(chainHotWallet.getNetName());
             task.setTotalNum(assets.size());
-            gatherTaskMapper.insert(task);
+            chainGatherTaskService.save(task);
             //创建 对应明细
             for (ChainAssets asset : assets) {
                 ChainGatherDetail chainGatherDetail = new ChainGatherDetail();
@@ -110,7 +106,7 @@ public class GatherJob {
                 chainGatherDetail.setFeeAmount(BigDecimal.ZERO);
                 chainGatherDetail.setFeeCoinName(base.getCoinName());
 
-                gatherDetailMapper.insert(chainGatherDetail);
+                chainGatherDetailService.save(chainGatherDetail);
             }
         }
 
@@ -120,10 +116,8 @@ public class GatherJob {
     public void executeGather(){
         log.info("开始扫描归集任务");
 
-        LambdaQueryWrapper<ChainGatherTask> twrapper = Wrappers.lambdaQuery();
-        twrapper.eq(ChainGatherTask::getTaskStatus,1);
-        twrapper.eq(ChainGatherTask::getNetName,NetEnum.TRON.getNetName());
-        ChainGatherTask chainGatherTask = gatherTaskMapper.selectOne(twrapper);
+
+        ChainGatherTask chainGatherTask = chainGatherTaskService.getRunningTask(NetEnum.TRON.getNetName());
         if(ObjectUtils.isNull(chainGatherTask)){
             log.info("没有归集任务");
             return;
@@ -132,20 +126,13 @@ public class GatherJob {
         defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         TransactionStatus status = transactionManager.getTransaction(defaultTransactionDefinition);
         //扫描任务明细
-        LambdaQueryWrapper<ChainGatherDetail> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(ChainGatherDetail::getGatherStatus,0);
-        wrapper.eq(ChainGatherDetail::getTaskId,chainGatherTask.getId());
-        wrapper.orderByDesc(ChainGatherDetail::getId);
-        List<ChainGatherDetail> chainGatherDetails = gatherDetailMapper.selectList(wrapper);
+
+        List<ChainGatherDetail> chainGatherDetails = chainGatherDetailService.getNotStartDetail(chainGatherTask.getId());
         ChainGatherDetail nowTask =null;
 
         if(CollectionUtils.isEmpty(chainGatherDetails)){
-            wrapper.clear();
-            wrapper.eq(ChainGatherDetail::getGatherStatus,2);
-            wrapper.eq(ChainGatherDetail::getTaskId,chainGatherTask.getId());
-            wrapper.le(ChainGatherDetail::getTryTime,5);
-            wrapper.orderByAsc(ChainGatherDetail::getTryTime);
-            chainGatherDetails = gatherDetailMapper.selectList(wrapper);
+
+            chainGatherDetails = chainGatherDetailService.getGoingDetail(chainGatherTask.getId());
             if(!CollectionUtils.isEmpty(chainGatherDetails)){
                 nowTask=chainGatherDetails.get(0);
             }
@@ -155,7 +142,7 @@ public class GatherJob {
         if(ObjectUtils.isNull(nowTask)){
             chainGatherTask.setTaskStatus(5);
             chainGatherTask.setEndTime(System.currentTimeMillis());
-            gatherTaskMapper.updateById(chainGatherTask);
+            chainGatherTaskService.updateById(chainGatherTask);
             transactionManager.commit(status);
             return;
         }
@@ -166,18 +153,17 @@ public class GatherJob {
         nowTask.setGatherStatus(1);
         nowTask.setCreateTime(System.currentTimeMillis());
         nowTask.setTryTime(nowTask.getTryTime()+1);
-        gatherDetailMapper.updateById(nowTask);
+        chainGatherDetailService.updateById(nowTask);
         transactionManager.commit(status);
         execute(nowTask,chainGatherTask,start);
     }
 
     public void execute(ChainGatherDetail nowTask, ChainGatherTask chainGatherTask,Long start) {
 
-            ChainPoolAddress address = chainPoolAddressService.getByAddress(nowTask.getGatherAddress());
-            LambdaQueryWrapper<ChainCoin> cwrapper = Wrappers.lambdaQuery();
-            cwrapper.eq(ChainCoin::getCoinName,nowTask.getCoinName());
-            cwrapper.eq(ChainCoin::getNetName, NetEnum.TRON.getNetName());
-            ChainCoin transCoin = coinMapper.selectOne(cwrapper);
+        ChainPoolAddress address = chainPoolAddressService.getByAddress(nowTask.getGatherAddress());
+
+        ChainCoin transCoin = chainCoinService.getCoinByName(nowTask.getCoinName(), NetEnum.TRON.getNetName());
+
         try{
             JSONObject jsonObject = operateService.addressToGather(nowTask, chainGatherTask.getAddress(), address.getPrivateKey(), transCoin.getCoinCode());
             if(null==jsonObject){
@@ -240,7 +226,7 @@ public class GatherJob {
             log.error("归集发生异常{},{}",e.getMessage(),e.getStackTrace());
             nowTask.setGatherStatus(2);
         }
-        gatherDetailMapper.updateById(nowTask);
+        chainGatherDetailService.updateById(nowTask);
         if (3==nowTask.getGatherStatus()){
             log.info("归集成功任务id{},子任务id{}",nowTask.getTaskId(),nowTask.getId());
         }else {

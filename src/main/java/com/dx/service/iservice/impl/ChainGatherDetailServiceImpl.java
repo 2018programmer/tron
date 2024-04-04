@@ -46,4 +46,23 @@ public class ChainGatherDetailServiceImpl extends ServiceImpl<ChainGatherDetailM
         wrapper.set(ChainGatherDetail::getGatherStatus,4);
         update(wrapper);
     }
+
+    @Override
+    public List<ChainGatherDetail> getNotStartDetail(Integer id) {
+        LambdaQueryWrapper<ChainGatherDetail> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainGatherDetail::getGatherStatus,0);
+        wrapper.eq(ChainGatherDetail::getTaskId,id);
+        wrapper.orderByDesc(ChainGatherDetail::getId);
+        return list(wrapper);
+    }
+
+    @Override
+    public List<ChainGatherDetail> getGoingDetail(Integer id) {
+        LambdaQueryWrapper<ChainGatherDetail> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainGatherDetail::getGatherStatus,2);
+        wrapper.eq(ChainGatherDetail::getTaskId,id);
+        wrapper.le(ChainGatherDetail::getTryTime,5);
+        wrapper.orderByAsc(ChainGatherDetail::getTryTime);
+        return list(wrapper);
+    }
 }

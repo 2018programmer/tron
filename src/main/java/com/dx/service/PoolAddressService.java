@@ -93,9 +93,9 @@ public class PoolAddressService {
             poolManageDTO.setNetName(chainNet.getNetName());
             Long total = chainPoolAddressService.getCount(chainNet.getNetName());
             Long noNum = chainPoolAddressService.getNoAssignedNum(chainNet.getNetName());
-            List<ChainGatherTask> runningTask = chainGatherTaskService.getRunningTask(chainNet.getNetName());
+            ChainGatherTask runningTask = chainGatherTaskService.getRunningTask(chainNet.getNetName());
             poolManageDTO.setTotalNum(total.intValue());
-            if(runningTask.size()>=1){
+            if(ObjectUtils.isNotNull(runningTask)){
                 poolManageDTO.setGatherStatus(1);
             }else {
                 poolManageDTO.setGatherStatus(0);

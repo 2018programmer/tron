@@ -27,4 +27,11 @@ public class ChainHotWalletServiceImpl extends ServiceImpl<ChainHotWalletMapper,
         wrapper.eq(ChainHotWallet::getRunningStatus,1);
         return list(wrapper);
     }
+
+    @Override
+    public List<ChainHotWallet> getHotWalletsByNet(String netName) {
+        LambdaQueryWrapper<ChainHotWallet> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainHotWallet::getNetName,netName);
+        return list(wrapper);
+    }
 }
