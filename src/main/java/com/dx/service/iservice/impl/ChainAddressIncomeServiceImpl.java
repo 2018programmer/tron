@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dx.entity.ChainAddressIncome;
 import com.dx.mapper.ChainAddressIncomeMapper;
 import com.dx.service.iservice.IChainAddressIncomeService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ChainAddressIncomeServiceImpl extends ServiceImpl<ChainAddressIncomeMapper, ChainAddressIncome> implements IChainAddressIncomeService {
     @Override
     public Long getIncomeWrongCount() {
