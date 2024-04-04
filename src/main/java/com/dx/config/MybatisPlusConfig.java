@@ -25,7 +25,7 @@ public class MybatisPlusConfig {
         // 分页插件，如果你不配置，分页插件将不生效
         // 指定数据库方言为 MYSQL
         PaginationInnerInterceptor pageInterceptor = new PaginationInnerInterceptor(DbType.MYSQL);
-        pageInterceptor.setMaxLimit(100L); // 单页分页条数限制
+        pageInterceptor.setMaxLimit(200L); // 单页分页条数限制
         interceptor.addInnerInterceptor(pageInterceptor);
 
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
