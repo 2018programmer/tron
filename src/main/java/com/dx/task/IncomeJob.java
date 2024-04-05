@@ -7,29 +7,28 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.entity.ChainAddressIncome;
 import com.dx.entity.ChainPoolAddress;
-import com.dx.mapper.ChainAddressIncomeMapper;
-import com.dx.mapper.ChainPoolAddressMapper;
 import com.dx.pojo.vo.CreateOrderVO;
 import com.dx.service.ApiService;
+import com.dx.service.iservice.IChainAddressIncomeService;
+import com.dx.service.iservice.IChainPoolAddressService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
 @Component
 public class IncomeJob {
-
     @Autowired
-    private ChainAddressIncomeMapper incomeMapper;
+    private IChainAddressIncomeService chainAddressIncomeService;
 
     @Autowired
     private ApiService apiService;
-
     @Autowired
-    private ChainPoolAddressMapper poolAddressMapper;
+    private IChainPoolAddressService chainPoolAddressService;
 
     /**
      * 重试调用充值订单
@@ -43,7 +42,7 @@ public class IncomeJob {
         wrapper.gt(ChainAddressIncome::getCreateTime,System.currentTimeMillis()-24*60*60*1000);
         wrapper.eq(ChainAddressIncome::getEffective,1);
         wrapper.last("limit 10");
-        List<ChainAddressIncome> chainAddressIncomes = incomeMapper.selectList(wrapper);
+        List<ChainAddressIncome> chainAddressIncomes = chainAddressIncomeService.list(wrapper);
         log.info("重试调用充值订单:{}",chainAddressIncomes.size());
         if (CollectionUtils.isEmpty(chainAddressIncomes)){
             return;
@@ -51,9 +50,7 @@ public class IncomeJob {
         for (ChainAddressIncome chainAddressIncome : chainAddressIncomes) {
             log.info("重试调用充值订单:{}",chainAddressIncome.toString());
             CreateOrderVO createOrderVO = new CreateOrderVO();
-            LambdaQueryWrapper<ChainPoolAddress> pwrapper = Wrappers.lambdaQuery();
-            pwrapper.eq(ChainPoolAddress::getAddress,chainAddressIncome.getAddress());
-            ChainPoolAddress poolAddress = poolAddressMapper.selectOne(pwrapper);
+            ChainPoolAddress poolAddress = chainPoolAddressService.getByAddress(chainAddressIncome.getAddress());
             createOrderVO.setExchangeCurrency(chainAddressIncome.getCoinName());
             createOrderVO.setAccountId(poolAddress.getAssignedId());
             createOrderVO.setType(poolAddress.getAssignType());
@@ -80,7 +77,7 @@ public class IncomeJob {
                 }
             }
             chainAddressIncome.setSerial(orderId);
-            incomeMapper.updateById(chainAddressIncome);
+            chainAddressIncomeService.updateById(chainAddressIncome);
         }
 
     }

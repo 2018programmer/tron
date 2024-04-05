@@ -2,25 +2,23 @@ package com.dx.task;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.Constant;
 import com.dx.common.RedisUtil;
 import com.dx.entity.ChainAddressIncome;
 import com.dx.entity.ChainCoin;
 import com.dx.entity.ChainFlow;
 import com.dx.entity.ChainPoolAddress;
-import com.dx.mapper.ChainAddressIncomeMapper;
-import com.dx.mapper.ChainCoinMapper;
-import com.dx.mapper.ChainFlowMapper;
-import com.dx.mapper.ChainPoolAddressMapper;
 import com.dx.pojo.dto.ContactDTO;
 import com.dx.pojo.dto.GetCurrencyListDTO;
 import com.dx.pojo.vo.CreateOrderVO;
 import com.dx.service.ApiService;
 import com.dx.service.BasicService;
+import com.dx.service.iservice.IChainAddressIncomeService;
+import com.dx.service.iservice.IChainCoinService;
+import com.dx.service.iservice.IChainFlowService;
+import com.dx.service.iservice.IChainPoolAddressService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,19 +40,17 @@ public class MonitorJob {
     @Autowired
     private BasicService basicService;
     @Autowired
-    private ChainPoolAddressMapper poolAddressMapper;
-
+    private IChainPoolAddressService chainPoolAddressService;
     @Autowired
-    private ChainAddressIncomeMapper incomeMapper;
+    private IChainAddressIncomeService chainAddressIncomeService;
     @Autowired
-    private ChainCoinMapper coinMapper;
+    private IChainCoinService chainCoinService;
     @Autowired
     private PlatformTransactionManager transactionManager;
     @Autowired
     private ApiService apiService;
-
     @Autowired
-    private ChainFlowMapper flowMapper;
+    private IChainFlowService chainFlowService;
     @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
         var numRedis =0;
@@ -88,17 +84,15 @@ public class MonitorJob {
                 continue;
             }
             List<ContactDTO> list = JSONUtil.toList(tron, ContactDTO.class);
-            LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
-            List<ChainPoolAddress> chainPoolAddresses = poolAddressMapper.selectList(wrapper);
+            List<ChainPoolAddress> chainPoolAddresses = chainPoolAddressService.list();
             DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
 //            defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             TransactionStatus status = transactionManager.getTransaction(defaultTransactionDefinition);
             try {
 
                 for (ContactDTO contactDTO : list) {
-                    LambdaQueryWrapper<ChainFlow> fwrapper = Wrappers.lambdaQuery();
-                    fwrapper.eq(ChainFlow::getTxId,contactDTO.getTxId());
-                    List<ChainFlow> chainFlows = flowMapper.selectList(fwrapper);
+
+                    List<ChainFlow> chainFlows = chainFlowService.getByTxId(contactDTO.getTxId());
                     if(CollectionUtils.isNotEmpty(chainFlows)){
                         continue;
                     }
@@ -114,9 +108,7 @@ public class MonitorJob {
                     chainAddressIncome.setFromAddress(contactDTO.getFromAddress());
                     chainAddressIncome.setAddress(chainPoolAddress.getAddress());
                     chainAddressIncome.setCreateTime(System.currentTimeMillis());
-                    LambdaQueryWrapper<ChainCoin> coinwrapper = Wrappers.lambdaQuery();
-                    coinwrapper.eq(ChainCoin::getCoinCode,contactDTO.getCoinCode());
-                    ChainCoin chainCoin = coinMapper.selectOne(coinwrapper);
+                    ChainCoin chainCoin = chainCoinService.getCoinByCode(contactDTO.getCoinCode());
                     chainAddressIncome.setNetName(chainCoin.getNetName());
                     chainAddressIncome.setTxId(contactDTO.getTxId());
                     List<GetCurrencyListDTO> currencyList = apiService.getCurrencyList();
@@ -193,8 +185,8 @@ public class MonitorJob {
                         chainAddressIncome.setEffective(0);
                     }
                     chainAddressIncome.setOrderLog(reason.toJSONString());
-                    flowMapper.insert(chainFlow);
-                    incomeMapper.insert(chainAddressIncome);
+                    chainFlowService.save(chainFlow);
+                    chainAddressIncomeService.save(chainAddressIncome);
                 }
                 // 提交事务
                 redisUtil.increment(Constant.RedisKey.HITCOUNTER, 1);

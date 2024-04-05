@@ -1,18 +1,12 @@
 package com.dx.task;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.common.NetEnum;
 import com.dx.entity.*;
-import com.dx.mapper.*;
 import com.dx.service.BasicService;
-import com.dx.service.iservice.IChainCoinService;
-import com.dx.service.iservice.IChainGatherDetailService;
-import com.dx.service.iservice.IChainGatherTaskService;
-import com.dx.service.iservice.IChainPoolAddressService;
+import com.dx.service.iservice.*;
 import com.dx.service.other.OperateService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +32,6 @@ public class GatherJob {
     private OperateService operateService;
     @Autowired
     private IChainGatherTaskService chainGatherTaskService;
-
     @Autowired
     private IChainPoolAddressService chainPoolAddressService;
     @Autowired
@@ -46,32 +39,25 @@ public class GatherJob {
     @Autowired
     private IChainCoinService chainCoinService;
     @Autowired
-    private ChainFlowMapper flowMapper;
-
+    private IChainFlowService chainFlowService;
     @Autowired
     private PlatformTransactionManager transactionManager;
     @Autowired
-    private ChainNetMapper netMapper;
+    private IChainNetService chainNetService;
     @Autowired
-    private ChainHotWalletMapper hotWalletMapper;
+    private IChainHotWalletService chainHotWalletService;
     @Autowired
-    private ChainAssetsMapper assetsMapper;
+    private IChainAssetsService chainAssetsService;
 
     @XxlJob("autoGather")
     public void autoGather(){
-        LambdaQueryWrapper<ChainNet> nwrapper = Wrappers.lambdaQuery();
-        nwrapper.eq(ChainNet::getRunningStatus,1);
-        List<ChainNet> chainNets = netMapper.selectList(nwrapper);
+        List<ChainNet> chainNets = chainNetService.getRunningNets();
         for (ChainNet chainNet : chainNets) {
             ChainGatherTask chainGatherTask = chainGatherTaskService.getRunningTask(NetEnum.TRON.getNetName());
             if(ObjectUtils.isNull(chainGatherTask)){
                 continue;
             }
-            LambdaQueryWrapper<ChainHotWallet> hotwrapper = Wrappers.lambdaQuery();
-            hotwrapper.eq(ChainHotWallet::getNetName,chainNet.getNetName());
-            hotwrapper.eq(ChainHotWallet::getRunningStatus,1);
-            List<ChainHotWallet> chainHotWallets = hotWalletMapper.selectList(hotwrapper);
-
+            List<ChainHotWallet> chainHotWallets = chainHotWalletService.getOnHotWalletList(chainNet.getNetName());
             if(CollectionUtils.isEmpty(chainHotWallets)){
                 continue;
             }
@@ -81,7 +67,8 @@ public class GatherJob {
             List<ChainCoin> chainCoins = chainCoinService.getByNet(chainNet.getNetName());
             ChainCoin base = chainCoins.stream().filter(o -> o.getCoinType().equals("base")).collect(Collectors.toList()).get(0);
             //获取资产表
-            List<ChainAssets> assets = assetsMapper.getHaveAssets(chainHotWallet.getNetName(), null,1);
+            List<ChainAssets> assets = chainAssetsService.getHaveAssets(chainHotWallet.getNetName(), null,1);
+
             if(CollectionUtils.isEmpty(assets)){
                 continue;
             }
@@ -201,7 +188,7 @@ public class GatherJob {
                     nowTask.setFeeAmount(nowTask.getFeeAmount().add(jsonObject.getBigDecimal("fee")));
                     nowTask.setFeeAddress(jsonObject.getString("feeAddress"));
                     if("base".equals(transCoin.getCoinType())){
-                        flowMapper.insert(gatherFlow);
+                        chainFlowService.save(gatherFlow);
                         nowTask.setGatherStatus(3);
                         nowTask.setGatherStage(3);
                         nowTask.setFinishTime(System.currentTimeMillis());
@@ -209,7 +196,7 @@ public class GatherJob {
                     }else {
                         String result = json.getJSONObject("receipt").getString("result");
                         if("SUCCESS".equals(result)){
-                            flowMapper.insert(gatherFlow);
+                            chainFlowService.save(gatherFlow);
                             nowTask.setGatherStatus(3);
                             nowTask.setGatherStage(3);
                             nowTask.setFinishTime(System.currentTimeMillis());

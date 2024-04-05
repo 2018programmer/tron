@@ -8,6 +8,8 @@ import com.dx.mapper.ChainFlowMapper;
 import com.dx.service.iservice.IChainFlowService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ChainFlowServiceImpl extends ServiceImpl<ChainFlowMapper, ChainFlow> implements IChainFlowService {
     @Override
@@ -27,5 +29,12 @@ public class ChainFlowServiceImpl extends ServiceImpl<ChainFlowMapper, ChainFlow
         wrapper.eq(ChainFlow::getAddress,address);
         wrapper.eq(ChainFlow::getFlowWay,4);
         return count(wrapper);
+    }
+
+    @Override
+    public List<ChainFlow> getByTxId(String txId) {
+        LambdaQueryWrapper<ChainFlow> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainFlow::getTxId,txId);
+        return list(wrapper);
     }
 }
