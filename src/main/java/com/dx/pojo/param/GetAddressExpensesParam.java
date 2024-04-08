@@ -1,4 +1,4 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import com.dx.common.PageVO;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class GetAddressExpensesVO extends PageVO implements Serializable {
+public class GetAddressExpensesParam extends PageVO implements Serializable {
     /**
      *  状态 1 等待中 2处理中 3异常 4已完成
      */

@@ -1,11 +1,11 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class CreateOrderVO {
+public class CreateOrderParam {
     /**
      * 币种名称
      */
@@ -38,4 +38,8 @@ public class CreateOrderVO {
      * 交易id
      */
     private String tranId;
+    /**
+     * 三方订单号
+     */
+    private String tradeOrderId;
 }

@@ -2,7 +2,7 @@ package com.dx.controller;
 
 import com.dx.common.Result;
 import com.dx.pojo.dto.AssetHotDTO;
-import com.dx.pojo.vo.FreezeBalanceVO;
+import com.dx.pojo.param.FreezeBalanceParam;
 import com.dx.service.AssetsService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class ChainAssetsController {
      * 冷却热钱包
      */
     @PostMapping("/hot-wallet/balance/freeze")
-    public Result freezeHotBalance(@RequestBody FreezeBalanceVO vo){
+    public Result freezeHotBalance(@RequestBody FreezeBalanceParam vo){
         return assetsService.freezeHotBalance(vo);
 
     }
@@ -42,7 +42,7 @@ public class ChainAssetsController {
      * 冷却矿工费钱包
      */
     @PostMapping("/fee-wallet/balance/freeze")
-    public Result freezeBalance(@RequestBody FreezeBalanceVO vo){
+    public Result freezeBalance(@RequestBody FreezeBalanceParam vo){
         return assetsService.freezeFeeBalance(vo);
 
     }

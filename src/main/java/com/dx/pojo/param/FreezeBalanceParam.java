@@ -1,4 +1,4 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class FreezeBalanceVO implements Serializable {
+public class FreezeBalanceParam implements Serializable {
     /**
      * 钱包id
      */

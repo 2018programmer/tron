@@ -6,9 +6,9 @@ import com.dx.common.Result;
 import com.dx.pojo.dto.GetGatherDetailsDTO;
 import com.dx.pojo.dto.GetGatherTasksDTO;
 import com.dx.service.GatherService;
-import com.dx.pojo.vo.GetGatherDetailsVO;
-import com.dx.pojo.vo.GetGatherTasksVO;
-import com.dx.pojo.vo.ManualGatherVO;
+import com.dx.pojo.param.GetGatherDetailsParam;
+import com.dx.pojo.param.GetGatherTasksParam;
+import com.dx.pojo.param.ManualGatherParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,7 @@ public class ChainGatherController {
      * @return
      */
     @PostMapping("/manual")
-    public Result manualGather(@RequestBody ManualGatherVO vo){
+    public Result manualGather(@RequestBody ManualGatherParam vo){
         return gatherService.manualGather(vo);
     }
 
@@ -37,7 +37,7 @@ public class ChainGatherController {
      * @return
      */
     @GetMapping("/task/list/get")
-    public Result<IPage<GetGatherTasksDTO>> getGatherTasks(GetGatherTasksVO vo){
+    public Result<IPage<GetGatherTasksDTO>> getGatherTasks(GetGatherTasksParam vo){
         return gatherService.getGatherTasks(vo);
     }
 
@@ -45,7 +45,7 @@ public class ChainGatherController {
      * 获取归集任务明细
      */
     @GetMapping("/task/detail/list/get")
-    public Result<GetGatherDetailsDTO> getGatherDetails(GetGatherDetailsVO vo){
+    public Result<GetGatherDetailsDTO> getGatherDetails(GetGatherDetailsParam vo){
         return gatherService.getGatherDetails(vo);
     }
 

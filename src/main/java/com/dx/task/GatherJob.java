@@ -164,13 +164,11 @@ public class GatherJob {
                     Thread.sleep(4000);
                     //解析记录 更新流水 和子任务
                     JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
-
-//                    BigDecimal num6 = new BigDecimal("1000000");
-//                    BigDecimal gatherFee =BigDecimal.ZERO;
-//                    if(json.containsKey("fee")) {
-//                        String fee = json.getString("fee");
-//                        gatherFee = new BigDecimal(fee).divide(num6, 6, RoundingMode.FLOOR);
-//                    }
+                    if(json.isEmpty()){
+                        Thread.sleep(2000);
+                        //解析记录 更新流水 和子任务
+                        json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
+                    }
                     ChainFlow gatherFlow = new ChainFlow();
                     gatherFlow.setNetName("TRON");
                     gatherFlow.setWalletType(3);

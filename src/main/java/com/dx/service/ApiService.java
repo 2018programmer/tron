@@ -8,7 +8,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.dx.common.Constant;
 import com.dx.common.Result;
 import com.dx.pojo.dto.GetCurrencyListDTO;
-import com.dx.pojo.vo.CreateOrderVO;
+import com.dx.pojo.param.CreateOrderParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class ApiService {
     @Value("${trade.url}")
     private String tradeUrl;
 
-    public JSONObject createOrder(CreateOrderVO vo){
+    public JSONObject createOrder(CreateOrderParam vo){
 
         String body = HttpRequest.post(orderUrl + Constant.OrderUrl.CREATEORDER).body(JSON.toJSONString(vo)).execute().body();
         log.info("创建充值订单返回参数:{}",body);

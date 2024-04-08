@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.entity.ChainAddressExpenses;
 import com.dx.entity.ChainAddressIncome;
-import com.dx.pojo.vo.ConfirmOrderVO;
-import com.dx.pojo.vo.GetAddressExpensesVO;
-import com.dx.pojo.vo.GetAddressIncomeVO;
+import com.dx.pojo.param.ConfirmOrderParam;
+import com.dx.pojo.param.GetAddressExpensesParam;
+import com.dx.pojo.param.GetAddressIncomeParam;
 import com.dx.service.TranferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class ChainTransferController {
      * 获取收款监听列表
      */
     @GetMapping("/income/list/get")
-    public Result<IPage<ChainAddressIncome>> getAddressIncome(GetAddressIncomeVO vo){
+    public Result<IPage<ChainAddressIncome>> getAddressIncome(GetAddressIncomeParam vo){
         return transferService.getAddressIncome(vo);
     }
 
@@ -32,7 +32,7 @@ public class ChainTransferController {
      * 获取出款列表
      */
     @GetMapping("/expenses/list/get")
-    public Result<IPage<ChainAddressExpenses>> getAddressExpenses(GetAddressExpensesVO vo){
+    public Result<IPage<ChainAddressExpenses>> getAddressExpenses(GetAddressExpensesParam vo){
         return transferService.getAddressExpenses(vo);
     }
 
@@ -51,7 +51,7 @@ public class ChainTransferController {
      * @return
      */
     @PostMapping("/income/confirm")
-    public Result  confirmOrder(@RequestBody ConfirmOrderVO vo){
+    public Result  confirmOrder(@RequestBody ConfirmOrderParam vo){
         return transferService.confirmOrder(vo);
     }
 }

@@ -140,7 +140,7 @@ public class HttpSerive {
         Boolean success = jsonObject.getBoolean("success");
         if(Objects.isNull(success)||false==success){
             log.info("获取区块信息失败");
-            throw new RuntimeException("获取区块信息失败");
+            return new JSONObject();
         }
         JSONObject result = jsonObject.getJSONObject("result");
         return result;

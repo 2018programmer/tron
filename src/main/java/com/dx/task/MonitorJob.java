@@ -6,19 +6,13 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.dx.common.Constant;
 import com.dx.common.RedisUtil;
-import com.dx.entity.ChainAddressIncome;
-import com.dx.entity.ChainCoin;
-import com.dx.entity.ChainFlow;
-import com.dx.entity.ChainPoolAddress;
+import com.dx.entity.*;
 import com.dx.pojo.dto.ContactDTO;
 import com.dx.pojo.dto.GetCurrencyListDTO;
-import com.dx.pojo.vo.CreateOrderVO;
+import com.dx.pojo.param.CreateOrderParam;
 import com.dx.service.ApiService;
 import com.dx.service.BasicService;
-import com.dx.service.iservice.IChainAddressIncomeService;
-import com.dx.service.iservice.IChainCoinService;
-import com.dx.service.iservice.IChainFlowService;
-import com.dx.service.iservice.IChainPoolAddressService;
+import com.dx.service.iservice.*;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +45,9 @@ public class MonitorJob {
     private ApiService apiService;
     @Autowired
     private IChainFlowService chainFlowService;
+
+    @Autowired
+    private IChainThirdOrderService chainThirdOrderService;
     @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
         var numRedis =0;
@@ -150,23 +147,43 @@ public class MonitorJob {
                         reason.put("success",false);
                         reason.put("reason","地址已删除");
                     }
+                    ChainThirdOrder chainThirdOrder=chainThirdOrderService.getByAddress(chainPoolAddress.getAddress());
+                    CreateOrderParam createOrderParam = new CreateOrderParam();
+                    createOrderParam.setExchangeCurrency(chainCoin.getCoinName());
+
+                    createOrderParam.setExchangeAmount(contactDTO.getAmount());
+                    createOrderParam.setFromAddr(contactDTO.getFromAddress());
+                    createOrderParam.setToAddr(contactDTO.getToAddress());
+                    createOrderParam.setTranId(contactDTO.getTxId());
+                    createOrderParam.setMainNet(1);
+                    if (chainPoolAddress.getAssignType()==4){
+                        if (Objects.isNull(chainThirdOrder)){
+                            reason.put("success",false);
+                            reason.put("reason","异常的第三方临时池地址");
+                        }else {
+                            if (chainThirdOrder.getUnbindTime()<System.currentTimeMillis()){
+                                reason.put("success",false);
+                                reason.put("reason","第三方订单超时");
+                            }else {
+                                String[] split = chainThirdOrder.getSerial().split(":");
+                                createOrderParam.setType(3);
+                                createOrderParam.setAccountId(split[0]);
+                                createOrderParam.setTradeOrderId(split[1]);
+                            }
+                        }
+
+                    }else {
+                        createOrderParam.setType(chainPoolAddress.getAssignType());
+                        createOrderParam.setAccountId(chainPoolAddress.getAssignedId());
+                    }
                     if(reason.getBoolean("success")){
                         chainAddressIncome.setEffective(1);
                         //创建充值订单
-                        CreateOrderVO createOrderVO = new CreateOrderVO();
-                        createOrderVO.setExchangeCurrency(chainCoin.getCoinName());
-                        createOrderVO.setAccountId(chainPoolAddress.getAssignedId());
-                        createOrderVO.setType(chainPoolAddress.getAssignType());
-                        createOrderVO.setExchangeAmount(contactDTO.getAmount());
-                        createOrderVO.setFromAddr(contactDTO.getFromAddress());
-                        createOrderVO.setToAddr(contactDTO.getToAddress());
-                        createOrderVO.setTranId(contactDTO.getTxId());
-                        createOrderVO.setMainNet(1);
-                        log.info("充值订单请求参数:{}",createOrderVO);
+                        log.info("充值订单请求参数:{}", createOrderParam);
                         //新建进程调用创建订单
                         String orderId=null;
                         try{
-                            JSONObject jsonObject = apiService.createOrder(createOrderVO);
+                            JSONObject jsonObject = apiService.createOrder(createOrderParam);
                             Boolean success = jsonObject.getBoolean("success");
                             if (!Objects.isNull(success) && true == success) {
                                 orderId=jsonObject.getJSONObject("result").getString("orderId");

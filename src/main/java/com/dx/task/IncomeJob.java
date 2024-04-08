@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dx.entity.ChainAddressIncome;
 import com.dx.entity.ChainPoolAddress;
-import com.dx.pojo.vo.CreateOrderVO;
+import com.dx.pojo.param.CreateOrderParam;
 import com.dx.service.ApiService;
 import com.dx.service.iservice.IChainAddressIncomeService;
 import com.dx.service.iservice.IChainPoolAddressService;
@@ -49,20 +49,20 @@ public class IncomeJob {
         }
         for (ChainAddressIncome chainAddressIncome : chainAddressIncomes) {
             log.info("重试调用充值订单:{}",chainAddressIncome.toString());
-            CreateOrderVO createOrderVO = new CreateOrderVO();
+            CreateOrderParam createOrderParam = new CreateOrderParam();
             ChainPoolAddress poolAddress = chainPoolAddressService.getByAddress(chainAddressIncome.getAddress());
-            createOrderVO.setExchangeCurrency(chainAddressIncome.getCoinName());
-            createOrderVO.setAccountId(poolAddress.getAssignedId());
-            createOrderVO.setType(poolAddress.getAssignType());
-            createOrderVO.setExchangeAmount(chainAddressIncome.getAmount());
-            createOrderVO.setFromAddr(chainAddressIncome.getFromAddress());
-            createOrderVO.setToAddr(chainAddressIncome.getAddress());
-            createOrderVO.setTranId(chainAddressIncome.getTxId());
-            createOrderVO.setMainNet(1);
-            log.info("充值订单请求参数:{}",createOrderVO);
+            createOrderParam.setExchangeCurrency(chainAddressIncome.getCoinName());
+            createOrderParam.setAccountId(poolAddress.getAssignedId());
+            createOrderParam.setType(poolAddress.getAssignType());
+            createOrderParam.setExchangeAmount(chainAddressIncome.getAmount());
+            createOrderParam.setFromAddr(chainAddressIncome.getFromAddress());
+            createOrderParam.setToAddr(chainAddressIncome.getAddress());
+            createOrderParam.setTranId(chainAddressIncome.getTxId());
+            createOrderParam.setMainNet(1);
+            log.info("充值订单请求参数:{}", createOrderParam);
             String orderId = null;
             try{
-                JSONObject jsonObject = apiService.createOrder(createOrderVO);
+                JSONObject jsonObject = apiService.createOrder(createOrderParam);
                 chainAddressIncome.setOrderLog(jsonObject.toJSONString());
                 Boolean success = jsonObject.getBoolean("success");
                 if (!Objects.isNull(success) && true == success) {

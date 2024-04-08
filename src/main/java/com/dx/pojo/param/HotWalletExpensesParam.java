@@ -1,4 +1,4 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
-public class HotWalletExpensesVO implements Serializable {
+public class HotWalletExpensesParam implements Serializable {
     /**
      * 主网名称
      */

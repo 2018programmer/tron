@@ -7,7 +7,7 @@ import com.dx.common.Constant;
 import com.dx.common.Result;
 import com.dx.entity.*;
 import com.dx.pojo.dto.AssetHotDTO;
-import com.dx.pojo.vo.FreezeBalanceVO;
+import com.dx.pojo.param.FreezeBalanceParam;
 import com.dx.service.iservice.*;
 import com.dx.service.other.OperateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +79,7 @@ public class AssetsService {
         return result;
     }
 
-    public Result freezeHotBalance(FreezeBalanceVO vo) {
+    public Result freezeHotBalance(FreezeBalanceParam vo) {
         Result<Object> result = new Result<>();
         if(CollectionUtils.isEmpty(vo.getCoinCodeList())){
             result.error("未选择币种");
@@ -105,7 +105,7 @@ public class AssetsService {
 
     }
 
-    public Result freezeFeeBalance(FreezeBalanceVO vo) {
+    public Result freezeFeeBalance(FreezeBalanceParam vo) {
         Result<Object> result = new Result<>();
         ChainFeeWallet feeWallet = chainFeeWalletService.getById(vo.getId());
         ChainColdWallet coldWallet = chainColdWalletService.getByNet(feeWallet.getNetName());

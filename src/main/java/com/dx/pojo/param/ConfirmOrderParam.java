@@ -1,11 +1,11 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-public class ConfirmOrderVO implements Serializable {
+public class ConfirmOrderParam implements Serializable {
     /**
      * 交易id
      */

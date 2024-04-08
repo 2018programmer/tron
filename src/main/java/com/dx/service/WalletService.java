@@ -9,7 +9,7 @@ import com.dx.common.NetEnum;
 import com.dx.common.Result;
 import com.dx.entity.*;
 import com.dx.pojo.dto.*;
-import com.dx.pojo.vo.HotWalletExpensesVO;
+import com.dx.pojo.param.HotWalletExpensesParam;
 import com.dx.service.iservice.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -228,7 +228,7 @@ public class WalletService {
         return result;
     }
 
-    public Result<HotWalletExpensesDTO> hotWalletExpenses(HotWalletExpensesVO vo){
+    public Result<HotWalletExpensesDTO> hotWalletExpenses(HotWalletExpensesParam vo){
         log.info("出款参数为:{}"+vo.toString());
         Result<HotWalletExpensesDTO> result = new Result<>();
 

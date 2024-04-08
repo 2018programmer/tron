@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.entity.ChainCoin;
 import com.dx.pojo.dto.CoinDTO;
-import com.dx.pojo.vo.UpdateMinNumVO;
+import com.dx.pojo.param.UpdateMinNumParam;
 import com.dx.service.iservice.IChainCoinService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class CoinService {
 
     @Autowired
     private IChainCoinService chainCoinService;
-    public Result updateMinNum(UpdateMinNumVO vo){
+    public Result updateMinNum(UpdateMinNumParam vo){
         Result<Object> result = new Result<>();
         ChainCoin chainCoin = chainCoinService.getById(vo.getId());
         if(Objects.isNull(chainCoin)){

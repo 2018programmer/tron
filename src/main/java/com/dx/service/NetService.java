@@ -9,7 +9,7 @@ import com.dx.entity.ChainCoin;
 import com.dx.entity.ChainNet;
 import com.dx.pojo.dto.GetNetByNameDTO;
 import com.dx.pojo.dto.NetDTO;
-import com.dx.pojo.vo.UpdateNetStatusVO;
+import com.dx.pojo.param.UpdateNetStatusParam;
 import com.dx.service.iservice.IChainCoinService;
 import com.dx.service.iservice.IChainNetService;
 import org.springframework.beans.BeanUtils;
@@ -31,7 +31,7 @@ public class NetService {
     /**
      * 修改运行状态
      */
-    public Result  updateNetStatus(UpdateNetStatusVO vo){
+    public Result  updateNetStatus(UpdateNetStatusParam vo){
         Result<Object> result = new Result<>();
         LambdaUpdateWrapper<ChainNet> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(ChainNet::getNetName,vo.getNetName());

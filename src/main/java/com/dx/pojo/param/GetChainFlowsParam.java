@@ -1,4 +1,4 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import com.dx.common.PageVO;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class GetChainFlowsVO extends PageVO implements Serializable {
+public class GetChainFlowsParam extends PageVO implements Serializable {
 
     /**
      * 开始时间 时间戳

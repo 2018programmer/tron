@@ -1,4 +1,4 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import com.dx.common.PageVO;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class GetPoolManageVO extends PageVO implements Serializable {
+public class GetPoolManageParam extends PageVO implements Serializable {
     @NotNull
     private String netName;
 }

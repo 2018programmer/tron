@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.entity.ChainFlow;
 import com.dx.service.FlowService;
-import com.dx.pojo.vo.GetChainFlowsVO;
+import com.dx.pojo.param.GetChainFlowsParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +25,7 @@ public class ChainFlowController {
      * @param vo
      */
     @GetMapping("/list/get")
-    public Result<IPage<ChainFlow>> getChainFlows(GetChainFlowsVO vo){
+    public Result<IPage<ChainFlow>> getChainFlows(GetChainFlowsParam vo){
         return flowService.getChainFlows(vo);
     }
 }

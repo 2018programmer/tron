@@ -1,4 +1,4 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class GetUserAddressVO implements Serializable {
+public class GetUserAddressParam implements Serializable {
     /**
      * 类型 1 商户 2钱包用户 3商户用户
      */

@@ -3,7 +3,7 @@ package com.dx.controller;
 import com.dx.common.Result;
 import com.dx.pojo.dto.GetNetByNameDTO;
 import com.dx.pojo.dto.NetDTO;
-import com.dx.pojo.vo.UpdateNetStatusVO;
+import com.dx.pojo.param.UpdateNetStatusParam;
 import com.dx.service.NetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +51,7 @@ public class ChainNetController {
      */
     @PostMapping("/status/update")
     @ResponseBody
-    public Result updateNetStatus(@RequestBody UpdateNetStatusVO vo){
+    public Result updateNetStatus(@RequestBody UpdateNetStatusParam vo){
         return netService.updateNetStatus(vo);
     }
 

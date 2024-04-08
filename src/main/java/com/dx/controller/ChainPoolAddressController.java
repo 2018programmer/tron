@@ -3,7 +3,7 @@ package com.dx.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dx.common.Result;
 import com.dx.pojo.dto.*;
-import com.dx.pojo.vo.*;
+import com.dx.pojo.param.*;
 import com.dx.service.PoolAddressService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class ChainPoolAddressController {
      * 获取地址池的地址明细
      */
     @PostMapping ("/info/list/get")
-    public Result<IPage<PoolAddressDTO>> getPoolAddress(@RequestBody QueryPoolAddressVO vo){
+    public Result<IPage<PoolAddressDTO>> getPoolAddress(@RequestBody QueryPoolAddressParam vo){
         return poolService.getPoolAddress(vo);
     }
     /**
@@ -40,7 +40,7 @@ public class ChainPoolAddressController {
      * 获取地址池管理明细
      */
     @GetMapping("/manage/list/get")
-    public Result<IPage<CoinManageDTO>> getPoolManage(GetPoolManageVO vo){
+    public Result<IPage<CoinManageDTO>> getPoolManage(GetPoolManageParam vo){
         return poolService.getPoolManage(vo.getNetName(),vo.getPageNum(),vo.getPageSize());
     }
 
@@ -48,7 +48,7 @@ public class ChainPoolAddressController {
      * 修改归集阀值
      */
     @PostMapping("/manage/update")
-    public Result updatePoolManage(@RequestBody UpdatePoolManageVO vo){
+    public Result updatePoolManage(@RequestBody UpdatePoolManageParam vo){
         return poolService.updatePoolManage(vo);
     }
 
@@ -65,7 +65,7 @@ public class ChainPoolAddressController {
      * @return
      */
     @PostMapping("/user-address/get")
-    public Result getUserAddress( @Validated  @RequestBody GetUserAddressVO vo){
+    public Result getUserAddress( @Validated  @RequestBody GetUserAddressParam vo){
         return poolService.matchUserAddress(vo);
     }
     /**
@@ -76,10 +76,29 @@ public class ChainPoolAddressController {
         return poolService.verifyAddress(address,netName,type);
     }
     /**
-     * 接触绑定地址
+     * 解除绑定地址
      */
     @PostMapping("/address/unbind")
-    public Result unbindAddress(@RequestBody UnbindAddressVO vo){
+    public Result unbindAddress(@RequestBody UnbindAddressParam vo){
         return poolService.unbindAddress(vo);
+    }
+
+    /**
+     * 绑定第三方订单临时池
+     * @return
+     */
+    @PostMapping("/third-order/bind")
+    public Result bindThirdOrder(@RequestBody BindThirdOrderParam param){
+        return  poolService.bindThirdOrder(param);
+    }
+
+
+    /**
+     * 添加临时池数量
+     * @return
+     */
+    @PostMapping("/third-order-address/add")
+    public Result addThirdOrderAddress(@RequestBody AddThirdOrderAddressParam param){
+        return  poolService.addThirdOrderAddress(param);
     }
 }

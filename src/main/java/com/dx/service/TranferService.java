@@ -10,9 +10,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.entity.ChainAddressExpenses;
 import com.dx.entity.ChainAddressIncome;
-import com.dx.pojo.vo.ConfirmOrderVO;
-import com.dx.pojo.vo.GetAddressExpensesVO;
-import com.dx.pojo.vo.GetAddressIncomeVO;
+import com.dx.pojo.param.ConfirmOrderParam;
+import com.dx.pojo.param.GetAddressExpensesParam;
+import com.dx.pojo.param.GetAddressIncomeParam;
 import com.dx.service.iservice.IChainAddressExpensesService;
 import com.dx.service.iservice.IChainAddressIncomeService;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class TranferService {
     private BasicService basicService;
 
 
-    public Result<IPage<ChainAddressIncome>> getAddressIncome(GetAddressIncomeVO vo) {
+    public Result<IPage<ChainAddressIncome>> getAddressIncome(GetAddressIncomeParam vo) {
         Result<IPage<ChainAddressIncome>> result = new Result<>();
         LambdaQueryWrapper<ChainAddressIncome> wrapper = Wrappers.lambdaQuery();
 
@@ -56,7 +56,7 @@ public class TranferService {
 
     }
 
-    public Result<IPage<ChainAddressExpenses>> getAddressExpenses(GetAddressExpensesVO vo) {
+    public Result<IPage<ChainAddressExpenses>> getAddressExpenses(GetAddressExpensesParam vo) {
         Result<IPage<ChainAddressExpenses>> result = new Result<>();
         LambdaQueryWrapper<ChainAddressExpenses> wrapper = Wrappers.lambdaQuery();
         if(StringUtils.isNotEmpty(vo.getSerial())){
@@ -96,7 +96,7 @@ public class TranferService {
         return result;
     }
 
-    public Result confirmOrder(ConfirmOrderVO vo) {
+    public Result confirmOrder(ConfirmOrderParam vo) {
         Result<Object> result = new Result<>();
         return result;
     }

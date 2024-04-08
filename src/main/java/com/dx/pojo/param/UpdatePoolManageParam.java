@@ -1,4 +1,4 @@
-package com.dx.pojo.vo;
+package com.dx.pojo.param;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
-public class UpdatePoolManageVO implements Serializable {
+public class UpdatePoolManageParam implements Serializable {
     /**
      * 币种编码
      */

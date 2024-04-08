@@ -15,9 +15,9 @@ import com.dx.pojo.dto.GatherTotalDTO;
 import com.dx.pojo.dto.GetGatherDetailDTO;
 import com.dx.pojo.dto.GetGatherDetailsDTO;
 import com.dx.pojo.dto.GetGatherTasksDTO;
-import com.dx.pojo.vo.GetGatherDetailsVO;
-import com.dx.pojo.vo.GetGatherTasksVO;
-import com.dx.pojo.vo.ManualGatherVO;
+import com.dx.pojo.param.GetGatherDetailsParam;
+import com.dx.pojo.param.GetGatherTasksParam;
+import com.dx.pojo.param.ManualGatherParam;
 import com.dx.service.iservice.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -53,7 +53,7 @@ public class GatherService {
     private IChainAssetsService chainAssetsService;
 
 
-    public Result manualGather(ManualGatherVO vo) {
+    public Result manualGather(ManualGatherParam vo) {
         Result<Object> result = new Result<>();
 
         ChainGatherTask chainGatherTask = chainGatherTaskService.getRunningTask(vo.getNetName());
@@ -104,7 +104,7 @@ public class GatherService {
     }
 
 
-    public Result<IPage<GetGatherTasksDTO>> getGatherTasks(GetGatherTasksVO vo) {
+    public Result<IPage<GetGatherTasksDTO>> getGatherTasks(GetGatherTasksParam vo) {
         Result<IPage<GetGatherTasksDTO>> result = new Result<>();
         LambdaQueryWrapper<ChainGatherTask> wrapper = Wrappers.lambdaQuery();
         if(ObjectUtils.isNotNull(vo.getBeginTime())){
@@ -134,7 +134,7 @@ public class GatherService {
         return result;
     }
 
-    public Result<GetGatherDetailsDTO> getGatherDetails(GetGatherDetailsVO vo) {
+    public Result<GetGatherDetailsDTO> getGatherDetails(GetGatherDetailsParam vo) {
         Result<GetGatherDetailsDTO> result = new Result<>();
         GetGatherDetailsDTO getGatherDetailsDTO = new GetGatherDetailsDTO();
         ChainGatherTask chainGatherTask = chainGatherTaskService.getById(vo.getId());

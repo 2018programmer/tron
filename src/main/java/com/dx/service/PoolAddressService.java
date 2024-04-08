@@ -11,10 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dx.common.Result;
 import com.dx.entity.*;
 import com.dx.pojo.dto.*;
-import com.dx.pojo.vo.GetUserAddressVO;
-import com.dx.pojo.vo.QueryPoolAddressVO;
-import com.dx.pojo.vo.UnbindAddressVO;
-import com.dx.pojo.vo.UpdatePoolManageVO;
+import com.dx.pojo.param.*;
 import com.dx.service.iservice.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -44,6 +41,9 @@ public class PoolAddressService {
     private IChainAssetsService chainAssetsService;
     @Autowired
     private ApiService apiService;
+
+    @Autowired
+    private IChainThirdOrderService chainThirdOrderService;
     public Result<IPage<CoinManageDTO>> getPoolManage(String netName,Integer pageNum,Integer pageSize) {
         Result<IPage<CoinManageDTO>> result = new Result<>();
         IPage<ChainCoin> page = new Page<>(pageNum,pageSize);
@@ -64,7 +64,7 @@ public class PoolAddressService {
         return result;
     }
 
-    public Result updatePoolManage(UpdatePoolManageVO vo) {
+    public Result updatePoolManage(UpdatePoolManageParam vo) {
         Result<Object> result = new Result<>();
         ChainCoin chainCoin = chainCoinService.getCoinByCode(vo.getCoinCode());
         LambdaQueryWrapper<ChainCoin> wrapper = Wrappers.lambdaQuery();
@@ -108,7 +108,7 @@ public class PoolAddressService {
         return  result;
     }
 
-    public Result<IPage<PoolAddressDTO>> getPoolAddress(QueryPoolAddressVO vo) {
+    public Result<IPage<PoolAddressDTO>> getPoolAddress(QueryPoolAddressParam vo) {
         Result<IPage<PoolAddressDTO>> result = new Result<>();
 
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
@@ -201,7 +201,7 @@ public class PoolAddressService {
     }
 
 
-    public Result matchUserAddress(GetUserAddressVO vo) {
+    public Result matchUserAddress(GetUserAddressParam vo) {
         Result<Object> result = new Result<>();
 
         List<ChainPoolAddress> chainPoolAddresses = chainPoolAddressService.getByAssigned(vo.getAssignedId(),vo.getAssignType(),vo.getNetName());
@@ -248,8 +248,43 @@ public class PoolAddressService {
 
     }
 
-    public Result unbindAddress(UnbindAddressVO vo) {
+    public Result unbindAddress(UnbindAddressParam vo) {
         chainPoolAddressService.unbindAddress(vo.getAddress());
         return Result.ok();
+    }
+
+    public Result bindThirdOrder(BindThirdOrderParam param) {
+        Result<Object> result = new Result<>();
+        List<ChainThirdOrder> list =chainThirdOrderService.getAvailableAddress(param.getNetName());
+        if (CollectionUtils.isEmpty(list)){
+            return result.error("暂时没有可用地址,请添加");
+        }
+        ChainThirdOrder chainThirdOrder = list.get(0);
+        long curr = System.currentTimeMillis();
+        chainThirdOrder.setBindTime(curr);
+        chainThirdOrder.setSerial(param.getMerchantId()+":"+param.getThirdSerial());
+        chainThirdOrder.setUnbindTime(curr+30*60*1000+30*1000);
+        chainThirdOrderService.updateById(chainThirdOrder);
+        return result;
+    }
+
+    public Result addThirdOrderAddress(AddThirdOrderAddressParam param){
+        Result<Object> result = new Result<>();
+        JSONObject json = basicService.createAddressBynum(param.getNetName(), param.getNum());
+
+        List<ChainPoolAddress> list = JSON.parseArray(json.getString("list"), ChainPoolAddress.class);
+        for (ChainPoolAddress poolAddress : list) {
+            poolAddress.setCreateTime(System.currentTimeMillis());
+            poolAddress.setNetName(param.getNetName());
+            poolAddress.setIsActivated(0);
+            poolAddress.setIsAssigned(1);
+            poolAddress.setAssignType(4);
+            chainPoolAddressService.save(poolAddress);
+            ChainThirdOrder chainThirdOrder = new ChainThirdOrder();
+            chainThirdOrder.setAddress(poolAddress.getAddress());
+            chainThirdOrder.setNetName(param.getNetName());
+            chainThirdOrderService.save(chainThirdOrder);
+        }
+        return result;
     }
 }

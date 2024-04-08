@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
 public class ChainPoolAddress {
     @TableId(value = "id", type = IdType.AUTO)
@@ -31,7 +29,7 @@ public class ChainPoolAddress {
      */
     private Integer isActivated;
     /**
-     * 分配类型 0 无 1 商户 2钱包用户 3 商户用户
+     * 分配类型 0 无 1 商户 2钱包用户 3 商户用户  4  三方临时订单池
      */
     private Integer assignType;
     /**
