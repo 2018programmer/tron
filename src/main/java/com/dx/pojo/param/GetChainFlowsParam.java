@@ -34,4 +34,9 @@ public class GetChainFlowsParam extends PageVO implements Serializable {
      * 1充值 2提款 3矿工费 4 归集 5冷却
      */
     private Integer flowWay;
+
+    /**
+     * 流水组id
+     */
+    private String groupId;
 }

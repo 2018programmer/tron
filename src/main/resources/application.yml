@@ -1,11 +1,11 @@
 nacos:
-  discovery:
-    namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
-    group: ${NACOS_GROUP:DEFAULT_GROUP}
-    server-addr: ${NACOS_SERVER_ADDR:nacos-headless.wallet:8848}
-    username: ${NACOS_USERNAME:nacos}
-    password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
-    autoRegister: true
+  # discovery:
+  #   namespace: ${NACOS_NAMESPACE:5d0e7255-b3f2-46e5-b6ad-fcf3ff940c14}
+  #   group: ${NACOS_GROUP:DEFAULT_GROUP}
+  #   server-addr: ${NACOS_SERVER_ADDR:nacos-headless.wallet:8848}
+  #   username: ${NACOS_USERNAME:nacos}
+  #   password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}
+  #   autoRegister: true
   config:
     username: ${NACOS_USERNAME:nacos}
     password: ${NACOS_PASSWORD:jgPX7rWDLyL3N7Q3TJ7Ky6opm65LVST9}

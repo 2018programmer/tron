@@ -11,6 +11,7 @@ import com.dx.pojo.param.GetChainFlowsParam;
 import com.dx.service.iservice.IChainFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class FlowService {
@@ -35,6 +36,10 @@ public class FlowService {
         }
         if(ObjectUtils.isNotNull(vo.getEndTime())){
             wrapper.le(ChainFlow::getCreateTime,vo.getEndTime());
+        }
+        //流水组id
+        if (StringUtils.hasLength(vo.getGroupId())){
+            wrapper.eq(ChainFlow::getGroupId,vo.getGroupId());
         }
         wrapper.orderByDesc(ChainFlow::getId);
         IPage<ChainFlow> page = new Page<>(vo.getPageNum(), vo.getPageSize());
