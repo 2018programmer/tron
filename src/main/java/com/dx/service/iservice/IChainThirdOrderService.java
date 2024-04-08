@@ -9,4 +9,6 @@ public interface IChainThirdOrderService extends IService<ChainThirdOrder> {
     List<ChainThirdOrder> getAvailableAddress(String netName);
 
     ChainThirdOrder getByAddress(String address);
+
+    void cancelSameBind(String merchantId, String thirdSerial, String address);
 }

@@ -255,16 +255,19 @@ public class PoolAddressService {
 
     public Result bindThirdOrder(BindThirdOrderParam param) {
         Result<Object> result = new Result<>();
+
+
         List<ChainThirdOrder> list =chainThirdOrderService.getAvailableAddress(param.getNetName());
         if (CollectionUtils.isEmpty(list)){
             return result.error("暂时没有可用地址,请添加");
         }
         ChainThirdOrder chainThirdOrder = list.get(0);
         long curr = System.currentTimeMillis();
-        chainThirdOrder.setBindTime(curr);
         chainThirdOrder.setSerial(param.getMerchantId()+":"+param.getThirdSerial());
         chainThirdOrder.setUnbindTime(curr+30*60*1000+30*1000);
         chainThirdOrderService.updateById(chainThirdOrder);
+        //取消之前的绑定
+        chainThirdOrderService.cancelSameBind(param.getMerchantId(),param.getThirdSerial(),chainThirdOrder.getAddress());
         return result;
     }
 

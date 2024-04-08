@@ -21,15 +21,7 @@ public class ChainThirdOrder {
      */
     private String serial;
     /**
-     * 绑定时间
-     */
-    private Long bindTime;
-    /**
      * 解绑时间
      */
     private Long unbindTime;
-    /**
-     * 有效最小金额
-     */
-//    private BigDecimal amount;
 }

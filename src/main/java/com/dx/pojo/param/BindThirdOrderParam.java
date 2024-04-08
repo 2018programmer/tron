@@ -14,8 +14,8 @@ public class BindThirdOrderParam implements Serializable {
      * 商户id
      */
     private String merchantId;
-
     /**
+
      * 主网
      */
     private String netName;
