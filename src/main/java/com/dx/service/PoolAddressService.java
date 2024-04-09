@@ -41,9 +41,6 @@ public class PoolAddressService {
     private IChainAssetsService chainAssetsService;
     @Autowired
     private ApiService apiService;
-
-    @Autowired
-    private IChainThirdOrderService chainThirdOrderService;
     public Result<IPage<CoinManageDTO>> getPoolManage(String netName,Integer pageNum,Integer pageSize) {
         Result<IPage<CoinManageDTO>> result = new Result<>();
         IPage<ChainCoin> page = new Page<>(pageNum,pageSize);
