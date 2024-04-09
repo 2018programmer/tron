@@ -302,9 +302,18 @@ public class WalletService {
         try{
             Thread.sleep(4000);
         }catch (Exception e){
+            log.info(e.getMessage());
         }
-
         JSONObject json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
+        if(json.isEmpty()){
+            try{
+                Thread.sleep(2000);
+            }catch (Exception e){
+                log.info(e.getMessage());
+            }
+            //解析记录 更新流水 和子任务
+            json = basicService.gettransactioninfo(NetEnum.TRON.getNetName(), txId);
+        }
         BigDecimal num6 = new BigDecimal("1000000");
         BigDecimal gatherFee =BigDecimal.ZERO;
         if(json.containsKey("fee")) {
