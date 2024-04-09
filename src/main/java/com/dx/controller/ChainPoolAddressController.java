@@ -68,6 +68,15 @@ public class ChainPoolAddressController {
     public Result getUserAddress( @Validated  @RequestBody GetUserAddressParam vo){
         return poolService.matchUserAddress(vo);
     }
+
+    /**
+     * 获取一个扫码支付的地址
+     * @return
+     */
+    @PostMapping("/scan-address/get")
+    public Result<List<GetScanAddressDTO>> getScanAddress(){
+        return poolService.getScanAddress();
+    }
     /**
      * 检验地址是否在地址池中 type 1:只检验地址格式是否正确 2:都检验
      */
@@ -76,29 +85,17 @@ public class ChainPoolAddressController {
         return poolService.verifyAddress(address,netName,type);
     }
     /**
-     * 解除绑定地址
+     * 解除绑定地址(删除地址)
      */
     @PostMapping("/address/unbind")
+    public Result deleteAddress(@RequestBody UnbindAddressParam vo){
+        return poolService.deleteAddress(vo);
+    }
+    /**
+     * 解除绑定地址(解除绑定关系)
+     */
+    @PostMapping("/address/unbind-delete")
     public Result unbindAddress(@RequestBody UnbindAddressParam vo){
         return poolService.unbindAddress(vo);
-    }
-
-    /**
-     * 绑定第三方订单临时池
-     * @return
-     */
-    @PostMapping("/third-order/bind")
-    public Result bindThirdOrder(@RequestBody BindThirdOrderParam param){
-        return  poolService.bindThirdOrder(param);
-    }
-
-
-    /**
-     * 添加临时池数量
-     * @return
-     */
-    @PostMapping("/third-order-address/add")
-    public Result addThirdOrderAddress(@RequestBody AddThirdOrderAddressParam param){
-        return  poolService.addThirdOrderAddress(param);
     }
 }

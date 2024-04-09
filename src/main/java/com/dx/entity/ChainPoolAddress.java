@@ -41,7 +41,7 @@ public class ChainPoolAddress {
      */
     private String assignedId;
     /**
-     * 业务解绑 0 未解绑 1 已解绑
+     * 业务删除 0 未删除 1 已删除
      */
     private Integer isDelete;
 }

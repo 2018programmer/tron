@@ -248,46 +248,38 @@ public class PoolAddressService {
 
     }
 
+    public Result deleteAddress(UnbindAddressParam vo) {
+        chainPoolAddressService.deleteAddress(vo.getAddress());
+        return Result.ok();
+    }
+
     public Result unbindAddress(UnbindAddressParam vo) {
+
         chainPoolAddressService.unbindAddress(vo.getAddress());
         return Result.ok();
     }
 
-    public Result bindThirdOrder(BindThirdOrderParam param) {
-        Result<Object> result = new Result<>();
-
-
-        List<ChainThirdOrder> list =chainThirdOrderService.getAvailableAddress(param.getNetName());
-        if (CollectionUtils.isEmpty(list)){
-            return result.error("暂时没有可用地址,请添加");
+    public Result<List<GetScanAddressDTO>> getScanAddress() {
+        Result<List<GetScanAddressDTO>> result = new Result<>();
+        List<GetScanAddressDTO> dtoList = new ArrayList<>();
+        //遍历主网
+        List<ChainNet> list = chainNetService.list();
+        if(CollectionUtils.isEmpty(list)){
+            return result;
         }
-        ChainThirdOrder chainThirdOrder = list.get(0);
-        long curr = System.currentTimeMillis();
-        chainThirdOrder.setSerial(param.getMerchantId()+":"+param.getThirdSerial());
-        chainThirdOrder.setUnbindTime(curr+30*60*1000+30*1000);
-        chainThirdOrderService.updateById(chainThirdOrder);
-        //取消之前的绑定
-        chainThirdOrderService.cancelSameBind(param.getMerchantId(),param.getThirdSerial(),chainThirdOrder.getAddress());
-        return result;
-    }
-
-    public Result addThirdOrderAddress(AddThirdOrderAddressParam param){
-        Result<Object> result = new Result<>();
-        JSONObject json = basicService.createAddressBynum(param.getNetName(), param.getNum());
-
-        List<ChainPoolAddress> list = JSON.parseArray(json.getString("list"), ChainPoolAddress.class);
-        for (ChainPoolAddress poolAddress : list) {
-            poolAddress.setCreateTime(System.currentTimeMillis());
-            poolAddress.setNetName(param.getNetName());
-            poolAddress.setIsActivated(0);
+        for (ChainNet chainNet : list) {
+            List<ChainPoolAddress> noAssignedAddress = chainPoolAddressService.getNoAssignedAddress(chainNet.getNetName());
+            ChainPoolAddress poolAddress = noAssignedAddress.get(0);
+            GetScanAddressDTO getScanAddressDTO = new GetScanAddressDTO();
+            getScanAddressDTO.setAddress(poolAddress.getAddress());
+            getScanAddressDTO.setNetName(chainNet.getNetName());
+            getScanAddressDTO.setNetDispalyName(chainNet.getDisplayName());
             poolAddress.setIsAssigned(1);
             poolAddress.setAssignType(4);
-            chainPoolAddressService.save(poolAddress);
-            ChainThirdOrder chainThirdOrder = new ChainThirdOrder();
-            chainThirdOrder.setAddress(poolAddress.getAddress());
-            chainThirdOrder.setNetName(param.getNetName());
-            chainThirdOrderService.save(chainThirdOrder);
+            chainPoolAddressService.updateById(poolAddress);
+            dtoList.add(getScanAddressDTO);
         }
+        result.setResult(dtoList);
         return result;
     }
 }

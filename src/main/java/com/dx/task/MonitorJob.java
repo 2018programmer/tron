@@ -45,9 +45,6 @@ public class MonitorJob {
     private ApiService apiService;
     @Autowired
     private IChainFlowService chainFlowService;
-
-    @Autowired
-    private IChainThirdOrderService chainThirdOrderService;
     @XxlJob("monitorTransferTRON")
     public void monitorTransferTRON()  {
         var numRedis =0;
@@ -147,7 +144,7 @@ public class MonitorJob {
                         reason.put("success",false);
                         reason.put("reason","地址已删除");
                     }
-                    ChainThirdOrder chainThirdOrder=chainThirdOrderService.getByAddress(chainPoolAddress.getAddress());
+
                     CreateOrderParam createOrderParam = new CreateOrderParam();
                     createOrderParam.setExchangeCurrency(chainCoin.getCoinName());
 
@@ -156,26 +153,8 @@ public class MonitorJob {
                     createOrderParam.setToAddr(contactDTO.getToAddress());
                     createOrderParam.setTranId(contactDTO.getTxId());
                     createOrderParam.setMainNet(1);
-                    if (chainPoolAddress.getAssignType()==4){
-                        if (Objects.isNull(chainThirdOrder)){
-                            reason.put("success",false);
-                            reason.put("reason","异常的第三方临时池地址");
-                        }else {
-                            if (chainThirdOrder.getUnbindTime()<System.currentTimeMillis()){
-                                reason.put("success",false);
-                                reason.put("reason","第三方订单超时");
-                            }else {
-                                String[] split = chainThirdOrder.getSerial().split(":");
-                                createOrderParam.setType(3);
-                                createOrderParam.setAccountId(split[0]);
-                                createOrderParam.setTradeOrderId(split[1]);
-                            }
-                        }
-
-                    }else {
-                        createOrderParam.setType(chainPoolAddress.getAssignType());
-                        createOrderParam.setAccountId(chainPoolAddress.getAssignedId());
-                    }
+                    createOrderParam.setType(chainPoolAddress.getAssignType());
+                    createOrderParam.setAccountId(chainPoolAddress.getAssignedId());
                     if(reason.getBoolean("success")){
                         chainAddressIncome.setEffective(1);
                         //创建充值订单

@@ -18,9 +18,13 @@ public interface IChainPoolAddressService extends IService<ChainPoolAddress> {
 
     ChainPoolAddress getValidAddress(String address, String netName);
 
-    void unbindAddress(String address);
+    void deleteAddress(String address);
 
     ChainPoolAddress getByAddress(String address);
 
     List<ChainPoolAddress> getAssignedByNet(String netName);
+
+    void unbindAddress(String address);
+
+    List<ChainPoolAddress> getNoAssignedAddress(String netName);
 }

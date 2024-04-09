@@ -65,7 +65,7 @@ public class ChainPoolAddressServiceImpl extends ServiceImpl<ChainPoolAddressMap
     }
 
     @Override
-    public void unbindAddress(String address) {
+    public void deleteAddress(String address) {
         LambdaUpdateWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(ChainPoolAddress::getAddress,address);
         wrapper.set(ChainPoolAddress::getIsDelete,1);
@@ -84,6 +84,23 @@ public class ChainPoolAddressServiceImpl extends ServiceImpl<ChainPoolAddressMap
         LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ChainPoolAddress::getNetName, netName);
         wrapper.eq(ChainPoolAddress::getIsAssigned,1);
+        return list(wrapper);
+    }
+
+    @Override
+    public void unbindAddress(String address) {
+        LambdaUpdateWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(ChainPoolAddress::getAddress,address);
+        wrapper.set(ChainPoolAddress::getIsAssigned,0);
+        wrapper.set(ChainPoolAddress::getAssignType,0);
+        update(wrapper);
+    }
+
+    @Override
+    public List<ChainPoolAddress> getNoAssignedAddress(String netName) {
+        LambdaQueryWrapper<ChainPoolAddress> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ChainPoolAddress::getNetName,netName);
+        wrapper.eq(ChainPoolAddress::getIsAssigned,0);
         return list(wrapper);
     }
 
