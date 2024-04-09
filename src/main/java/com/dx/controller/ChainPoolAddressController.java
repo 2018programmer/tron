@@ -70,7 +70,7 @@ public class ChainPoolAddressController {
     }
 
     /**
-     * 获取一个扫码支付的地址
+     * 获取扫码支付的地址
      * @return
      */
     @PostMapping("/scan-address/get")
