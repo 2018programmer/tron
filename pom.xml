@@ -14,6 +14,7 @@
         <module>blockchain-service</module>
         <module>ex</module>
         <module>tron-sdk</module>
+        <module>futures</module>
     </modules>
 
     <properties>
