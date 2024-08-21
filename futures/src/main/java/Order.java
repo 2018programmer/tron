@@ -1,14 +1,23 @@
 public class Order {
     private String id;
     private String symbol;
-    private String type; // "BUY" or "SELL"
+    private String type; // ORDER_TYPE_BUY 或 ORDER_TYPE_SELL
     private double amount;
     private double price;
-    private String status;
+    private String status; // ORDER_STATUS_OPEN, ORDER_STATUS_FILLED, ORDER_STATUS_PARTIALLY_FILLED, ORDER_STATUS_CANCELLED
     private long timestamp;
+    private boolean systemTradable; // 是否可以系统级别交易
 
     public String getId() {
         return id;
+    }
+
+    public boolean isSystemTradable() {
+        return systemTradable;
+    }
+
+    public void setSystemTradable(boolean systemTradable) {
+        this.systemTradable = systemTradable;
     }
 
     public void setId(String id) {

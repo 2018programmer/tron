@@ -9,28 +9,49 @@ public class Main {
     public static  RedisTemplate<String,Object> redisTemplate = null ;
 
     public static void main(String[] args) {
-        // 如下需要整改 然后给出全部完整代码
-        // 增加取消订单功能 。
-        // 返回的内容 也包装成对象 calculatePotentialProfit(String orderId, double currentPrice) {
-        // recordTrade里面的map用对象实现 同时给出字段注释 和 getter setter
-        // 需要判断equals==“”的地方 都优化成常量来表示。并且为每个常量注释。
-        // 加入一个回调用监听函数 实现可以读取到新交易成功记录的函数 （应该是 redisTemplate.opsForHash().putAll("trade:" + tradeId, tradeInfo);redisTemplate.opsForList().leftPush("tradeHistory:" + symbol, tradeId); 存入的数据 对不对）。返回所有关联到的已知信息
-        // 买入/卖出 增加系统级别。（为CryptoContractTrading对象增加一个设定不同symbol的当前价格属性 当订单买入/卖出时候 即便没有对应出售订单 也能完成交易 。同时order 字段增加一个属性 是否可以系统级别交易）。 为Order的全部字段加注释
-        // 新增一个函数。功能给出一个价格分段值 和价格。比如10,160（那么如价格130 140 150 170 180 190就是区间） 100（100 200 300），然后返回给出所有挂单的区间对应数量（四舍五入）
+        systemTradable字段有了，但是交易时候代码没有修改。systemTradable==true的时候如果对手方也是systemtrade 那么两者不应该产生交易。第二 ：爆仓价格设计的不对，应该order加个张数字段。getStopOutPrice直接传递order对象。 爆仓价格计算规则是 1. 多头仓位（Long Position）爆仓价格计算公式：
 
-        // 模拟 5个买10个卖的测试函数
-        // 增加一个函数 输入订单号 返回值是价格。这个价格指的是买入的订单到达爆仓的条件
+        爆仓价格=开仓价格×(1−1杠杆倍数)\text{爆仓价格} = \text{开仓价格} \times \left( 1 - \frac{1}{\text{杠杆倍数}} \right)爆仓价格=开仓价格×(1−杠杆倍数1​)
 
-        String orderId = "someOrderId";
-        double currentPrice = 55000.0;
+        2. 空头仓位（Short Position）爆仓价格计算公式：
+
+        爆仓价格=开仓价格×(1+1杠杆倍数)\text{爆仓价格} = \text{开仓价格} \times \left( 1 + \frac{1}{\text{杠杆倍数}} \right)爆仓价格=开仓价格×(1+杠杆倍数1​)
         CryptoContractTrading cryptoContractTrading = new CryptoContractTrading(redisTemplate);
-        Map<String, Double> result = cryptoContractTrading.calculatePotentialProfit(orderId, currentPrice);
+         testOrderBookAndStopOut(cryptoContractTrading);
+    }
 
-        if (result != null) {
-            System.out.println("Potential Profit: " + result.get("potentialProfit"));
-            System.out.println("Remaining Amount: " + result.get("remainingAmount"));
-        } else {
-            System.out.println("Order not found or already filled");
+    /**
+     * 测试订单簿和爆仓价格
+     */
+    public static void testOrderBookAndStopOut(CryptoContractTrading cryptoContractTrading) {
+        String symbol = "BTC/USDT";
+
+        // 创建 5 个买单
+        for (int i = 0; i < 5; i++) {
+            Order buyOrder = new Order(symbol, CryptoContractTrading.ORDER_TYPE_BUY, 1.0, 50000.0 - i * 100, ORDER_STATUS_OPEN, true);
+            cryptoContractTrading.placeOrder(buyOrder);
+        }
+
+        // 创建 10 个卖单
+        for (int i = 0; i < 10; i++) {
+            Order sellOrder = new Order(symbol, CryptoContractTrading.ORDER_TYPE_SELL, 1.0, 51000.0 + i * 100, ORDER_STATUS_OPEN, true);
+            cryptoContractTrading.placeOrder(sellOrder);
+        }
+
+        // 输出订单簿快照
+        double[] priceIntervals = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200};
+        Map<Double, Double> orderBookSnapshot = cryptoContractTrading.getOrderBookSnapshot(symbol, priceIntervals);
+
+        for (Map.Entry<Double, Double> entry : orderBookSnapshot.entrySet()) {
+            System.out.printf("Price Interval: %.2f - %.2f, Total Volume: %.2f%n",
+                    entry.getKey(), entry.getKey() + 10, entry.getValue());
+        }
+
+        // 测试爆仓价格
+        for (int i = 0; i < 5; i++) {
+            String buyOrderId = "buyOrder-" + i;
+            double stopOutPrice = cryptoContractTrading.getStopOutPrice(buyOrderId);
+            System.out.printf("Buy Order %s: Stop Out Price = %.2f%n", buyOrderId, stopOutPrice);
         }
     }
 }
