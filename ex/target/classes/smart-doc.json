@@ -1,0 +1,12 @@
+{
+  "serverUrl": "http://192.168.222.241:8087/blockchain-service",
+  "isStrict": false, //是否开启严格模式
+  "outPath": "target/doc",
+  "projectName": "chain-service",//配置自己的项目名称
+  "appToken": "19fc608344a04379b372c8f4a4f98580", //torna平台appToken,@since 2.0.9
+  "openUrl": "http://torna.dx.com/api",//torna平台地址，填写自己的私有化部署地址@since 2.0.9
+  "debugEnvName":"本地", //torna测试环境
+  "replace": true,//推送torna时替换旧的文档,
+  "tornaDebug": true,
+  "debugEnvUrl":"http://192.168.222.241:8087/blockchain-service"//torna
+}

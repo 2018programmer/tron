@@ -14,7 +14,11 @@
 
 
     <dependencies>
-
+        <dependency>
+            <groupId>com.dx</groupId>
+            <artifactId>futures</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -30,16 +34,16 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>com.alibaba.boot</groupId>
-            <artifactId>nacos-config-spring-boot-starter</artifactId>
-            <version>${nacos.config.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.boot</groupId>
-            <artifactId>nacos-discovery-spring-boot-starter</artifactId>
-            <version>${nacos.discovery.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.boot</groupId>-->
+<!--            <artifactId>nacos-config-spring-boot-starter</artifactId>-->
+<!--            <version>${nacos.config.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.boot</groupId>-->
+<!--            <artifactId>nacos-discovery-spring-boot-starter</artifactId>-->
+<!--            <version>${nacos.discovery.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
@@ -152,7 +156,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
             <configuration>
-                <mainClass>com.dx.BlockchainServiceApplication</mainClass>
+                <mainClass>com.dx.Exchange</mainClass>
             </configuration>
             <executions>
                 <execution>
